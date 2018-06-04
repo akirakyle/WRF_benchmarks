@@ -1,0 +1,186 @@
+#!/bin/sh
+
+input=namelist.input
+output=rsl.out.0000
+file=$output
+recur=
+table=
+items=
+dir=
+filter=2
+tstep=1
+ists=
+width=28
+min_width=4
+isheader=
+header_only=
+
+help() {
+        echo ""
+        echo "Usage: ${0##*/} [OPTIONS]"
+        echo "Analyzes timing output info for WRF runs"
+        echo ""
+        echo "OPTIONS:"
+        echo "    -a, --all                 Includes all timesteps, including those involving disk I/O (default: off)"
+        echo "    -d, --dir   DIR1 DIR2 ... Specifies a space-delimited list of run directories"
+        echo "    -f, --file  RSL_OUT_FILE  Name of output file containing timing info (default: ${output})"
+        echo "    -s, --timestep TSTEP      Use TSTEP (seconds) to compute speed (default: automatically detected)"
+        echo "    -r, --recursive           Search for RSL_OUT_FILE(s) recursively starting from run directories"
+        echo "    -t, --table               Produces a report in tabular format"
+        echo "    -H, --header              Includes table header"
+        echo "    -T, --top                 Prints table header and exits"
+        echo "    -w, --width WIDTH         Use WIDTH characters for file names (default: ${width}, min: ${min_width})"
+        echo "    -x, --extended            Use extended-format output file name (rsl.out.00000000)"
+        echo "    -h, --help                This help"
+        echo ""
+        exit 0
+}
+
+
+while test $# -gt 0
+do
+    case $1 in
+        -a|--all)
+            filter=1
+            shift
+            ;;
+        -d|--dir)
+            shift
+            dir=$@
+            break
+            ;;
+        -f|--file)
+            output=$2
+            shift ; shift ;
+            ;;
+        -r|--recursive)
+            recur=1
+	    shift
+            ;;
+        -s|--timestep)
+            ists=1
+            tstep=$2
+	    shift
+	    shift
+            ;;
+        -t|--table)
+            table=1
+	    shift
+            ;;
+        -w|--width)
+            width=$2
+	    shift
+	    shift
+            ;;
+        -h|--help)
+            help
+            shift
+            ;;
+        -H|--header)
+            isheader=1
+	    shift
+	    ;;
+        -T|--top)
+            isheader=1
+            header_only=1
+	    table=1
+	    shift
+	    ;;
+        -x|--extended)
+            output=rsl.out.00000000
+	    shift
+	    ;;
+	*)
+	    shift
+	    ;;
+esac
+done
+
+if [ -n "${table}" ]; then
+
+	if [ ${width} -lt ${min_width} ]; then
+    		width=${min_width}
+	fi
+
+	header_seq="-----------------------------------------------------------------------------------------------------"
+	for ((i=0;i<${width};i++))
+	do
+		header_seq="${header_seq}-"
+	done
+
+	width_s=
+	for ((i=0;i<$(( ${width} - 4 ));i++))
+	do
+		width_s="${width_s} "
+	done
+
+	if [ -n "${isheader}" ]; then
+		printf "File%s Comp: Total(s)  Steps  Avg.(s/step)        Speed    I/O: Total(s)  Avg.(s/step)   XxY      CPUs\n" "${width_s}"
+		echo "${header_seq}"
+		if [ -n "${header_only}" ]; then
+		exit 0
+		fi
+	fi
+
+fi
+
+if [ -n "${recur}" ]; then
+	file=`find ${dir:-.} -name ${output} -print`
+elif [ "$dir" != "" ]; then
+	file=
+	for d in $dir
+	do
+		[ -r $d/$output ] && file="$file $d/$output"
+	done
+fi
+
+
+for out in $file
+do
+        if [ "${ists}" == "" ]; then
+		tstep=`fgrep 'time_step ' ${out%/*}/${input} | cut -d= -f2 | sed -e"s/,/ /g" -e"s/ //g"`
+        fi
+
+        offset=
+	if [ -n "${filter}" ]; then
+		offset=`grep -A3 Writing $out 2>/dev/null | fgrep "Timing for main:" | awk 'BEGIN{i=0;t=0}{i=i+1;t=t+$9}END{printf("-v io=%d -v to=%f",i,t)}'`
+		#echo "offset=$offset"
+	fi
+
+	if [ "$table" == "" ]; then
+
+		[ ! -r $out ] && { echo File $out not found; exit 1; }
+
+		grep "Timing for main:.*domain  *1" $out | tail -n +$filter | 
+			awk ${offset} -v s=${tstep} 'BEGIN{t=0;at=0;i=0;}{t=t+$9;i=i+1;}\
+			END{t=t-to;i=i-io;printf("Total Time: %10.5fs\n",t);\
+				at=t/i; \
+				print "Average Time: " at " sec/step over " i " time steps"; \
+				print "Simulation speed: s/"at}'
+
+		echo
+		echo "I/O Statistics"
+		grep Writing $out | 
+			awk 'BEGIN{t=0;at=0;i=0;}{t=t+$8;i=i+1;}\
+			END{printf("Total Time: %10.5fs\n",t);\
+				at=t/i; \
+				print "Average Time: " at " sec/step over " i " time steps"}'
+ 		echo 
+	else
+       	 	printf "%${width}.${width}s " $out
+     		grep "Timing for main:.*domain  *1" $out 2>/dev/null | tail -n +$filter | 
+			awk ${offset} -v s=${tstep} 'BEGIN{t=0;i=0;}{t=t+$9;i=i+1}\
+			END{t=t-to;i=i-io;if (i>0) {at=t/i;printf("%12.5f  %5i  %12.5f  %12.5f",t,i,at,s/at)}\
+				else {printf("      --        --        --            --     ")}}'
+		grep Writing $out 2>/dev/null | 
+			awk 'BEGIN{t=0;i=0;}{t=t+$8;i=i+1;}\
+			END{if (i>0) {printf("    %12.5f  %12.5f",t,t/i)}\
+				else {printf("         --            --     ")}}'
+		grep Ntasks $out 2>/dev/null | sed -e"s/,/ /g" |
+			awk '{x=$4;y=$8;}END{if (NR>0) {printf("    %ix%i\t%i\n",x,y,x*y)}\
+				else {printf("      -- \t--\n")}}'
+	fi
+
+done
+
+exit 0
