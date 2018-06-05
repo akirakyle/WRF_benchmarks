@@ -1,0 +1,23 @@
+* Benchmarks for WRF
+This repo contains benchmark cases used for assessing the scaling performance of
+WRF on NCAR's Cheyenne Supercomputer.
+
+Each directory contains the namelists for WPS and WRF necessary for running the
+case.
+
+The Katrina data can be downloaded using curl from the WRF tutorial page
+
+#+begin_src sh
+curl http://www2.mmm.ucar.edu/wrf/TUTORIAL_DATA/Katrina.tar.gz -o Katrina.tar.gz
+tar -xf Katrina.tar
+#+end_src
+
+The ~scripts~ directory contains useful shell scripts for creating the run
+directory for each case and linking all the necessary data files and executable.
+
+For example to run the ~katrina-3km~ case, (assuming you've compiled serial WPS
+and dmpar WRF) you should edit the top of the ~link_katrina~ scripts to provide
+the correct paths to the ~RUN_DIR~, ~DATA_DIR~, ~SCRIPTS_DIR~, ~WPS_DIR~
+~WRF_DIR~, ~NAMELIST_DIR~. Then run ~link_katrina~, change to the ~$RUN_DIR~,
+execute ~./run_wps~, and finally submit the job with ~qsub
+cheyenne_real_and_wrf.sh~.

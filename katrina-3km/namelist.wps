@@ -12,11 +12,8 @@
  parent_grid_ratio =   1,
  i_parent_start    =   1,
  j_parent_start    =   1,
- e_we              =  98,
- e_sn              =  70,
- e_we                                = 425,
- e_sn                                = 300,
- e_vert                              = 35,
+ e_we              =  1024,
+ e_sn              =  1024,
  !
  !!!!!!!!!!!!!!!!!!!!!!!!!!!! IMPORTANT NOTE !!!!!!!!!!!!!!!!!!!!!!!!!!!!
  ! The default datasets used to produce the HGT_M, GREENFRAC, 
@@ -33,8 +30,8 @@
  !!!!!!!!!!!!!!!!!!!!!!!!!!!! IMPORTANT NOTE !!!!!!!!!!!!!!!!!!!!!!!!!!!!
  !
  geog_data_res = 'default',
- dx = 12000,
- dy = 12000,
+ dx = 3000,
+ dy = 3000,
  map_proj = 'mercator',
  ref_lat   =  25.00,
  ref_lon   = -89.00,

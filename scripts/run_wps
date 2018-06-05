@@ -1,0 +1,5 @@
+#!/bin/sh
+
+./ungrib.exe >& ungrib_data.log
+./geogrid.exe
+./metgrid.exe

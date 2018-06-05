@@ -1,0 +1,18 @@
+#!/bin/sh
+
+if [ -z "$1" ]; then
+    WPS_DIR=WPS
+else
+    WPS_DIR=$1
+fi
+
+if [ -z "$2" ]; then
+    TABLE=GFS
+else
+    TABLE=$2
+fi
+
+ln -sf $WPS_DIR/ungrib.exe .
+ln -sf $WPS_DIR/geogrid.exe .
+ln -sf $WPS_DIR/metgrid.exe .
+ln -sf $WPS_DIR/ungrib/Variable_Tables/Vtable.$TABLE Vtable
