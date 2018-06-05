@@ -3,7 +3,7 @@
 #PBS -N cheyenne_real_and_wrf
 ### Project code
 #PBS -A SCSG0002
-#PBS -l walltime=00:30:00
+#PBS -l walltime=01:00:00
 #PBS -q regular
 ### Merge output and error files
 #PBS -j oe
