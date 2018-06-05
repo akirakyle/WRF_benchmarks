@@ -29,7 +29,7 @@
  /
 
  &domains
- time_step                           = 15,
+ time_step                           = 30,
  time_step_fract_num                 = 0,
  time_step_fract_den                 = 1,
  max_dom                             = 1,
@@ -39,8 +39,8 @@
  p_top_requested                     = 5000,
  num_metgrid_levels                  = 27,
  num_metgrid_soil_levels             = 4,
- dx                                  = 3000,
- dy                                  = 3000,
+ dx                                  = 1000,
+ dy                                  = 1000,
  grid_id                             = 1,
  parent_id                           = 0,
  i_parent_start                      = 1,

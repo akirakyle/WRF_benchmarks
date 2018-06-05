@@ -15,9 +15,12 @@ tar -xf Katrina.tar
 The ~scripts~ directory contains useful shell scripts for creating the run
 directory for each case and linking all the necessary data files and executable.
 
-For example to run the ~katrina-3km~ case, (assuming you've compiled serial WPS
-and dmpar WRF) you should edit the top of the ~link_katrina~ scripts to provide
-the correct paths to the ~RUN_DIR~, ~DATA_DIR~, ~SCRIPTS_DIR~, ~WPS_DIR~
-~WRF_DIR~, ~NAMELIST_DIR~. Then run ~link_katrina~, change to the ~$RUN_DIR~,
-execute ~./run_wps~, and finally submit the job with ~qsub
-cheyenne_real_and_wrf.sh~.
+For example to run the ~katrina-3km~ case:
+- Compile WRF and WPS
+- Edit the top of the ~link_katrina~ script:
+  - Provide the correct paths to the ~RUN_DIR~, ~DATA_DIR~, ~SCRIPTS_DIR~,
+    ~WPS_DIR~ ~WRF_DIR~, ~NAMELIST_DIR~.
+- Run ~link_katrina 3km~
+- Change to the ~$RUN_DIR~
+- Execute ~./run_wps~
+- Submit the job with ~qsub cheyenne_real_and_wrf.sh~
