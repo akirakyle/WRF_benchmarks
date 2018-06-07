@@ -1,0 +1,84 @@
+#!/bin/sh
+
+set -e
+
+help() {
+    echo ""
+    echo "Usage: ${0##*/} [-h] [-d DIR] [-t NUM] -w WRF1 WRF2 ... -n X Y Z ... -c CASE1 CASE2 ..."
+    echo "Creates and submits a series of PBS jobs scripts for all combinations of parameters"
+    echo ""
+    echo "OPTIONS:"
+    echo "    -w, --wrfs  WRF_DIR LIST     Directories of compiled WRF versions to use."
+    echo "    -n, --nodes NUM_NODES LIST   Number of nodes to use."
+    echo "    -c, --cases CASE_DIR LIST    Directories with cases to run, each containing a namelist.input, wrfbdy, and wrfinput or wrfrst."
+    echo "    -t, --trial NUM              A trial number to avoid overwriting a previous run with the same parameters. [default 1]"
+    echo "    -h, --help                   This help"
+    echo ""
+    exit 0
+}
+
+wnc_flags=(false false false)
+TRIAL_NUM=1
+
+while test $# -gt 0
+do
+    case $1 in
+        -w|--wrfs)
+            wnc_flags=(true false false) ;;
+        -n|--nodes)
+            wnc_flags=(false true false) ;;
+        -c|--cases)
+            wnc_flags=(false false true) ;;
+        -t|--trial)
+            wnc_flags=(false false false)
+            TRIAL_NUM=$2
+            shift ;;
+        -h|--help)
+            help ;;
+	      *)
+            if [ "${wnc_flags[0]}" = true ] ; then
+                WRFs+=("$1")
+            elif [ "${wnc_flags[1]}" = true ] ; then
+                NODES+=($1)
+            elif [ "${wnc_flags[2]}" = true ] ; then
+                CASES+=("$1")
+            fi
+	          ;;
+    esac
+	  shift
+done
+
+for CASE_NAME in $CASES
+do
+    for WRF_NAME in $WRFs
+    do
+        for N in $NODES
+        do
+            JOB_NAME=${CASE_NAME}-${WRF_NAME}-${N}-${TRIAL_NUM}
+            RUN_DIR=~/work/run
+            mkdir -p $RUN_DIR/$JOB_NAME
+            cd $RUN_DIR/$JOB_NAME
+
+            ln -sf ~/work/WRFs/${WRF_NAME}/run/* .
+            ln -sf ~/work/cases/${CASE_NAME}/* . # must be second to overwrite default namelist.input
+
+            envsubst '${JOB_NAME},${N}' > cheyenne_wrf.pbs << EOF
+#!/bin/bash
+#PBS -N ${JOB_NAME}
+#PBS -A SCSG0002
+#PBS -l walltime=00:30:00
+#PBS -q regular
+#PBS -j oe
+#PBS -l select=${N}:ncpus=36:mpiprocs=36
+#PBS -m abe
+#PBS -M akirak@ucar.edu
+
+export TMPDIR=/glade/scratch/$USER/temp
+mkdir -p $TMPDIR
+
+./mpirun_wrf
+EOF
+            qsub $JOB_NAME.pbs
+        done
+    done
+done

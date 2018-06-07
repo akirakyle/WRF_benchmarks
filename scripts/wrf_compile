@@ -2,6 +2,8 @@
 
 set -e
 
+# TODO: theres a bug when using this script to compile WRF with mvapich
+
 help() {
     echo ""
     echo "Usage: ${0##*/} [OPTIONS]"

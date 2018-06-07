@@ -1,37 +1,41 @@
 * Benchmarks for WRF
-This repo contains benchmark cases used for assessing the scaling performance of
-WRF on NCAR's Cheyenne Supercomputer.
+This repo documents the benchmark cases used for assessing the scaling
+performance of WRF on NCAR's Cheyenne Supercomputer.
 
-Each directory contains the namelists for WPS and WRF necessary for running the
-case.
+- ~namelists/~ contains the namelists for WPS and WRF for the various benchmark
+  cases.
+- ~scripts/~ contains useful scripts for automating the compilation, running,
+  and analysis of the WRF test cases
 
-The Katrina data can be downloaded using curl from the WRF tutorial page
+** WRF compilation
+~wrf_compile~ will compile WRF from source with the given options. See
+~wrf_compile --help~
+
+For both WRF3.9.1.1 and WRFV3.8.1:
+- compiler option 15 = dmpar - INTEL (ifort/icc)
+- nest option 1 = basic
+
+Example invocations of ~wrf_compile~ on cheyenne:
 
 #+begin_src sh
-curl http://www2.mmm.ucar.edu/wrf/TUTORIAL_DATA/Katrina.tar.gz -o Katrina.tar.gz
-tar -xf Katrina.tar
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 \
+    --compile 15 \
+    --nest 1 \
+    --mpiexec mpiexec_mpt \
+    --modules \
+    ncarenv/1.2 \
+    intel/18.0.1 \
+    ncarcompilers/0.4.1 \
+    mpt/2.18 \
+    netcdf/4.6.0
 #+end_src
 
-The ~scripts~ directory contains useful shell scripts for creating the run
-directory for each case and linking all the necessary data files and executable.
-
-For example to run the ~katrina-3km~ case:
-- Compile WRF and WPS
-- Edit the top of the ~link_katrina~ script:
-  - Provide the correct paths to the ~RUN_DIR~, ~DATA_DIR~, ~SCRIPTS_DIR~,
-    ~WPS_DIR~ ~WRF_DIR~, ~NAMELIST_DIR~.
-- Run ~link_katrina 3km~
-- Change to the ~$RUN_DIR~
-- Execute ~./run_wps~
-- Submit the job with ~qsub cheyenne_real_and_wrf.sh~
-
 #+begin_src sh
-# compile 15 = dmpar - INTEL (ifort/icc)
-# nest 1 = basic
-
 wrf_compile \
     --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 \
+    --wrfdir ~/work/WRFs/WRFV3.8.1-intel-dmpar-mpt2.18 \
     --compile 15 \
     --nest 1 \
     --mpiexec mpiexec_mpt \
@@ -47,16 +51,167 @@ wrf_compile \
 export PATH=/glade/u/apps/ch/opt/mvapich2/2.2/gnu/7.1.0/bin/:$PATH
 
 wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
-    --outdir ~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz\
+    --outdir ~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mvapich2.2 \
     --compile 15 \
     --nest 1 \
-    --mpiexec "mpirun_rsh -hostfile $PBS_NODEFILE -n $1"  \
+    --mpiexec \
+    "export PATH=/glade/u/apps/ch/opt/mvapich2/2.2/gnu/7.1.0/bin/:$PATH\n\
+        mpirun_rsh -hostfile $PBS_NODEFILE -n $1"  \
     --modules \
     ncarenv/1.2 \
     intel/18.0.1 \
     ncarcompilers/0.4.1 \
-    mpt/2.18 \
     netcdf/4.6.0
-
 #+end_src
+
+#+begin_src sh
+export PATH=/glade/u/apps/ch/opt/mvapich2/2.2/gnu/7.1.0/bin/:$PATH
+
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
+    --outdir ~/work/WRFs/WRFV3.8.1-intel-dmpar-mvapich2.2 \
+    --compile 15 \
+    --nest 1 \
+    --mpiexec \
+    "export PATH=/glade/u/apps/ch/opt/mvapich2/2.2/gnu/7.1.0/bin/:$PATH\n\
+        mpirun_rsh -hostfile $PBS_NODEFILE -n $1"  \
+    --modules \
+    ncarenv/1.2 \
+    intel/18.0.1 \
+    ncarcompilers/0.4.1 \
+    netcdf/4.6.0
+#+end_src
+
+** Example pbs job scripts for cheyenne
+#+begin_src sh
+#!/bin/bash
+### Job Name
+#PBS -N cheyenne_wrf
+### Project code
+#PBS -A SCSG0002
+#PBS -l walltime=00:20:00
+#PBS -q regular
+### Merge output and error files
+#PBS -j oe
+### Select 2 nodes with 36 CPUs each for a total of 72 MPI processes
+#PBS -l select=2:ncpus=36:mpiprocs=36
+### Send email on abort, begin and end
+#PBS -m abe
+### Specify mail recipient
+#PBS -M akirak@ucar.edu
+
+export TMPDIR=/glade/scratch/$USER/temp
+mkdir -p $TMPDIR
+
+### Run the executable
+mpiexec_mpt ./wrf.exe
+#+end_src
+
+~real.exe~ must also be run with mpi
+#+begin_src sh
+mpiexec_mpt ./real.exe
+#+end_src
+
+To profile with ~arm-map~
+#+begin_src sh
+module load arm-forge/18.1.2
+# map --connect ./wrf.exe # for live, interactive profiling
+map --profile ./wrf.exe # for generating profile file to be loaded later
+#+end_src
+
+To profile with ~arm-reports~
+#+begin_src sh
+module load arm-reports/18.1.2
+perf-report -mpi -n 72 ./wrf.exe
+#+end_src
+
+To use ~mvapich~ instead of ~mpt~
+#+begin_src sh
+ml reset
+ml rm mpt/2.15f
+
+export PATH=/glade/u/apps/ch/opt/mvapich2/2.2/gnu/7.1.0/bin/:$PATH
+
+mpirun_rsh -hostfile $PBS_NODEFILE -n 72 ./wrf.exe
+#+end_src
+
+** Batch PBS job scripts generation and submission
+~wrf_run_pbs_jobs~ will create the run directories and pbs job scripts necessary
+to run the given WRF versions with the given node counts and benchmark cases.
+See ~wrf_run_pbs_jobs --help~.
+
+Example invocations of ~wrf_run_pbs_jobs~:
+#+begin_src sh
+wrf_run_pbs_jobs \
+    --wrfs \
+    "WRFV3.8.1-intel-dmpar-mpt2.18" \
+    --nodes 2 \
+    --cases \
+    "conus12km" \
+    --trial 1
+#+end_src
+
+#+begin_src sh
+wrf_run_pbs_jobs \
+    --wrfs \
+    "WRFV3.9.1.1-intel-dmpar-mpt2.18" \
+    "WRFV3.8.1-intel-dmpar-mpt2.18" \
+    "WRFV3.9.1.1-intel-dmpar-mvapich2.2" \
+    --nodes 2 4 8 16 32 64 128 256 512 \
+    --cases \
+    "conus12km" \
+    "conus2.5km" \
+    "katrina1km" \
+    "katrina3km" \
+    "tracer_simple_01" \
+    "dust_simple_01" \
+    --trial 1
+#+end_src
+
+** The benchmark cases
+*** katrina
+The Katrina data can be downloaded using curl from the WRF tutorial page
+
+#+begin_src sh
+curl http://www2.mmm.ucar.edu/wrf/TUTORIAL_DATA/Katrina.tar.gz -o Katrina.tar.gz
+tar -xf Katrina.tar
+#+end_src
+
+To generate the necessary ~wrfbdy_d01~ and ~wrfinput_d01~ WRF input data, one
+needs to run WPS on the above Katrina data. Once WPS is compiled, the following
+script can be modified to create a run directory for WPS and generate a
+directory with the case data files which can then be passed into
+~wrf_run_pbs_jobs~
+
+#+begin_src sh
+#!/bin/sh
+# TODO: THIS ISN'T THE CORRECT SCRIPT, WILL BE UPDATED SOON!
+
+CASE_NAME=$1
+RUN_DIR=~/work/katrina-$CASE_NAME
+DATA_DIR=~/data/Katrina
+SCRIPTS_DIR=~/WRF_benchmarks/scripts
+WPS_DIR=~/WPS
+WRF_DIR=~/WRF
+NAMELIST_DIR=~/WRF_benchmarks/katrina-$CASE_NAME
+
+mkdir -p $RUN_DIR
+cd $RUN_DIR
+
+ln -sf $NAMELIST_DIR/namelist.wps .
+ln -sf $NAMELIST_DIR/namelist.input .
+
+#ln -sf $SCRIPTS_DIR/cheyenne_real.sh .
+#ln -sf $SCRIPTS_DIR/cheyenne_wrf.sh .
+ln -sf $SCRIPTS_DIR/cheyenne_real_and_wrf.sh .
+ln -sf $SCRIPTS_DIR/run_wps .
+
+$SCRIPTS_DIR/link_wps $WPS_DIR GFS
+$WPS_DIR/link_grib.csh $DATA_DIR/avn
+$SCRIPTS_DIR/link_wrf $WRF_DIR
+#+end_src
+*** TODO katrina1km
+*** TODO katrin3km
+*** TODO conus12km
+*** TODO conus2.5km
