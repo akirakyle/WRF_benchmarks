@@ -19,17 +19,16 @@ set -e
 export TMPDIR=/glade/scratch/$USER/temp
 mkdir -p $TMPDIR
 
-WRF_NAME=WRFV3.9.1.1-intel-dmpar-mpt2.18
-RUN_DIR=~/work/run/conus12km/$WRF_NAME/2nodes
+WRF_NAME=WRFV3.8.1-intel-dmpar-mpt2.18
+CASE_NAME=conus12km
+
+RUN_DIR=~/work/run/$CASE_NAME/$WRF_NAME/test
 mkdir -p $RUN_DIR
 cd $RUN_DIR
 
-# link the necessary files into the run directory
-ln -s ~/work/cases/conus12km/* .
+ln -s ~/work/cases/$CASE_NAME/* .
 ln -s ~/work/WRFs/$WRF_NAME/run/* .
 
-module load $WRF_NAME
-
 ### Run the executable
-mpiexec_mpt ./wrf.exe
+./mpirun_wrf
 

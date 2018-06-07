@@ -24,3 +24,39 @@ For example to run the ~katrina-3km~ case:
 - Change to the ~$RUN_DIR~
 - Execute ~./run_wps~
 - Submit the job with ~qsub cheyenne_real_and_wrf.sh~
+
+#+begin_src sh
+# compile 15 = dmpar - INTEL (ifort/icc)
+# nest 1 = basic
+
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 \
+    --compile 15 \
+    --nest 1 \
+    --mpiexec mpiexec_mpt \
+    --modules \
+    ncarenv/1.2 \
+    intel/18.0.1 \
+    ncarcompilers/0.4.1 \
+    mpt/2.18 \
+    netcdf/4.6.0
+#+end_src
+
+#+begin_src sh
+export PATH=/glade/u/apps/ch/opt/mvapich2/2.2/gnu/7.1.0/bin/:$PATH
+
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
+    --outdir ~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 \
+    --compile 15 \
+    --nest 1 \
+    --mpiexec "mpirun_rsh -hostfile $PBS_NODEFILE -n $1"  \
+    --modules \
+    ncarenv/1.2 \
+    intel/18.0.1 \
+    ncarcompilers/0.4.1 \
+    mpt/2.18 \
+    netcdf/4.6.0
+
+#+end_src

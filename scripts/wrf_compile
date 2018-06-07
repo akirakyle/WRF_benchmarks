@@ -3,18 +3,20 @@
 set -e
 
 help() {
-        echo ""
-        echo "Usage: ${0##*/} [OPTIONS]"
-        echo "Configures and compiles WRF from source"
-        echo ""
-        echo "OPTIONS:"
-        echo "    -s, --source  WRF_SOURCE.TAR.gz   gzipped tar file containing the WRF source code"
-        echo "    -o, --outdir  WRF_DIR             Location to put the compiled WRF files. Should be nonexistent or empty directory."
-        echo "    -c, --compile NUM                 Select NUM option from the WRF ./configure compiler options list. Note this number is dependent on the WRF version."
-        echo "    -n, --nest NUM                    Select NUM option for nesting from the ./configure nesting options list. Note this number is dependent on the WRF version"
-        echo "    -h, --help                        This help"
-        echo ""
-        exit 0
+    echo ""
+    echo "Usage: ${0##*/} [OPTIONS]"
+    echo "Configures and compiles WRF from source"
+    echo ""
+    echo "OPTIONS:"
+    echo "    -s, --source  WRF_SOURCE.TAR.gz     gzipped tar file containing the WRF source code"
+    echo "    -o, --wrfdir  WRF_DIR               Location to put the compiled WRF files. Should be nonexistent or empty directory."
+    echo "    -c, --compile NUM                   Select NUM option from the WRF ./configure compiler options list. Note this number is dependent on the WRF version."
+    echo "    -n, --nest NUM                      Select NUM option for nesting from the ./configure nesting options list. Note this number is dependent on the WRF version"
+    echo "    -p, --mpiexec MPIEXEC_CMD           Command to launch an executable using mpi on nodes."
+    echo "    -m, --modules MODULE1 MODULE2 ...   List of modules to be loaded into the environment for compilation and execution. Note: the order of matters here, prereqs must be loaded first."
+    echo "    -h, --help                          This help"
+    echo ""
+    exit 0
 }
 
 while test $# -gt 0
@@ -22,20 +24,28 @@ do
     case $1 in
         -s|--source)
             wrf_source=$2
-            shift
+            shift; shift;
             ;;
-        -o|--outdir)
-            shift
+        -o|--wrfdir)
             wrf_dir=$2
-            break
+            shift; shift;
             ;;
         -c|--compile)
             compile_num=$2
-            shift
+            shift; shift;
             ;;
         -n|--nest)
             nest_num=$2
+            shift; shift;
+            ;;
+        -p|--mpiexec)
+            mpiexec_cmd=$2
+            shift; shift;
+            ;;
+        -m|--modules)
             shift
+            modules=$@
+            break
             ;;
         -h|--help)
             help
@@ -47,12 +57,18 @@ do
     esac
 done
 
-if [ -z "$wrf_source" ] || [ -z "$wrf_dir" ] || [ -z "$configure_expect" ] ; then
+if [ -z "$wrf_source" ] || [ -z "$wrf_dir" ] || \
+       [ -z "$compile_num" ] || [ -z "$nest_num" ] ; then
     help
 fi
 
-$wrf_source=$(readlink -f $wrf_source)
-$configure_expect=$(readlink -f $configure_expect)
+wrf_source=$(readlink -f $wrf_source)
+
+module purge
+for mod in $modules
+do
+    module load $mod
+done
 
 mkdir -p $wrf_dir
 cd $wrf_dir
@@ -76,5 +92,13 @@ echo "expect eof" >> config_wrf.expect
 expect -f config_wrf.expect
 rm config_wrf.expect
 
-./compile em_real &> compile.log
+echo "#!/bin/sh" > run/mpirun_wrf
+echo "module purge" >> run/mpirun_wrf
+for mod in $modules
+do
+    echo "module load $mod" >> run/mpirun_wrf
+done
+echo "$mpiexec_cmd ./wrf.exe" >> run/mpirun_wrf
+chmod a+x run/mpirun_wrf
 
+./compile em_real &> compile.log
