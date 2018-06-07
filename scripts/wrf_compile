@@ -1,0 +1,80 @@
+#!/bin/sh
+
+set -e
+
+help() {
+        echo ""
+        echo "Usage: ${0##*/} [OPTIONS]"
+        echo "Configures and compiles WRF from source"
+        echo ""
+        echo "OPTIONS:"
+        echo "    -s, --source  WRF_SOURCE.TAR.gz   gzipped tar file containing the WRF source code"
+        echo "    -o, --outdir  WRF_DIR             Location to put the compiled WRF files. Should be nonexistent or empty directory."
+        echo "    -c, --compile NUM                 Select NUM option from the WRF ./configure compiler options list. Note this number is dependent on the WRF version."
+        echo "    -n, --nest NUM                    Select NUM option for nesting from the ./configure nesting options list. Note this number is dependent on the WRF version"
+        echo "    -h, --help                        This help"
+        echo ""
+        exit 0
+}
+
+while test $# -gt 0
+do
+    case $1 in
+        -s|--source)
+            wrf_source=$2
+            shift
+            ;;
+        -o|--outdir)
+            shift
+            wrf_dir=$2
+            break
+            ;;
+        -c|--compile)
+            compile_num=$2
+            shift
+            ;;
+        -n|--nest)
+            nest_num=$2
+            shift
+            ;;
+        -h|--help)
+            help
+            shift
+            ;;
+	      *)
+	          shift
+	          ;;
+    esac
+done
+
+if [ -z "$wrf_source" ] || [ -z "$wrf_dir" ] || [ -z "$configure_expect" ] ; then
+    help
+fi
+
+$wrf_source=$(readlink -f $wrf_source)
+$configure_expect=$(readlink -f $configure_expect)
+
+mkdir -p $wrf_dir
+cd $wrf_dir
+cp $wrf_source .
+gunzip *
+wrf_tar=$(ls)
+tar -xf $wrf_tar
+rm $wrf_tar
+wrf_untar_name=$(ls)
+mv $wrf_untar_name/* .
+rmdir $wrf_untar_name
+
+echo "set timeout -1" >> config_wrf.expect
+echo "spawn ./configure" >> config_wrf.expect
+echo "expect \"Enter selection\"" >> config_wrf.expect
+echo "send -- \"$compile_num\\r\"" >> config_wrf.expect
+echo "expect \"Compile for nesting?\"" >> config_wrf.expect
+echo "send -- \"$nest_num\\r\"" >> config_wrf.expect
+echo "expect eof" >> config_wrf.expect
+
+expect -f config_wrf.expect
+rm config_wrf.expect
+
+./compile em_real &> compile.log
+

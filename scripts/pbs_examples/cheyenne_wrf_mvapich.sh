@@ -1,9 +1,9 @@
 #!/bin/bash
 ### Job Name
-#PBS -N cheyenne_real_and_wrf
+#PBS -N cheyenne_wrf
 ### Project code
 #PBS -A SCSG0002
-#PBS -l walltime=01:00:00
+#PBS -l walltime=00:20:00
 #PBS -q regular
 ### Merge output and error files
 #PBS -j oe
@@ -17,6 +17,10 @@
 export TMPDIR=/glade/scratch/$USER/temp
 mkdir -p $TMPDIR
 
+ml reset
+ml rm mpt/2.15f
+
+export PATH=/glade/u/apps/ch/opt/mvapich2/2.2/gnu/7.1.0/bin/:$PATH
+
 ### Run the executable
-mpiexec_mpt ./real.exe
-mpiexec_mpt ./wrf.exe
+mpirun_rsh -hostfile $PBS_NODEFILE -n 72 ./wrf.exe
