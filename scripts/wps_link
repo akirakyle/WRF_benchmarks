@@ -1,14 +1,11 @@
 #!/bin/sh
 
-if [ -z "$1" ]; then
-    WPS_DIR=WPS
+if [ -z "$1" || -z "$2" ]; then
+    echo ""
+    echo "Usage: ${0##*/} PATH_TO_WPS_DIR Vtable_type(ex: GFS)"
+    exit 0
 else
-    WPS_DIR=$1
-fi
-
-if [ -z "$2" ]; then
-    TABLE=GFS
-else
+    WRF_DIR=$1
     TABLE=$2
 fi
 

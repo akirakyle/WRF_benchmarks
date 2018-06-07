@@ -1,7 +1,9 @@
 #!/bin/sh
 
 if [ -z "$1" ]; then
-    WRF_DIR=WRF
+    echo ""
+    echo "Usage: ${0##*/} PATH_TO_WRF_DIR"
+    exit 0
 else
     WRF_DIR=$1
 fi
