@@ -138,7 +138,7 @@ fi
 for out in $file
 do
         if [ "${ists}" == "" ]; then
-		tstep=`fgrep 'time_step ' ${out%/*}/${input} | cut -d= -f2 | sed -e"s/,/ /g" -e"s/ //g"`
+		tstep=`grep -F 'time_step ' ${out%/*}/${input} | cut -d= -f2 | sed -e"s/,/ /g" -e"s/ //g"`
         fi
 
         offset=

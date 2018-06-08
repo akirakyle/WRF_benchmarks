@@ -48,40 +48,35 @@ wrf_compile \
 #+end_src
 
 #+begin_src sh
-export PATH=/glade/u/apps/ch/opt/mvapich2/2.2/gnu/7.1.0/bin/:$PATH
-
 wrf_compile \
     --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz\
-    --outdir ~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mvapich2.2 \
+    --wrfdir ~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mvapich2.2 \
     --compile 15 \
     --nest 1 \
-    --mpiexec \
-    "export PATH=/glade/u/apps/ch/opt/mvapich2/2.2/gnu/7.1.0/bin/:$PATH\n\
-        mpirun_rsh -hostfile $PBS_NODEFILE -n $1"  \
+    --mpiexec 'mpirun_rsh -hostfile $PBS_NODEFILE -n $1'  \
     --modules \
     ncarenv/1.2 \
     intel/18.0.1 \
     ncarcompilers/0.4.1 \
+    mvapich/2.2 \
     netcdf/4.6.0
 #+end_src
 
 #+begin_src sh
-export PATH=/glade/u/apps/ch/opt/mvapich2/2.2/gnu/7.1.0/bin/:$PATH
-
 wrf_compile \
     --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
-    --outdir ~/work/WRFs/WRFV3.8.1-intel-dmpar-mvapich2.2 \
+    --wrfdir ~/work/WRFs/WRFV3.8.1-intel-dmpar-mvapich2.2 \
     --compile 15 \
     --nest 1 \
-    --mpiexec \
-    "export PATH=/glade/u/apps/ch/opt/mvapich2/2.2/gnu/7.1.0/bin/:$PATH\n\
-        mpirun_rsh -hostfile $PBS_NODEFILE -n $1"  \
+    --mpiexec 'mpirun_rsh -hostfile $PBS_NODEFILE -n $1'  \
     --modules \
     ncarenv/1.2 \
     intel/18.0.1 \
     ncarcompilers/0.4.1 \
+    mvapich/2.2 \
     netcdf/4.6.0
 #+end_src
+
 
 ** Example pbs job scripts for cheyenne
 #+begin_src sh
@@ -136,6 +131,7 @@ export PATH=/glade/u/apps/ch/opt/mvapich2/2.2/gnu/7.1.0/bin/:$PATH
 mpirun_rsh -hostfile $PBS_NODEFILE -n 72 ./wrf.exe
 #+end_src
 
+
 ** Batch PBS job scripts generation and submission
 ~wrf_run_pbs_jobs~ will create the run directories and pbs job scripts necessary
 to run the given WRF versions with the given node counts and benchmark cases.
@@ -143,31 +139,29 @@ See ~wrf_run_pbs_jobs --help~.
 
 Example invocations of ~wrf_run_pbs_jobs~:
 #+begin_src sh
-wrf_run_pbs_jobs \
-    --wrfs \
-    "WRFV3.8.1-intel-dmpar-mpt2.18" \
-    --nodes 2 \
-    --cases \
-    "conus12km" \
-    --trial 1
+wrf_run_pbs_jobs -w "~/work/WRFs/WRFV3.8.1-intel-dmpar-mpt2.18" -n 2 \
+                 -c "~/WRF_benchmarks/conus12km" --t 1
+wrf_run_pbs_jobs -w "~/work/WRFs/WRFV3.8.1-intel-dmpar-mvapich2.2" -n 2 \
+                 -c "~/WRF_benchmarks/conus12km" --t 1
 #+end_src
 
 #+begin_src sh
 wrf_run_pbs_jobs \
     --wrfs \
-    "WRFV3.9.1.1-intel-dmpar-mpt2.18" \
-    "WRFV3.8.1-intel-dmpar-mpt2.18" \
-    "WRFV3.9.1.1-intel-dmpar-mvapich2.2" \
+    "~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18" \
+    "~/work/WRFs/WRFV3.8.1-intel-dmpar-mpt2.18" \
+    "~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mvapich2.2" \
     --nodes 2 4 8 16 32 64 128 256 512 \
     --cases \
-    "conus12km" \
-    "conus2.5km" \
-    "katrina1km" \
-    "katrina3km" \
-    "tracer_simple_01" \
-    "dust_simple_01" \
+    "~/WRF_benchmarks/cases/conus12km" \
+    "~/WRF_benchmarks/cases/conus2.5km" \
+    "~/WRF_benchmarks/cases/katrina1km" \
+    "~/WRF_benchmarks/cases/katrina3km" \
+    "~/WRF_benchmarks/cases/tracer_simple_01" \
+    "~/WRF_benchmarks/cases/dust_simple_01" \
     --trial 1
 #+end_src
+
 
 ** The benchmark cases
 *** katrina
@@ -186,30 +180,27 @@ directory with the case data files which can then be passed into
 
 #+begin_src sh
 #!/bin/sh
-# TODO: THIS ISN'T THE CORRECT SCRIPT, WILL BE UPDATED SOON!
 
-CASE_NAME=$1
-RUN_DIR=~/work/katrina-$CASE_NAME
-DATA_DIR=~/data/Katrina
-SCRIPTS_DIR=~/WRF_benchmarks/scripts
-WPS_DIR=~/WPS
-WRF_DIR=~/WRF
-NAMELIST_DIR=~/WRF_benchmarks/katrina-$CASE_NAME
+CASE_NAME=-ex
+RUN_DIR=~/work/case_data/katrina$CASE_NAME
+DATA_DIR=~/work/raw_data/Katrina
+WPS_DIR=~/work/WPS
 
 mkdir -p $RUN_DIR
 cd $RUN_DIR
 
-ln -sf $NAMELIST_DIR/namelist.wps .
-ln -sf $NAMELIST_DIR/namelist.input .
+ln -sf ~/WRF_benchmarks/cases/katrina-$CASE_NAME/namelist.wps .
 
-#ln -sf $SCRIPTS_DIR/cheyenne_real.sh .
-#ln -sf $SCRIPTS_DIR/cheyenne_wrf.sh .
-ln -sf $SCRIPTS_DIR/cheyenne_real_and_wrf.sh .
-ln -sf $SCRIPTS_DIR/run_wps .
+ln -sf $WPS_DIR/ungrib.exe .
+ln -sf $WPS_DIR/geogrid.exe .
+ln -sf $WPS_DIR/metgrid.exe .
+ln -sf $WPS_DIR/ungrib/Variable_Tables/Vtable.GFS Vtable
 
-$SCRIPTS_DIR/link_wps $WPS_DIR GFS
 $WPS_DIR/link_grib.csh $DATA_DIR/avn
-$SCRIPTS_DIR/link_wrf $WRF_DIR
+
+./ungrib.exe >& ungrib_data.log
+./geogrid.exe
+./metgrid.exe
 #+end_src
 *** TODO katrina1km
 *** TODO katrin3km

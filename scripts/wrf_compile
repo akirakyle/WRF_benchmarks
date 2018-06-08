@@ -2,8 +2,6 @@
 
 set -e
 
-# TODO: theres a bug when using this script to compile WRF with mvapich
-
 help() {
     echo ""
     echo "Usage: ${0##*/} [OPTIONS]"
@@ -21,48 +19,53 @@ help() {
     exit 0
 }
 
+if [ $# -eq 0 ]; then help; fi
+
 while test $# -gt 0
 do
     case $1 in
         -s|--source)
-            wrf_source=$2
-            shift; shift;
+            if [ -z "$2" ]; then
+                echo "source directory must be specified." ; help
+            else
+                wrf_source=$2
+            fi
             ;;
         -o|--wrfdir)
-            wrf_dir=$2
-            shift; shift;
+            if [ -z "$2" ]; then
+                echo "wrf output directory must be specified." ; help
+            else
+                wrf_dir=$2
+            fi
             ;;
         -c|--compile)
-            compile_num=$2
-            shift; shift;
+            if [ -z "$2" ]; then
+                echo "compile num must be specified." ; help
+            else
+                compile_num=$2
+            fi
             ;;
         -n|--nest)
-            nest_num=$2
-            shift; shift;
+            if [ -z "$2" ]; then
+                echo "nest num must be specified." ; help
+            else
+                nest_num=$2
+            fi
             ;;
         -p|--mpiexec)
             mpiexec_cmd=$2
-            shift; shift;
             ;;
         -m|--modules)
             shift
             modules=$@
             break
             ;;
-        -h|--help)
+        *|-h|--help)
             help
-            shift
             ;;
-	      *)
-	          shift
-	          ;;
     esac
+	  shift; shift
 done
-
-if [ -z "$wrf_source" ] || [ -z "$wrf_dir" ] || \
-       [ -z "$compile_num" ] || [ -z "$nest_num" ] ; then
-    help
-fi
 
 wrf_source=$(readlink -f $wrf_source)
 
@@ -104,3 +107,5 @@ echo "$mpiexec_cmd ./wrf.exe" >> run/mpirun_wrf
 chmod a+x run/mpirun_wrf
 
 ./compile em_real &> compile.log
+
+tail compile.log
