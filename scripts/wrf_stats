@@ -102,11 +102,11 @@ if [ -n "${table}" ]; then
     		width=${min_width}
 	fi
 
-	header_seq="-----------------------------------------------------------------------------------------------------"
-	for ((i=0;i<${width};i++))
-	do
-		header_seq="${header_seq}-"
-	done
+	header_seq="|------------------------------+----------------+-------+--------------+---------------+---------------+---------------+--------+-------|"
+	#for ((i=0;i<${width};i++))
+	#do
+	#	header_seq="${header_seq}-"
+	#done
 
 	width_s=
 	for ((i=0;i<$(( ${width} - 4 ));i++))
@@ -115,7 +115,7 @@ if [ -n "${table}" ]; then
 	done
 
 	if [ -n "${isheader}" ]; then
-		printf "File%s Comp: Total(s)  Steps  Avg.(s/step)        Speed    I/O: Total(s)  Avg.(s/step)   XxY      CPUs\n" "${width_s}"
+		printf "| File%s | Comp: Total(s) | Steps | Avg.(s/step) |        Speed  | I/O: Total(s) |  Avg.(s/step) |  XxY   |  CPUs |\n" "${width_s}"
 		echo "${header_seq}"
 		if [ -n "${header_only}" ]; then
 		exit 0
@@ -167,18 +167,18 @@ do
 				print "Average Time: " at " sec/step over " i " time steps"}'
  		echo 
 	else
-       	 	printf "%${width}.${width}s " $out
+       	 	printf "| %${width}.${width}s " $out
      		grep "Timing for main:.*domain  *1" $out 2>/dev/null | tail -n +$filter | 
 			awk ${offset} -v s=${tstep} 'BEGIN{t=0;i=0;}{t=t+$9;i=i+1}\
-			END{t=t-to;i=i-io;if (i>0) {at=t/i;printf("%12.5f  %5i  %12.5f  %12.5f",t,i,at,s/at)}\
-				else {printf("      --        --        --            --     ")}}'
+			END{t=t-to;i=i-io;if (i>0) {at=t/i;printf("|   %12.5f | %5i | %12.5f | %12.5f",t,i,at,s/at)}\
+				else {printf(" |       --   |     --   |     --    |        --     ")}}'
 		grep Writing $out 2>/dev/null | 
 			awk 'BEGIN{t=0;i=0;}{t=t+$8;i=i+1;}\
-			END{if (i>0) {printf("    %12.5f  %12.5f",t,t/i)}\
-				else {printf("         --            --     ")}}'
+			END{if (i>0) {printf("  |  %12.5f | %12.5f",t,t/i)}\
+				else {printf("      |   --      |      --     ")}}'
 		grep Ntasks $out 2>/dev/null | sed -e"s/,/ /g" |
-			awk '{x=$4;y=$8;}END{if (NR>0) {printf("    %ix%i\t%i\n",x,y,x*y)}\
-				else {printf("      -- \t--\n")}}'
+			awk '{x=$4;y=$8;}END{if (NR>0) {printf("  |  %ix%i | %i |\n",x,y,x*y)}\
+				else {printf("   |   -- | -- |\n")}}'
 	fi
 
 done

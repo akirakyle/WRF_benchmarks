@@ -58,11 +58,11 @@ done
 
 PWD=$(pwd)
 
-for CASE_DIR in $CASES
+for CASE_DIR in "${CASES[@]}"
 do
-    for WRF_DIR in $WRFs
+    for WRF_DIR in "${WRFs[@]}"
     do
-        for N in $NODES
+        for N in "${NODES[@]}"
         do
             cd $PWD
             WRF_PATH=$(readlink -f $WRF_DIR)
