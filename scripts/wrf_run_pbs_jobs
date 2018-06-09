@@ -6,7 +6,6 @@ help() {
     echo ""
     echo "Usage: ${0##*/} [-h] [-d DIR] [-t NUM] -w WRF1 WRF2 ... -n X Y Z ... -c CASE1 CASE2 ..."
     echo "Creates and submits a series of PBS jobs scripts for all combinations of parameters"
-    echo "Note paths must be absolute"
     echo ""
     echo "OPTIONS:"
     echo "    -w, --wrfs  WRF_DIR LIST     Directories of compiled WRF versions to use."
@@ -57,18 +56,24 @@ do
 	  shift
 done
 
-for CASE in $CASES
+PWD=$(pwd)
+
+for CASE_DIR in $CASES
 do
-    for WRF in $WRFs
+    for WRF_DIR in $WRFs
     do
         for N in $NODES
         do
-            JOB_NAME=${CASE}-${WRF}-${N}-${TRIAL_NUM}
+            cd $PWD
+            WRF_PATH=$(readlink -f $WRF_DIR)
+            CASE_PATH=$(readlink -f $CASE_DIR)
+
+            JOB_NAME=$(basename $CASE_DIR)-$(basename $WRF_DIR)-N$N-T$TRIAL_NUM
             mkdir -p $RUN_DIR/$JOB_NAME
             cd $RUN_DIR/$JOB_NAME
 
-            ln -sf ${WRF}/run/* .
-            ln -sf ${CASE}/* . # must be second to overwrite default namelist.input
+            ln -sf $WRF_PATH/run/* .
+            ln -sf $CASE_PATH/* .  # must be second to overwrite default namelist.input
 
             envsubst '${JOB_NAME},${N}' > $JOB_NAME.pbs << EOF
 #!/bin/bash

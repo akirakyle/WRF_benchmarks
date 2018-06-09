@@ -20,6 +20,19 @@ Example invocations of ~wrf_compile~ on cheyenne:
 #+begin_src sh
 wrf_compile \
     --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.9.1.1-intel-serial \
+    --compile 13 \
+    --nest 1 \
+    --modules \
+    ncarenv/1.2 \
+    intel/18.0.1 \
+    ncarcompilers/0.4.1 \
+    netcdf/4.6.0
+#+end_src
+
+#+begin_src sh
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz\
     --wrfdir ~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 \
     --compile 15 \
     --nest 1 \
@@ -49,32 +62,17 @@ wrf_compile \
 
 #+begin_src sh
 wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mvapich2.2 \
-    --compile 15 \
-    --nest 1 \
-    --mpiexec 'mpirun_rsh -hostfile $PBS_NODEFILE -n $1'  \
-    --modules \
-    ncarenv/1.2 \
-    intel/18.0.1 \
-    ncarcompilers/0.4.1 \
-    mvapich/2.2 \
-    netcdf/4.6.0
-#+end_src
-
-#+begin_src sh
-wrf_compile \
     --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.8.1-intel-dmpar-mvapich2.2 \
-    --compile 15 \
+    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu-dmpar-mvapich2.2 \
+    --compile 34 \
     --nest 1 \
     --mpiexec 'mpirun_rsh -hostfile $PBS_NODEFILE -n $1'  \
     --modules \
     ncarenv/1.2 \
-    intel/18.0.1 \
+    gnu/6.3.0 \
     ncarcompilers/0.4.1 \
     mvapich/2.2 \
-    netcdf/4.6.0
+    netcdf/4.6.1
 #+end_src
 
 
@@ -139,32 +137,34 @@ See ~wrf_run_pbs_jobs --help~.
 
 Example invocations of ~wrf_run_pbs_jobs~:
 #+begin_src sh
-wrf_run_pbs_jobs -w "~/work/WRFs/WRFV3.8.1-intel-dmpar-mpt2.18" -n 2 \
-                 -c "~/WRF_benchmarks/conus12km" --t 1
-wrf_run_pbs_jobs -w "~/work/WRFs/WRFV3.8.1-intel-dmpar-mvapich2.2" -n 2 \
-                 -c "~/WRF_benchmarks/conus12km" --t 1
+wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/conus12km -t 1
+wrf_run_pbs_jobs -w WRFs/WRFV3.8.1-intel-dmpar-mpt2.18 -n 2 -c cases/conus12km -t 1
+wrf_run_pbs_jobs -w WRFs/WRFV3.8.1-intel-dmpar-mvapich2.2 -n 2 -c cases/conus12km -t 1
+wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/katrina-ex -t 1
+wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 8 -c cases/katrina1km -t 1
+wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/katrina3km -t 1
 #+end_src
 
 #+begin_src sh
 wrf_run_pbs_jobs \
     --wrfs \
-    "~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18" \
-    "~/work/WRFs/WRFV3.8.1-intel-dmpar-mpt2.18" \
-    "~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mvapich2.2" \
+    ~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 \
+    ~/work/WRFs/WRFV3.8.1-intel-dmpar-mpt2.18 \
+    ~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mvapich2.2 \
     --nodes 2 4 8 16 32 64 128 256 512 \
     --cases \
-    "~/WRF_benchmarks/cases/conus12km" \
-    "~/WRF_benchmarks/cases/conus2.5km" \
-    "~/WRF_benchmarks/cases/katrina1km" \
-    "~/WRF_benchmarks/cases/katrina3km" \
-    "~/WRF_benchmarks/cases/tracer_simple_01" \
-    "~/WRF_benchmarks/cases/dust_simple_01" \
+    ~/WRF_benchmarks/cases/conus12km \
+    ~/WRF_benchmarks/cases/conus2.5km \
+    ~/WRF_benchmarks/cases/katrina1km \
+    ~/WRF_benchmarks/cases/katrina3km \
+    ~/WRF_benchmarks/cases/tracer_simple_01 \
+    ~/WRF_benchmarks/cases/dust_simple_01 \
     --trial 1
 #+end_src
 
 
 ** The benchmark cases
-*** katrina
+*** katrina (1km, 3km, 30km)
 The Katrina data can be downloaded using curl from the WRF tutorial page
 
 #+begin_src sh
@@ -172,37 +172,45 @@ curl http://www2.mmm.ucar.edu/wrf/TUTORIAL_DATA/Katrina.tar.gz -o Katrina.tar.gz
 tar -xf Katrina.tar
 #+end_src
 
-To generate the necessary ~wrfbdy_d01~ and ~wrfinput_d01~ WRF input data, one
-needs to run WPS on the above Katrina data. Once WPS is compiled, the following
-script can be modified to create a run directory for WPS and generate a
-directory with the case data files which can then be passed into
-~wrf_run_pbs_jobs~
+To generate the necessary ~wrfbdy_d01~ and ~wrfinput_d01~ WRF input data for
+~wrf_run_pbs_jobs~, one needs to run WPS on the above Katrina data. The
+following script can used to do this. WPS must already be compiled. Note that
+for the larger 1km and 3km domains, running a ~dmpar~ version of ~real.exe~ may
+be necessary since the serial version by encounter a ~SIGSEGV~ from running out
+of memory.
 
 #+begin_src sh
 #!/bin/sh
-
+set -e
 CASE_NAME=-ex
-RUN_DIR=~/work/case_data/katrina$CASE_NAME
 DATA_DIR=~/work/raw_data/Katrina
 WPS_DIR=~/work/WPS
 
+RUN_DIR=~/work/case_data/katrina$CASE_NAME
 mkdir -p $RUN_DIR
 cd $RUN_DIR
 
-ln -sf ~/WRF_benchmarks/cases/katrina-$CASE_NAME/namelist.wps .
-
-ln -sf $WPS_DIR/ungrib.exe .
-ln -sf $WPS_DIR/geogrid.exe .
-ln -sf $WPS_DIR/metgrid.exe .
+ln -sf ~/WRF_benchmarks/cases/katrina$CASE_NAME/namelist.* .
+ln -sf $(readlink -f $WPS_DIR)/*.exe .
 ln -sf $WPS_DIR/ungrib/Variable_Tables/Vtable.GFS Vtable
+ln -sf ~/work/WRFs/WRFV3.9.1.1-intel-serial/main/real.exe .
 
 $WPS_DIR/link_grib.csh $DATA_DIR/avn
 
 ./ungrib.exe >& ungrib_data.log
 ./geogrid.exe
 ./metgrid.exe
+./real.exe
 #+end_src
-*** TODO katrina1km
-*** TODO katrin3km
-*** TODO conus12km
-*** TODO conus2.5km
+
+The ~cases~ directory has the namelists for a 1km and 3km resolution case as
+well as the example namelist for a small run used in the tutorial at
+[[http://www2.mmm.ucar.edu/wrf/OnLineTutorial/CASES/SingleDomain/index.html]]
+
+*** conus (12km, 2.5km)
+The ~wrfbdy_d01~ and ~wrfrst_d01~ files for the official CONUS benchmarks at
+12km and 2.5km resolution can be found at:
+[[http://www2.mmm.ucar.edu/wrf/WG2/benchv3/]]
+
+*** ~dust_simple_01~ and ~tracer_simple_01~
+These are wrf-chem cases
