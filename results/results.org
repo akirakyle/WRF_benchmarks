@@ -14,43 +14,55 @@ import matplotlib.pyplot as plt
 
 * CONUS 12km
 
-#+begin_src bash :dir /ssh:cheyenne:~/work/run :results raw drawer
+#+begin_src bash :dir /ssh:cheyenne:~/work/run :results raw
 wrf_stats -t -H -d conus12km-WRFV3.8.1-gnu-dmpar-mvapich2.2-N*
 #+end_src
 
+#+NAME: conus12km-stats
 #+RESULTS:
-:RESULTS:
-File                         Comp: Total(s)  Steps  Avg.(s/step)        Speed    I/O: Total(s)  Avg.(s/step)   XxY      CPUs
----------------------------------------------------------------------------------------------------------------------------------
-conus12km-WRFV3.8.1-gnu-dmpa     10.87712    149       0.07300     986.29049        26.10210      13.05105    24x24	576
-conus12km-WRFV3.8.1-gnu-dmpa    161.50068    149       1.08390      66.42696        13.01239       6.50619    6x6	36
-conus12km-WRFV3.8.1-gnu-dmpa     85.83784    149       0.57609     124.97985        13.22285       6.61142    8x9	72
-conus12km-WRFV3.8.1-gnu-dmpa      5.93415    149       0.03983    1807.84106        75.27093      37.63546    32x36	1152
-conus12km-WRFV3.8.1-gnu-dmpa     43.80272    149       0.29398     244.91630        17.18948       8.59474    12x12	144
-conus12km-WRFV3.8.1-gnu-dmpa      4.02350    149       0.02700    2666.33528       339.89275     169.94638    48x48	2304
-conus12km-WRFV3.8.1-gnu-dmpa     20.89827    149       0.14026     513.34393        20.27428      10.13714    16x18	288
-:END:
+| File                         | Comp: Total(s) | Steps | Avg.(s/step) |      Speed | I/O: Total(s) | Avg.(s/step) |   XxY | CPUs |
+|------------------------------+----------------+-------+--------------+------------+---------------+--------------+-------+------|
+| conus12km-WRFV3.8.1-gnu-dmpa |       10.87712 |   149 |      0.07300 |  986.29049 |      26.10210 |     13.05105 | 24x24 |  576 |
+| conus12km-WRFV3.8.1-gnu-dmpa |      161.50068 |   149 |      1.08390 |   66.42696 |      13.01239 |      6.50619 |   6x6 |   36 |
+| conus12km-WRFV3.8.1-gnu-dmpa |       85.83784 |   149 |      0.57609 |  124.97985 |      13.22285 |      6.61142 |   8x9 |   72 |
+| conus12km-WRFV3.8.1-gnu-dmpa |        5.93415 |   149 |      0.03983 | 1807.84106 |      75.27093 |     37.63546 | 32x36 | 1152 |
+| conus12km-WRFV3.8.1-gnu-dmpa |       43.80272 |   149 |      0.29398 |  244.91630 |      17.18948 |      8.59474 | 12x12 |  144 |
+| conus12km-WRFV3.8.1-gnu-dmpa |        4.02350 |   149 |      0.02700 | 2666.33528 |     339.89275 |    169.94638 | 48x48 | 2304 |
+| conus12km-WRFV3.8.1-gnu-dmpa |       20.89827 |   149 |      0.14026 |  513.34393 |      20.27428 |     10.13714 | 16x18 |  288 |
 
-#+TBLNAME: data1
-| threads | view1 | view2 | view5 |
-|---------+-------+-------+-------|
-|       1 |  1.00 |  1.00 |  1.00 |
-|       2 |  1.45 |  1.70 |  1.49 |
-|       4 |  2.46 |  2.66 |  1.88 |
-|       8 |  3.78 |  4.30 |  2.35 |
-|      16 |  6.13 |  5.90 |  3.55 |
-
-#+BEGIN_SRC ipython :session :exports results :results raw drawer :var data1=data1
-data1 = np.array(data1,dtype="f")
-plt.plot(data1[:,0], data1[:,1], 'bx--', label="View 1")
-plt.plot(data1[:,0], data1[:,2], 'gx--', label="View 2")
-plt.plot(data1[:,0], data1[:,3], 'rx--', label="View 5")
-
+#+BEGIN_SRC ipython :session :exports results :results raw drawer :var data=conus12km-stats e_we=425 e_sn=300
+sec_step = np.array([d[3] for d in data])
+cpus = np.array([d[8] for d in data])
+perm = sec_step.argsort()
+sec_step = sec_step[perm]
+cpus = cpus[perm]
+gridpoints = e_we * e_sn
+plt.plot(gridpoints/cpus, 1/sec_step, 'r+--', label="CONUS 12km")
 plt.xlabel("Total grid points / core")
 plt.ylabel("Time steps / s")
+plt.legend(loc="upper right")
 # plt.title("Figure 1")
-plt.legend(loc="upper left")
 # plt.grid(True)
 #+END_SRC
 
+#+RESULTS:
+:RESULTS:
+# Out[21]:
+: <matplotlib.legend.Legend at 0x10f62eeb8>
+[[file:./obipy-resources/nGgFgi.svg]]
+:END:
 
+
+#+BEGIN_SRC ipython :session :exports results :results raw drawer :var data=conus12km-stats e_we=425 e_sn=300
+plt.loglog(gridpoints/cpus, 1/sec_step, 'r+--', label="CONUS 12km")
+plt.xlabel("Total grid points / core")
+plt.ylabel("Time steps / s")
+plt.legend(loc="upper right")
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[22]:
+: <matplotlib.legend.Legend at 0x10ed45518>
+[[file:./obipy-resources/VpWhtf.svg]]
+:END:
