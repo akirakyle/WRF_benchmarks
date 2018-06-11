@@ -29,12 +29,12 @@
  /
 
  &domains
- time_step                           = 15,
+ time_step                           = 18,
  time_step_fract_num                 = 0,
  time_step_fract_den                 = 1,
  max_dom                             = 1,
- e_we                                = 1024,
- e_sn                                = 1024,
+ e_we                                = 980,
+ e_sn                                = 700,
  e_vert                              = 35,
  p_top_requested                     = 5000,
  num_metgrid_levels                  = 27,

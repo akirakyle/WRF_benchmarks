@@ -13,6 +13,7 @@ help() {
     echo "    -c, --cases CASE_DIR LIST    Directories with cases to run, each containing a namelist.input, wrfbdy, and wrfinput or wrfrst."
     echo "    -t, --trial NUM              A trial number to avoid overwriting a previous run with the same parameters. [default 1]"
     echo "    -r, --rundir RUN_DIR         Directory to which to place run output. [default ~/work/run]"
+    echo "    -a, --walltime 'HH:MM:SS'    Walltime for all submitted jobs. [default 00:30:00]"
     echo "    -h, --help                   This help"
     echo ""
     exit 0
@@ -21,6 +22,7 @@ help() {
 wnc_flags=(false false false)
 TRIAL_NUM=1
 RUN_DIR=~/work/run
+WALL_TIME='00:30:00'
 
 while test $# -gt 0
 do
@@ -38,6 +40,10 @@ do
         -r|--rundir)
             wnc_flags=(false false false)
             RUN_DIR=$2
+            shift ;;
+        -a|--walltime)
+            wnc_flags=(false false false)
+            WALL_TIME=$2
             shift ;;
         -h|--help)
             help ;;
@@ -75,11 +81,11 @@ do
             ln -sf $WRF_PATH/run/* .
             ln -sf $CASE_PATH/* .  # must be second to overwrite default namelist.input
 
-            envsubst '${JOB_NAME},${N}' > $JOB_NAME.pbs << EOF
+            envsubst '${JOB_NAME},${N},${WALL_TIME}' > $JOB_NAME.pbs << EOF
 #!/bin/bash
 #PBS -N ${JOB_NAME}
 #PBS -A SCSG0002
-#PBS -l walltime=00:30:00
+#PBS -l walltime=${WALL_TIME}
 #PBS -q regular
 #PBS -j oe
 #PBS -l select=${N}:ncpus=36:mpiprocs=36

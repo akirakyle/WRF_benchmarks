@@ -6,6 +6,10 @@ performance of WRF on NCAR's Cheyenne Supercomputer.
   cases.
 - ~scripts/~ contains useful scripts for automating the compilation, running,
   and analysis of the WRF test cases
+- ~results/~ contains the timing results and analysis and plotting code
+- ~privatemodules/mvapich~ contains a custom module for mvapich since cheyenne
+  currently does not have an mvapich module. See ~.profile~ for adding this
+  custom module to your environment.
 
 ** WRF compilation
 ~wrf_compile~ will compile WRF from source with the given options. See
@@ -143,12 +147,17 @@ wrf_run_pbs_jobs -w WRFs/WRFV3.8.1-gnu-dmpar-mvapich2.2 -n 2 -c cases/conus12km 
 wrf_run_pbs_jobs -w WRFs/WRFV3.8.1-intel-dmpar-mpt2.18 -n 2 -c cases/conus2.5km -t 1
 wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/katrina-ex -t 1
 wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 8 -c cases/katrina1km -t 1
-wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/katrina3km -t 1
+wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/katrina3km -t 2 -a '01:00:00'
 #+end_src
 
 #+begin_src sh
 wrf_run_pbs_jobs \
     --wrfs ~/work/WRFs/WRFV3.8.1-gnu-dmpar-mvapich2.2 \
+    --nodes 1 2 4 8 16 32 64 \
+    --cases ~/WRF_benchmarks/cases/conus12km \
+    --trial 1
+wrf_run_pbs_jobs \
+    --wrfs ~/work/WRFs/WRFV3.8.1-intel-dmpar-mpt2.18 \
     --nodes 1 2 4 8 16 32 64 \
     --cases ~/WRF_benchmarks/cases/conus12km \
     --trial 1

@@ -12,8 +12,8 @@
  parent_grid_ratio =   1,
  i_parent_start    =   1,
  j_parent_start    =   1,
- e_we              =  1024,
- e_sn              =  1024,
+ e_we              =  2940,
+ e_sn              =  2100,
  !
  !!!!!!!!!!!!!!!!!!!!!!!!!!!! IMPORTANT NOTE !!!!!!!!!!!!!!!!!!!!!!!!!!!!
  ! The default datasets used to produce the HGT_M, GREENFRAC, 

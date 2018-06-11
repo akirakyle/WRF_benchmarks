@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 wrf_stats -t -H -d conus12km-WRFV3.8.1-gnu-dmpar-mvapich2.2-N*
 #+end_src
 
-#+NAME: conus12km-stats
+#+NAME: conus12km-mvapich
 #+RESULTS:
 | File                         | Comp: Total(s) | Steps | Avg.(s/step) |      Speed | I/O: Total(s) | Avg.(s/step) |   XxY | CPUs |
 |------------------------------+----------------+-------+--------------+------------+---------------+--------------+-------+------|
@@ -30,39 +30,47 @@ wrf_stats -t -H -d conus12km-WRFV3.8.1-gnu-dmpar-mvapich2.2-N*
 | conus12km-WRFV3.8.1-gnu-dmpa |        4.02350 |   149 |      0.02700 | 2666.33528 |     339.89275 |    169.94638 | 48x48 | 2304 |
 | conus12km-WRFV3.8.1-gnu-dmpa |       20.89827 |   149 |      0.14026 |  513.34393 |      20.27428 |     10.13714 | 16x18 |  288 |
 
-#+BEGIN_SRC ipython :session :exports results :results raw drawer :var data=conus12km-stats e_we=425 e_sn=300
-sec_step = np.array([d[3] for d in data])
-cpus = np.array([d[8] for d in data])
-perm = sec_step.argsort()
-sec_step = sec_step[perm]
-cpus = cpus[perm]
-gridpoints = e_we * e_sn
-plt.plot(gridpoints/cpus, 1/sec_step, 'r+--', label="CONUS 12km")
+#+begin_src bash :dir /ssh:cheyenne:~/work/run :results raw
+wrf_stats -t -H -d conus12km-WRFV3.8.1-intel-dmpar-mpt2.18-N*
+#+end_src
+
+#+NAME: conus12km-mpt
+#+RESULTS:
+| File                         | Comp: Total(s) | Steps | Avg.(s/step) |      Speed | I/O: Total(s) | Avg.(s/step) |   XxY | CPUs |
+|------------------------------+----------------+-------+--------------+------------+---------------+--------------+-------+------|
+| conus12km-WRFV3.8.1-intel-dm |        6.02415 |   149 |      0.04043 | 1780.83215 |      13.04767 |      6.52384 | 24x24 |  576 |
+| conus12km-WRFV3.8.1-intel-dm |       86.57501 |   149 |      0.58104 |  123.91567 |      11.61016 |      5.80508 |   6x6 |   36 |
+| conus12km-WRFV3.8.1-intel-dm |       42.85328 |   149 |      0.28761 |  250.34256 |      11.68894 |      5.84447 |   8x9 |   72 |
+| conus12km-WRFV3.8.1-intel-dm |        3.74614 |   149 |      0.02514 | 2863.74775 |      13.20536 |      6.60268 | 32x36 | 1152 |
+| conus12km-WRFV3.8.1-intel-dm |       21.26974 |   149 |      0.14275 |  504.37852 |      12.37127 |      6.18563 | 12x12 |  144 |
+| conus12km-WRFV3.8.1-intel-dm |        2.46127 |   149 |      0.01652 | 4358.72537 |      12.95793 |      6.47896 | 48x48 | 2304 |
+| conus12km-WRFV3.8.1-intel-dm |       10.91678 |   149 |      0.07327 |  982.70736 |      12.64363 |      6.32181 | 16x18 |  288 |
+
+
+#+BEGIN_SRC ipython :session :exports results :results raw drawer :var d1=conus12km-mvapich d2=conus12km-mpt e_we=425 e_sn=300
+def extract_data(data):
+    sec_step = np.array([d[3] for d in data])
+    cpus = np.array([d[8] for d in data])
+    perm = sec_step.argsort()
+    sec_step = sec_step[perm]
+    cpus = cpus[perm]
+    gridpoints = e_we * e_sn
+    return (gridpoints/cpus, 1/sec_step)
+
+#plt.plot(, 'r+--', label="CONUS 12km")
+x1,y1 = extract_data(d1)
+x2,y2 = extract_data(d2)
+plt.loglog(x1, y1, 'r+--', label="CONUS 12km MVAPICH")
+plt.loglog(x2, y2, 'b+--', label="CONUS 12km MPT")
 plt.xlabel("Total grid points / core")
 plt.ylabel("Time steps / s")
 plt.legend(loc="upper right")
-# plt.title("Figure 1")
-# plt.grid(True)
+plt.title("Scaling results")
+plt.grid(False)
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-# Out[21]:
-: <matplotlib.legend.Legend at 0x10f62eeb8>
-[[file:./obipy-resources/nGgFgi.svg]]
-:END:
-
-
-#+BEGIN_SRC ipython :session :exports results :results raw drawer :var data=conus12km-stats e_we=425 e_sn=300
-plt.loglog(gridpoints/cpus, 1/sec_step, 'r+--', label="CONUS 12km")
-plt.xlabel("Total grid points / core")
-plt.ylabel("Time steps / s")
-plt.legend(loc="upper right")
-#+END_SRC
-
-#+RESULTS:
-:RESULTS:
-# Out[22]:
-: <matplotlib.legend.Legend at 0x10ed45518>
-[[file:./obipy-resources/VpWhtf.svg]]
+# Out[29]:
+[[file:./obipy-resources/JWf8St.svg]]
 :END:
