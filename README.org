@@ -67,6 +67,36 @@ wrf_compile \
 #+begin_src sh
 wrf_compile \
     --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mpt2.18 \
+    --compile 34 \
+    --nest 1 \
+    --mpiexec mpiexec_mpt \
+    --modules \
+    ncarenv/1.2 \
+    gnu/6.3.0 \
+    ncarcompilers/0.4.1 \
+    mpt/2.18 \
+    netcdf/4.6.1
+#+end_src
+
+#+begin_src sh
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu7.3.0-mpt2.18 \
+    --compile 34 \
+    --nest 1 \
+    --mpiexec mpiexec_mpt \
+    --modules \
+    ncarenv/1.2 \
+    gnu/7.3.0 \
+    ncarcompilers/0.4.1 \
+    mpt/2.18 \
+    netcdf/4.6.1
+#+end_src
+
+#+begin_src sh
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
     --wrfdir ~/work/WRFs/WRFV3.8.1-gnu-dmpar-mvapich2.2 \
     --compile 34 \
     --nest 1 \
@@ -79,6 +109,50 @@ wrf_compile \
     netcdf/4.6.1
 #+end_src
 
+#+begin_src sh
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mvapich2.2 \
+    --compile 34 \
+    --nest 1 \
+    --mpiexec 'mpirun_rsh -hostfile $PBS_NODEFILE -n $1'  \
+    --modules \
+    ncarenv/1.2 \
+    gnu/6.3.0 \
+    ncarcompilers/0.4.1 \
+    mvapich2/2.2 \
+    netcdf/4.6.1
+#+end_src
+
+#+begin_src sh
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.7.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.7.1-intel-dmpar-mpt2.18 \
+    --compile 15 \
+    --nest 1 \
+    --mpiexec mpiexec_mpt \
+    --modules \
+    ncarenv/1.2 \
+    intel/18.0.1 \
+    ncarcompilers/0.4.1 \
+    mpt/2.18 \
+    netcdf/4.6.0
+#+end_src
+
+#+begin_src sh
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.6.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.6.1-intel-dmpar-mpt2.18 \
+    --compile 15 \
+    --nest 1 \
+    --mpiexec mpiexec_mpt \
+    --modules \
+    ncarenv/1.2 \
+    intel/18.0.1 \
+    ncarcompilers/0.4.1 \
+    mpt/2.18 \
+    netcdf/4.6.0
+#+end_src
 
 ** Example pbs job scripts for cheyenne
 #+begin_src sh
@@ -145,9 +219,13 @@ wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/conus12km
 wrf_run_pbs_jobs -w WRFs/WRFV3.8.1-intel-dmpar-mpt2.18 -n 2 -c cases/conus12km -t 1
 wrf_run_pbs_jobs -w WRFs/WRFV3.8.1-gnu-dmpar-mvapich2.2 -n 2 -c cases/conus12km -t 1
 wrf_run_pbs_jobs -w WRFs/WRFV3.8.1-intel-dmpar-mpt2.18 -n 2 -c cases/conus2.5km -t 1
+wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/conus2.5km -t 1
+wrf_run_pbs_jobs -w WRFs/WRFV3.7.1-intel-dmpar-mpt2.18 -n 2 -c cases/conus2.5km -t 1
 wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/katrina-ex -t 1
 wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 8 -c cases/katrina1km -t 1
 wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/katrina3km -t 2 -a '01:00:00'
+wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/katrina1km -t 2 -a '02:00:00'
+wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 12 -c cases/katrina1km -t 1 -a '02:00:00'
 #+end_src
 
 #+begin_src sh
@@ -158,6 +236,16 @@ wrf_run_pbs_jobs \
     --trial 1
 wrf_run_pbs_jobs \
     --wrfs ~/work/WRFs/WRFV3.8.1-intel-dmpar-mpt2.18 \
+    --nodes 1 2 4 8 16 32 64 \
+    --cases ~/WRF_benchmarks/cases/conus12km \
+    --trial 1
+wrf_run_pbs_jobs \
+    --wrfs ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mpt2.18 \
+    --nodes 1 2 4 8 16 32 64 \
+    --cases ~/WRF_benchmarks/cases/conus12km \
+    --trial 1
+wrf_run_pbs_jobs \
+    --wrfs ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mvapich2.2 \
     --nodes 1 2 4 8 16 32 64 \
     --cases ~/WRF_benchmarks/cases/conus12km \
     --trial 1

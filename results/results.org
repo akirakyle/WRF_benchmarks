@@ -3,7 +3,7 @@
 #+EMAIL: akyle@cmu.edu
 #+OPTIONS: toc:nil email:t
 
-#+BEGIN_SRC ipython :session :exports none
+#+BEGIN_SRC ipython :session :exports code
 import numpy as np
 import matplotlib.pyplot as plt
 %matplotlib inline
@@ -11,66 +11,127 @@ import matplotlib.pyplot as plt
 #+END_SRC
 
 #+RESULTS:
+: # Out[30]:
 
 * CONUS 12km
 
 #+begin_src bash :dir /ssh:cheyenne:~/work/run :results raw
-wrf_stats -t -H -d conus12km-WRFV3.8.1-gnu-dmpar-mvapich2.2-N*
+wrf_stats -t -H -d conus12km-WRFV3.8.1-gnu-dmpar-mvapich2.2-T1-N*
 #+end_src
 
-#+NAME: conus12km-mvapich
+#+NAME: conus12km-WRFV3.8.1-gnu-dmpar-mvapich2.2-T1
 #+RESULTS:
 | File                         | Comp: Total(s) | Steps | Avg.(s/step) |      Speed | I/O: Total(s) | Avg.(s/step) |   XxY | CPUs |
 |------------------------------+----------------+-------+--------------+------------+---------------+--------------+-------+------|
-| conus12km-WRFV3.8.1-gnu-dmpa |       10.87712 |   149 |      0.07300 |  986.29049 |      26.10210 |     13.05105 | 24x24 |  576 |
 | conus12km-WRFV3.8.1-gnu-dmpa |      161.50068 |   149 |      1.08390 |   66.42696 |      13.01239 |      6.50619 |   6x6 |   36 |
 | conus12km-WRFV3.8.1-gnu-dmpa |       85.83784 |   149 |      0.57609 |  124.97985 |      13.22285 |      6.61142 |   8x9 |   72 |
-| conus12km-WRFV3.8.1-gnu-dmpa |        5.93415 |   149 |      0.03983 | 1807.84106 |      75.27093 |     37.63546 | 32x36 | 1152 |
 | conus12km-WRFV3.8.1-gnu-dmpa |       43.80272 |   149 |      0.29398 |  244.91630 |      17.18948 |      8.59474 | 12x12 |  144 |
-| conus12km-WRFV3.8.1-gnu-dmpa |        4.02350 |   149 |      0.02700 | 2666.33528 |     339.89275 |    169.94638 | 48x48 | 2304 |
 | conus12km-WRFV3.8.1-gnu-dmpa |       20.89827 |   149 |      0.14026 |  513.34393 |      20.27428 |     10.13714 | 16x18 |  288 |
+| conus12km-WRFV3.8.1-gnu-dmpa |       10.87712 |   149 |      0.07300 |  986.29049 |      26.10210 |     13.05105 | 24x24 |  576 |
+| conus12km-WRFV3.8.1-gnu-dmpa |        5.93415 |   149 |      0.03983 | 1807.84106 |      75.27093 |     37.63546 | 32x36 | 1152 |
+| conus12km-WRFV3.8.1-gnu-dmpa |        4.02350 |   149 |      0.02700 | 2666.33528 |     339.89275 |    169.94638 | 48x48 | 2304 |
 
 #+begin_src bash :dir /ssh:cheyenne:~/work/run :results raw
-wrf_stats -t -H -d conus12km-WRFV3.8.1-intel-dmpar-mpt2.18-N*
+wrf_stats -t -H -d conus12km-WRFV3.8.1-gnu-dmpar-mvapich2.2-T2-N*
 #+end_src
 
-#+NAME: conus12km-mpt
+#+NAME: conus12km-WRFV3.8.1-gnu-dmpar-mvapich2.2-T2
 #+RESULTS:
 | File                         | Comp: Total(s) | Steps | Avg.(s/step) |      Speed | I/O: Total(s) | Avg.(s/step) |   XxY | CPUs |
 |------------------------------+----------------+-------+--------------+------------+---------------+--------------+-------+------|
-| conus12km-WRFV3.8.1-intel-dm |        6.02415 |   149 |      0.04043 | 1780.83215 |      13.04767 |      6.52384 | 24x24 |  576 |
+| conus12km-WRFV3.8.1-gnu-dmpa |      157.71430 |   149 |      1.05849 |   68.02173 |      12.63764 |      6.31882 |   6x6 |   36 |
+| conus12km-WRFV3.8.1-gnu-dmpa |       76.68678 |   149 |      0.51468 |  139.89373 |      12.67668 |      6.33834 |   8x9 |   72 |
+| conus12km-WRFV3.8.1-gnu-dmpa |       44.31821 |   149 |      0.29744 |  242.06754 |      13.79229 |      6.89614 | 12x12 |  144 |
+| conus12km-WRFV3.8.1-gnu-dmpa |       21.81602 |   149 |      0.14642 |  491.74872 |      15.77773 |      7.88887 | 16x18 |  288 |
+| conus12km-WRFV3.8.1-gnu-dmpa |       11.09775 |   149 |      0.07448 |  966.68244 |      25.71347 |     12.85674 | 24x24 |  576 |
+| conus12km-WRFV3.8.1-gnu-dmpa |        5.81085 |   149 |      0.03900 | 1846.20150 |      71.40889 |     35.70444 | 32x36 | 1152 |
+| conus12km-WRFV3.8.1-gnu-dmpa |        3.91272 |   149 |      0.02626 | 2741.82666 |     350.20424 |    175.10212 | 48x48 | 2304 |
+
+
+#+begin_src bash :dir /ssh:cheyenne:~/work/run :results raw
+wrf_stats -t -H -d conus12km-WRFV3.8.1-gnu6.3.0-mvapich2.2-T1-N*
+#+end_src
+
+#+NAME: conus12km-WRFV3.8.1-gnu6.3.0-mvapich2.2-T1
+#+RESULTS:
+| File                         | Comp: Total(s) | Steps | Avg.(s/step) |      Speed | I/O: Total(s) | Avg.(s/step) |   XxY | CPUs |
+|------------------------------+----------------+-------+--------------+------------+---------------+--------------+-------+------|
+| conus12km-WRFV3.8.1-gnu6.3.0 |      116.59193 |   149 |      0.78250 |   92.01323 |      12.73527 |      6.36763 |   6x6 |   36 |
+| conus12km-WRFV3.8.1-gnu6.3.0 |       58.99073 |   149 |      0.39591 |  181.85908 |      12.80697 |      6.40348 |   8x9 |   72 |
+| conus12km-WRFV3.8.1-gnu6.3.0 |       31.05322 |   149 |      0.20841 |  345.47142 |      13.75061 |      6.87531 | 12x12 |  144 |
+| conus12km-WRFV3.8.1-gnu6.3.0 |       15.65141 |   149 |      0.10504 |  685.43345 |      16.55407 |      8.27703 | 16x18 |  288 |
+| conus12km-WRFV3.8.1-gnu6.3.0 |        8.68723 |   149 |      0.05830 | 1234.91608 |      26.62334 |     13.31167 | 24x24 |  576 |
+| conus12km-WRFV3.8.1-gnu6.3.0 |        4.97045 |   149 |      0.03336 | 2158.35588 |      61.73998 |     30.86999 | 32x36 | 1152 |
+| conus12km-WRFV3.8.1-gnu6.3.0 |        3.22999 |   149 |      0.02168 | 3321.37251 |     316.97142 |    158.48571 | 48x48 | 2304 |
+
+#+begin_src bash :dir /ssh:cheyenne:~/work/run :results raw
+wrf_stats -t -H -d conus12km-WRFV3.8.1-intel-dmpar-mpt2.18-T1-N*
+#+end_src
+
+#+NAME: conus12km-WRFV3.8.1-intel-dmpar-mpt2.18-T1
+#+RESULTS:
+| File                         | Comp: Total(s) | Steps | Avg.(s/step) |      Speed | I/O: Total(s) | Avg.(s/step) |   XxY | CPUs |
+|------------------------------+----------------+-------+--------------+------------+---------------+--------------+-------+------|
 | conus12km-WRFV3.8.1-intel-dm |       86.57501 |   149 |      0.58104 |  123.91567 |      11.61016 |      5.80508 |   6x6 |   36 |
 | conus12km-WRFV3.8.1-intel-dm |       42.85328 |   149 |      0.28761 |  250.34256 |      11.68894 |      5.84447 |   8x9 |   72 |
-| conus12km-WRFV3.8.1-intel-dm |        3.74614 |   149 |      0.02514 | 2863.74775 |      13.20536 |      6.60268 | 32x36 | 1152 |
 | conus12km-WRFV3.8.1-intel-dm |       21.26974 |   149 |      0.14275 |  504.37852 |      12.37127 |      6.18563 | 12x12 |  144 |
-| conus12km-WRFV3.8.1-intel-dm |        2.46127 |   149 |      0.01652 | 4358.72537 |      12.95793 |      6.47896 | 48x48 | 2304 |
 | conus12km-WRFV3.8.1-intel-dm |       10.91678 |   149 |      0.07327 |  982.70736 |      12.64363 |      6.32181 | 16x18 |  288 |
+| conus12km-WRFV3.8.1-intel-dm |        6.02415 |   149 |      0.04043 | 1780.83215 |      13.04767 |      6.52384 | 24x24 |  576 |
+| conus12km-WRFV3.8.1-intel-dm |        3.74614 |   149 |      0.02514 | 2863.74775 |      13.20536 |      6.60268 | 32x36 | 1152 |
+| conus12km-WRFV3.8.1-intel-dm |        2.46127 |   149 |      0.01652 | 4358.72537 |      12.95793 |      6.47896 | 48x48 | 2304 |
 
+#+begin_src bash :dir /ssh:cheyenne:~/work/run :results raw
+wrf_stats -t -H -d conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N*
+#+end_src
 
-#+BEGIN_SRC ipython :session :exports results :results raw drawer :var d1=conus12km-mvapich d2=conus12km-mpt e_we=425 e_sn=300
+#+NAME: conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1
+#+RESULTS:
+| File                         | Comp: Total(s) | Steps | Avg.(s/step) |      Speed | I/O: Total(s) | Avg.(s/step) |   XxY | CPUs |
+|------------------------------+----------------+-------+--------------+------------+---------------+--------------+-------+------|
+| conus12km-WRFV3.8.1-gnu6.3.0 |      116.21725 |   149 |      0.77998 |   92.30988 |       9.98891 |      4.99446 |   6x6 |   36 |
+| conus12km-WRFV3.8.1-gnu6.3.0 |       58.23755 |   149 |      0.39086 |  184.21105 |      10.15777 |      5.07888 |   8x9 |   72 |
+| conus12km-WRFV3.8.1-gnu6.3.0 |       30.40925 |   149 |      0.20409 |  352.78739 |      11.43522 |      5.71761 | 12x12 |  144 |
+| conus12km-WRFV3.8.1-gnu6.3.0 |       15.25841 |   149 |      0.10241 |  703.08767 |      11.96531 |      5.98265 | 16x18 |  288 |
+| conus12km-WRFV3.8.1-gnu6.3.0 |        8.55777 |   149 |      0.05743 | 1253.59761 |      12.26190 |      6.13095 | 24x24 |  576 |
+| conus12km-WRFV3.8.1-gnu6.3.0 |        4.97061 |   149 |      0.03336 | 2158.28641 |      12.15401 |      6.07700 | 32x36 | 1152 |
+| conus12km-WRFV3.8.1-gnu6.3.0 |        3.25526 |   149 |      0.02185 | 3295.58929 |      12.54158 |      6.27079 | 48x48 | 2304 |
+
+#+HEADER: :var d1=conus12km-WRFV3.8.1-gnu-dmpar-mvapich2.2-T1
+#+HEADER: :var d2=conus12km-WRFV3.8.1-gnu6.3.0-mvapich2.2-T1
+#+HEADER: :var d3=conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1
+#+HEADER: :var d4=conus12km-WRFV3.8.1-intel-dmpar-mpt2.18-T1
+#+HEADER: :var e_we=425 e_sn=300
+#+BEGIN_SRC ipython :session :exports both :results raw drawer
 def extract_data(data):
     sec_step = np.array([d[3] for d in data])
     cpus = np.array([d[8] for d in data])
-    perm = sec_step.argsort()
-    sec_step = sec_step[perm]
-    cpus = cpus[perm]
     gridpoints = e_we * e_sn
     return (gridpoints/cpus, 1/sec_step)
 
-#plt.plot(, 'r+--', label="CONUS 12km")
-x1,y1 = extract_data(d1)
-x2,y2 = extract_data(d2)
-plt.loglog(x1, y1, 'r+--', label="CONUS 12km MVAPICH")
-plt.loglog(x2, y2, 'b+--', label="CONUS 12km MPT")
+x,y = zip(*[extract_data(d) for d in [d1, d2, d3, d4]])
+labels = [
+    "gnu6.3.0-custom_mvapich2.2",
+    "gnu6.3.0-system_mvapich2.2",
+    "gnu6.3.0-mpt2.18",
+    "intel18.0.1-mpt2.18"
+]
+specs = [
+    'r+--',
+    'c+--',
+    'g+--',
+    'b+--',
+]
+for i in range(len(x)):
+    plt.loglog(x[i], y[i], specs[i], label=labels[i])
 plt.xlabel("Total grid points / core")
 plt.ylabel("Time steps / s")
-plt.legend(loc="upper right")
-plt.title("Scaling results")
+plt.legend(loc="best")
+plt.title("Scaling results for CONUS 12km with WRFV3.8.1")
 plt.grid(False)
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-# Out[29]:
-[[file:./obipy-resources/JWf8St.svg]]
+# Out[43]:
+[[file:./obipy-resources/xmBzFi.svg]]
 :END:

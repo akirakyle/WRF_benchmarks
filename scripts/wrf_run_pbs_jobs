@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 help() {
     echo ""
     echo "Usage: ${0##*/} [-h] [-d DIR] [-t NUM] -w WRF1 WRF2 ... -n X Y Z ... -c CASE1 CASE2 ..."
@@ -72,9 +70,17 @@ do
         do
             cd $PWD
             WRF_PATH=$(readlink -f $WRF_DIR)
+            if [ -z $WRF_PATH ] ; then
+                echo "Invalid WRF_PATH: $WRF_DIR"
+                exit 1
+            fi
             CASE_PATH=$(readlink -f $CASE_DIR)
+            if [ -z $CASE_PATH ] ; then
+                echo "Invalid CASE_PATH: $CASE_PATH"
+                exit 1
+            fi
 
-            JOB_NAME=$(basename $CASE_DIR)-$(basename $WRF_DIR)-N$N-T$TRIAL_NUM
+            JOB_NAME=$(basename $CASE_DIR)-$(basename $WRF_DIR)-T$TRIAL_NUM-N$(printf "%03d" $N)
             mkdir -p $RUN_DIR/$JOB_NAME
             cd $RUN_DIR/$JOB_NAME
 
