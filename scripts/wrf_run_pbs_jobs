@@ -12,12 +12,13 @@ help() {
     echo "    -t, --trial NUM              A trial number to avoid overwriting a previous run with the same parameters. [default 1]"
     echo "    -r, --rundir RUN_DIR         Directory to which to place run output. [default ~/work/run]"
     echo "    -a, --walltime 'HH:MM:SS'    Walltime for all submitted jobs. [default 00:30:00]"
+    echo "    -e, --envvars ENV_VAR LIST   Environment variables to be set."
     echo "    -h, --help                   This help"
     echo ""
     exit 0
 }
 
-wnc_flags=(false false false)
+reading_list=none
 TRIAL_NUM=1
 RUN_DIR=~/work/run
 WALL_TIME='00:30:00'
@@ -26,32 +27,32 @@ while test $# -gt 0
 do
     case $1 in
         -w|--wrfs)
-            wnc_flags=(true false false) ;;
+            reading_list=wrfs ;;
         -n|--nodes)
-            wnc_flags=(false true false) ;;
+            reading_list=nodes ;;
         -c|--cases)
-            wnc_flags=(false false true) ;;
+            reading_list=cases ;;
+        -e|--envvars)
+            reading_list=envvars ;;
         -t|--trial)
-            wnc_flags=(false false false)
+            reading_list=none
             TRIAL_NUM=$2
             shift ;;
         -r|--rundir)
-            wnc_flags=(false false false)
+            reading_list=none
             RUN_DIR=$2
             shift ;;
         -a|--walltime)
-            wnc_flags=(false false false)
+            reading_list=none
             WALL_TIME=$2
             shift ;;
         -h|--help)
             help ;;
 	      *)
-            if [ "${wnc_flags[0]}" = true ] ; then
-                WRFs+=("$1")
-            elif [ "${wnc_flags[1]}" = true ] ; then
-                NODES+=($1)
-            elif [ "${wnc_flags[2]}" = true ] ; then
-                CASES+=("$1")
+            if   [ "$reading_list" = wrfs    ] ; then WRFs+=("$1")
+            elif [ "$reading_list" = nodes   ] ; then NODES+=($1)
+            elif [ "$reading_list" = cases   ] ; then CASES+=("$1")
+            elif [ "$reading_list" = envvars ] ; then ENVVARS+=("$1")
             else
                 help
             fi
@@ -59,6 +60,10 @@ do
     esac
 	  shift
 done
+
+if [ ${#ENVVARS[@]} -eq 0 ]; then
+   ENV_STR=$(printf "export %s\n" "${ENVVARS[@]}")
+fi
 
 PWD=$(pwd)
 
@@ -70,12 +75,12 @@ do
         do
             cd $PWD
             WRF_PATH=$(readlink -f $WRF_DIR)
-            if [ -z $WRF_PATH ] ; then
+            if [ -z $WRF_PATH ] || [ ! -d $WRF_PATH ]; then
                 echo "Invalid WRF_PATH: $WRF_DIR"
                 exit 1
             fi
             CASE_PATH=$(readlink -f $CASE_DIR)
-            if [ -z $CASE_PATH ] ; then
+            if [ -z $CASE_PATH ] || [ ! -d $WRF_PATH ]; then
                 echo "Invalid CASE_PATH: $CASE_PATH"
                 exit 1
             fi
@@ -87,7 +92,7 @@ do
             ln -sf $WRF_PATH/run/* .
             ln -sf $CASE_PATH/* .  # must be second to overwrite default namelist.input
 
-            envsubst '${JOB_NAME},${N},${WALL_TIME}' > $JOB_NAME.pbs << EOF
+            envsubst '${JOB_NAME},${N},${WALL_TIME},${ENV_STR}' > $JOB_NAME.pbs << EOF
 #!/bin/bash
 #PBS -N ${JOB_NAME}
 #PBS -A SCSG0002
@@ -100,6 +105,7 @@ do
 
 export TMPDIR=/glade/scratch/$USER/temp
 mkdir -p $TMPDIR
+${ENV_STR}
 
 ./mpirun_wrf $((${N} * 36))
 EOF

@@ -15,12 +15,9 @@ performance of WRF on NCAR's Cheyenne Supercomputer.
 ~wrf_compile~ will compile WRF from source with the given options. See
 ~wrf_compile --help~
 
-For both WRF3.9.1.1 and WRFV3.8.1:
-- compiler option 15 = dmpar - INTEL (ifort/icc)
-- nest option 1 = basic
+Invocations of ~wrf_compile~ on cheyenne:
 
-Example invocations of ~wrf_compile~ on cheyenne:
-
+*** old
 #+begin_src sh
 wrf_compile \
     --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz\
@@ -32,9 +29,7 @@ wrf_compile \
     intel/18.0.1 \
     ncarcompilers/0.4.1 \
     netcdf/4.6.0
-#+end_src
 
-#+begin_src sh
 wrf_compile \
     --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz\
     --wrfdir ~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 \
@@ -47,9 +42,7 @@ wrf_compile \
     ncarcompilers/0.4.1 \
     mpt/2.18 \
     netcdf/4.6.0
-#+end_src
 
-#+begin_src sh
 wrf_compile \
     --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
     --wrfdir ~/work/WRFs/WRFV3.8.1-intel-dmpar-mpt2.18 \
@@ -62,9 +55,7 @@ wrf_compile \
     ncarcompilers/0.4.1 \
     mpt/2.18 \
     netcdf/4.6.0
-#+end_src
 
-#+begin_src sh
 wrf_compile \
     --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
     --wrfdir ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mpt2.18 \
@@ -77,24 +68,7 @@ wrf_compile \
     ncarcompilers/0.4.1 \
     mpt/2.18 \
     netcdf/4.6.1
-#+end_src
 
-#+begin_src sh
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu7.3.0-mpt2.18 \
-    --compile 34 \
-    --nest 1 \
-    --mpiexec mpiexec_mpt \
-    --modules \
-    ncarenv/1.2 \
-    gnu/7.3.0 \
-    ncarcompilers/0.4.1 \
-    mpt/2.18 \
-    netcdf/4.6.1
-#+end_src
-
-#+begin_src sh
 wrf_compile \
     --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
     --wrfdir ~/work/WRFs/WRFV3.8.1-gnu-dmpar-mvapich2.2 \
@@ -107,9 +81,7 @@ wrf_compile \
     ncarcompilers/0.4.1 \
     mvapich/2.2 \
     netcdf/4.6.1
-#+end_src
 
-#+begin_src sh
 wrf_compile \
     --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
     --wrfdir ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mvapich2.2 \
@@ -124,34 +96,185 @@ wrf_compile \
     netcdf/4.6.1
 #+end_src
 
+*** new
 #+begin_src sh
 wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.7.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.7.1-intel-dmpar-mpt2.18 \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz \
+    --wrfdir ~/work/WRFs/WRFV3.9.1.1-intel18.0.1 \
+    --compile 13 \
+    --nest 1 \
+    --modules \
+    intel/18.0.1 \
+    netcdf/4.6.0 \
+    ncarcompilers/0.4.1 \
+    ncarenv/1.2
+
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz \
+    --wrfdir ~/work/WRFs/WRFV3.8.1-intel18.0.1 \
+    --compile 13 \
+    --nest 1 \
+    --modules \
+    intel/18.0.1 \
+    netcdf/4.6.0 \
+    ncarcompilers/0.4.1 \
+    ncarenv/1.2
+
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.9.1.1-intel18.0.1-mpt2.18 \
     --compile 15 \
     --nest 1 \
     --mpiexec mpiexec_mpt \
     --modules \
-    ncarenv/1.2 \
     intel/18.0.1 \
-    ncarcompilers/0.4.1 \
     mpt/2.18 \
-    netcdf/4.6.0
+    netcdf/4.6.0 \
+    ncarcompilers/0.4.1 \
+    ncarenv/1.2
+
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.8.1-intel18.0.1-mpt2.18 \
+    --compile 15 \
+    --nest 1 \
+    --mpiexec mpiexec_mpt \
+    --modules \
+    intel/18.0.1 \
+    mpt/2.18 \
+    netcdf/4.6.0 \
+    ncarcompilers/0.4.1 \
+    ncarenv/1.2
+
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.9.1.1-gnu8.1.0-mpt2.18 \
+    --compile 34 \
+    --nest 1 \
+    --mpiexec mpiexec_mpt \
+    --modules \
+    gnu/8.1.0 \
+    mpt/2.18 \
+    netcdf/4.6.1 \
+    ncarcompilers/0.4.1 \
+    ncarenv/1.2
+
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mpt2.18 \
+    --compile 34 \
+    --nest 1 \
+    --mpiexec mpiexec_mpt \
+    --modules \
+    gnu/6.3.0 \
+    mpt/2.18 \
+    netcdf/4.6.1 \
+    ncarcompilers/0.4.1 \
+    ncarenv/1.2
+
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz \
+    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mvapich2.2 \
+    --compile 34 \
+    --nest 1 \
+    --mpiexec 'mpirun_rsh -hostfile $PBS_NODEFILE -n $1'  \
+    --modules \
+    gnu/6.3.0 \
+    mvapich2/2.2 \
+    netcdf/4.6.1 \
+    ncarcompilers/0.4.1 \
+    ncarenv/1.2
+
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu7.1.0-mpt2.18 \
+    --compile 34 \
+    --nest 1 \
+    --mpiexec mpiexec_mpt \
+    --modules \
+    gnu/7.1.0 \
+    mpt/2.18 \
+    netcdf/4.6.1 \
+    ncarcompilers/0.4.1 \
+    ncarenv/1.2
+
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu7.1.0-mvapich2.2 \
+    --compile 34 \
+    --nest 1 \
+    --mpiexec 'mpirun_rsh -hostfile $PBS_NODEFILE -n $1'  \
+    --modules \
+    gnu/7.1.0 \
+    mvapich2/2.2 \
+    netcdf/4.6.1 \
+    ncarcompilers/0.4.1 \
+    ncarenv/1.2
 #+end_src
+
+*** failing
 
 #+begin_src sh
 wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.6.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.6.1-intel-dmpar-mpt2.18 \
-    --compile 15 \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.9.1.1-gnu8.1.0\
+    --compile 32 \
+    --nest 1 \
+    --modules \
+    gnu/8.1.0 \
+    netcdf/4.6.1 \
+    ncarcompilers/0.4.1 \
+    ncarenv/1.2
+
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu8.1.0\
+    --compile 32 \
+    --nest 1 \
+    --modules \
+    gnu/8.1.0 \
+    netcdf/4.6.1 \
+    ncarcompilers/0.4.1 \
+    ncarenv/1.2
+
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu8.1.0-mpt2.18 \
+    --compile 34 \
+    --nest 1 \
+    --mpiexec mpiexec_mpt \
+    --modules \
+    gnu/8.1.0 \
+    mpt/2.18 \
+    netcdf/4.6.1 \
+    ncarcompilers/0.4.1 \
+    ncarenv/1.2
+
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu7.3.0-mpt2.18 \
+    --compile 34 \
+    --nest 1 \
+    --mpiexec mpiexec_mpt \
+    --modules \
+    gnu/7.3.0 \
+    mpt/2.18 \
+    netcdf/4.6.1 \
+    ncarcompilers/0.4.1 \
+    ncarenv/1.2
+
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu7.3.0-mpt2.18 \
+    --compile 34 \
     --nest 1 \
     --mpiexec mpiexec_mpt \
     --modules \
     ncarenv/1.2 \
-    intel/18.0.1 \
+    gnu/7.3.0 \
     ncarcompilers/0.4.1 \
     mpt/2.18 \
-    netcdf/4.6.0
+    netcdf/4.6.1
 #+end_src
 
 ** Example pbs job scripts for cheyenne
@@ -221,12 +344,19 @@ wrf_run_pbs_jobs -w WRFs/WRFV3.8.1-gnu-dmpar-mvapich2.2 -n 2 -c cases/conus12km 
 wrf_run_pbs_jobs -w WRFs/WRFV3.8.1-intel-dmpar-mpt2.18 -n 2 -c cases/conus2.5km -t 1
 wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/conus2.5km -t 1
 wrf_run_pbs_jobs -w WRFs/WRFV3.7.1-intel-dmpar-mpt2.18 -n 2 -c cases/conus2.5km -t 1
+wrf_run_pbs_jobs -w WRFs/WRFV3.6.1-intel-dmpar-mpt2.18 -n 2 -c cases/conus2.5km -t 1
 wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/katrina-ex -t 1
 wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 8 -c cases/katrina1km -t 1
 wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/katrina3km -t 2 -a '01:00:00'
 wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/katrina1km -t 2 -a '02:00:00'
 wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 12 -c cases/katrina1km -t 1 -a '02:00:00'
+
+wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel18.0.1-mpt2.18 -n 2 -c cases/katrina1km -t 1 -a '02:00:00'
+wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel18.0.1-mpt2.18 -n 2 -c cases/katrina3km -t 1 -a '01:00:00'
 #+end_src
+wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-gnu8.1.0-mpt2.18 -n 2 -c cases/conus12km -t 1
+wrf_run_pbs_jobs -w WRFs/WRFV3.8.1-gnu6.3.0-mpt2.18 -n 2 -c cases/conus12km -t 2
+
 
 #+begin_src sh
 wrf_run_pbs_jobs \
@@ -240,23 +370,29 @@ wrf_run_pbs_jobs \
     --cases ~/WRF_benchmarks/cases/conus12km \
     --trial 1
 wrf_run_pbs_jobs \
-    --wrfs ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mpt2.18 \
-    --nodes 1 2 4 8 16 32 64 \
+    --wrfs ~/work/WRFs/WRFV3.8.1-intel18.0.1-mpt2.18 \
+    --nodes 1 2 4 8 16 32 64 128 256 \
     --cases ~/WRF_benchmarks/cases/conus12km \
     --trial 1
 wrf_run_pbs_jobs \
-    --wrfs ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mvapich2.2 \
-    --nodes 1 2 4 8 16 32 64 \
+    --wrfs ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mpt2.18 \
+    --nodes 1 2 4 8 16 32 64 128 256 \
     --cases ~/WRF_benchmarks/cases/conus12km \
-    --trial 1
+    --trial 2
+wrf_run_pbs_jobs \
+    --wrfs ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mvapich2.2 \
+    --nodes 1 2 4 8 16 32 64 128 256 \
+    --cases ~/WRF_benchmarks/cases/conus12km \
+    --trial 2
 #+end_src
 
 #+begin_src sh
 wrf_run_pbs_jobs \
     --wrfs \
-    ~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 \
-    ~/work/WRFs/WRFV3.8.1-intel-dmpar-mpt2.18 \
-    ~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mvapich2.2 \
+    ~/work/WRFs/WRFV3.9.1.1-intel18.0.1-mpt2.18 \
+    ~/work/WRFs/WRFV3.9.1.1-gnu8.1.0-mpt2.18 \
+    ~/work/WRFs/WRFV3.9.1.1-intel18.0.1-mvapich2.2 \
+    ~/work/WRFs/WRFV3.9.1.1-gnu8.1.0-mvapich2.2 \
     --nodes 2 4 8 16 32 64 128 256 512 \
     --cases \
     ~/WRF_benchmarks/cases/conus12km \
