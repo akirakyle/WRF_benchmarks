@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 #+END_SRC
 
 #+RESULTS:
-: # Out[30]:
+: # Out[68]:
 
 * CONUS 12km
 
@@ -122,6 +122,6 @@ plt.grid(False)
 
 #+RESULTS:
 :RESULTS:
-# Out[67]:
-[[file:./obipy-resources/MPJc3l.svg]]
+# Out[69]:
+[[file:./obipy-resources/28gTT0.svg]]
 :END:
