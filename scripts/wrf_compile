@@ -13,6 +13,7 @@ help() {
     echo "    -c, --compile NUM                   Select NUM option from the WRF ./configure compiler options list. Note this number is dependent on the WRF version."
     echo "    -n, --nest NUM                      Select NUM option for nesting from the ./configure nesting options list. Note this number is dependent on the WRF version"
     echo "    -p, --mpiexec MPIEXEC_CMD           Command to launch an executable using mpi on nodes."
+    echo "    -j, --tasks NUM                     Parallel compilation using NUM tasks (default 2)."
     echo "    -m, --modules MODULE1 MODULE2 ...   List of modules to be loaded into the environment for compilation and execution. Note: the order of matters here, prereqs must be loaded first."
     echo "    -h, --help                          This help"
     echo ""
@@ -52,6 +53,9 @@ do
                 nest_num=$2
             fi
             ;;
+        -j|--tasks)
+            n_tasks=$2
+            ;;
         -p|--mpiexec)
             mpiexec_cmd=$2
             ;;
@@ -75,7 +79,7 @@ do
     module load $mod
 done
 
-mkdir -p $wrf_dir
+mkdir $wrf_dir
 cd $wrf_dir
 cp $wrf_source .
 gunzip *
@@ -84,7 +88,7 @@ tar -xf $wrf_tar
 rm $wrf_tar
 wrf_untar_name=$(ls)
 mv $wrf_untar_name/* .
-rmdir $wrf_untar_name
+rm -r $wrf_untar_name
 
 printf "$compile_num\n$nest_num\n" | ./configure
 
@@ -97,6 +101,10 @@ done
 echo "$mpiexec_cmd ./wrf.exe" >> run/mpirun_wrf
 chmod a+x run/mpirun_wrf
 
-./compile em_real &> compile.log
+if [ -z $n_tasks ]; then
+    ./compile -j $n_tasks em_real &> compile.log
+else
+    ./compile em_real &> compile.log
+fi
 
 tail compile.log

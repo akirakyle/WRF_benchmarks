@@ -29,18 +29,18 @@
  /
 
  &domains
- time_step                           = 3,
+ time_step                           = 9,
  time_step_fract_num                 = 0,
  time_step_fract_den                 = 1,
  max_dom                             = 1,
- e_we                                = 2940,
- e_sn                                = 2100,
- e_vert                              = 30,
+ e_we                                = 980,
+ e_sn                                = 700,
+ e_vert                              = 35,
  p_top_requested                     = 5000,
  num_metgrid_levels                  = 27,
  num_metgrid_soil_levels             = 4,
- dx                                  = 1000,
- dy                                  = 1000,
+ dx                                  = 3000,
+ dy                                  = 3000,
  grid_id                             = 1,
  parent_id                           = 0,
  i_parent_start                      = 1,
@@ -55,7 +55,7 @@
  physics_suite                       = 'tropical'
  cu_physics                          = 0,
  sf_sfclay_physics                   = 1,
- radt                                = 1,
+ radt                                = 3,
  bldt                                = 0,
  cudt                                = 0,
  icloud                              = 1,

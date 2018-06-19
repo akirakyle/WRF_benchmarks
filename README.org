@@ -121,8 +121,34 @@ wrf_compile \
     ncarenv/1.2
 
 wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV4.0.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 \
+    --compile 15 \
+    --nest 1 \
+    --mpiexec mpiexec_mpt \
+    --modules \
+    intel/18.0.1 \
+    mpt/2.18 \
+    netcdf/4.6.0 \
+    ncarcompilers/0.4.1 \
+    ncarenv/1.2
+
+wrf_compile \
     --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz\
     --wrfdir ~/work/WRFs/WRFV3.9.1.1-intel18.0.1-mpt2.18 \
+    --compile 15 \
+    --nest 1 \
+    --mpiexec mpiexec_mpt \
+    --modules \
+    intel/18.0.1 \
+    mpt/2.18 \
+    netcdf/4.6.0 \
+    ncarcompilers/0.4.1 \
+    ncarenv/1.2
+
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV3.9.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV3.9-intel18.0.1-mpt2.18 \
     --compile 15 \
     --nest 1 \
     --mpiexec mpiexec_mpt \
@@ -353,10 +379,15 @@ wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 12 -c cases/katrina1
 
 wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel18.0.1-mpt2.18 -n 2 -c cases/katrina1km -t 1 -a '02:00:00'
 wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel18.0.1-mpt2.18 -n 2 -c cases/katrina3km -t 1 -a '01:00:00'
-#+end_src
 wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-gnu8.1.0-mpt2.18 -n 2 -c cases/conus12km -t 1
 wrf_run_pbs_jobs -w WRFs/WRFV3.8.1-gnu6.3.0-mpt2.18 -n 2 -c cases/conus12km -t 2
 
+wrf_run_pbs_jobs -w WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n 2 -c cases/conus12km -t 1
+wrf_run_pbs_jobs -w WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n 2 -c cases/katrina1km -t 1
+wrf_run_pbs_jobs -w WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n 2 -c cases/katrina3km -t 1
+#+end_src
+
+wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel18.0.1-mpt2.18 -n 2 -c cases/katrina3km -t 6
 
 #+begin_src sh
 wrf_run_pbs_jobs \
@@ -384,6 +415,15 @@ wrf_run_pbs_jobs \
     --nodes 1 2 4 8 16 32 64 128 256 \
     --cases ~/WRF_benchmarks/cases/conus12km \
     --trial 2
+
+wrf_run_pbs_jobs \
+    --wrfs \
+    ~/work/WRFs/WRFV4.0-gnu6.3.0-mpt2.18 \
+    ~/work/WRFs/WRFV4.0-gnu8.1.0-mpt2.18 \
+    ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 \
+    --nodes 1 2 4 8 16 32 64 128 \
+    --cases ~/WRF_benchmarks/cases/new_conus12km \
+    --trial 1
 #+end_src
 
 #+begin_src sh
@@ -448,6 +488,61 @@ $WPS_DIR/link_grib.csh $DATA_DIR/avn
 The ~cases~ directory has the namelists for a 1km and 3km resolution case as
 well as the example namelist for a small run used in the tutorial at
 [[http://www2.mmm.ucar.edu/wrf/OnLineTutorial/CASES/SingleDomain/index.html]]
+
+*** maria (1km, 3km)
+#+begin_src sh
+module purge
+module load intel/18.0.1
+module load mpt/2.18
+module load netcdf/4.6.0
+module load ncarcompilers/0.4.1
+module load ncarenv/1.2
+
+mkdir -p ~/work/case_data/maria1km
+cd ~/work/case_data/maria1km
+
+ln -sf ~/WRF_benchmarks/cases/maria1km/namelist.* .
+ln -sf ~/work/WPS-4.0/*.exe .
+ln -sf ~/work/WPS-4.0/ungrib/Variable_Tables/Vtable.GFS Vtable
+ln -sf ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18/main/real.exe .
+
+ln -sf /glade2/collections/rda/data/ds084.1/2018/20180617/gfs.0p25.2018061700.f000.grib2 GRIBFILE.AAA
+ln -sf /glade2/collections/rda/data/ds084.1/2018/20180617/gfs.0p25.2018061700.f003.grib2 GRIBFILE.AAB
+ln -sf /glade2/collections/rda/data/ds084.1/2018/20180617/gfs.0p25.2018061700.f006.grib2 GRIBFILE.AAC
+ln -sf /glade2/collections/rda/data/ds084.1/2018/20180617/gfs.0p25.2018061700.f009.grib2 GRIBFILE.AAD
+ln -sf /glade2/collections/rda/data/ds084.1/2018/20180617/gfs.0p25.2018061700.f012.grib2 GRIBFILE.AAE
+
+
+./ungrib.exe >& ungrib_data.log
+./geogrid.exe
+./metgrid.exe
+
+cat > cheyenne_real.pbs << "EOF"
+#!/bin/bash
+#PBS -N cheyenne_real
+#PBS -A SCSG0002
+#PBS -l walltime=00:30:00
+#PBS -q regular
+#PBS -j oe
+#PBS -l select=8:ncpus=36:mpiprocs=36
+#PBS -m abe
+#PBS -M akirak@ucar.edu
+
+export TMPDIR=/glade/scratch/$USER/temp
+mkdir -p $TMPDIR
+
+module purge
+module load intel/18.0.1
+module load mpt/2.18
+module load netcdf/4.6.0
+module load ncarcompilers/0.4.1
+module load ncarenv/1.2
+
+### Run the executable
+mpiexec_mpt ./real.exe
+EOF
+qsub cheyenne_real.pbs
+#+end_src
 
 *** conus (12km, 2.5km)
 The ~wrfbdy_d01~ and ~wrfrst_d01~ files for the official CONUS benchmarks at

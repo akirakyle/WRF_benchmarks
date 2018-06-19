@@ -35,7 +35,7 @@
  max_dom                             = 1,
  e_we                                = 2940,
  e_sn                                = 2100,
- e_vert                              = 30,
+ e_vert                              = 35,
  p_top_requested                     = 5000,
  num_metgrid_levels                  = 27,
  num_metgrid_soil_levels             = 4,
@@ -52,17 +52,38 @@
  /
 
  &physics
- physics_suite                       = 'tropical'
+ mp_physics                          = 2,
  cu_physics                          = 0,
+ ra_lw_physics                       = 4,
+ ra_sw_physics                       = 5,
  sf_sfclay_physics                   = 1,
- radt                                = 1,
+ sf_surface_physics                  = 2,
+ bl_pbl_physics                      = 1,
+ radt                                = 3,
  bldt                                = 0,
- cudt                                = 0,
+ cudt                                = 5,
+ ra_call_offset                      = 0,
+ cam_abs_freq_s                      = 21600,
+ levsiz                              = 59,
+ paerlev                             = 29,
+ cam_abs_dim1                        = 4,
+ cam_abs_dim2                        = 35,
  icloud                              = 1,
+ isfflx                              = 1,
+ ifsnow                              = 0,
  isftcflx                            = 2,
+ surface_input_source                = 1,
  num_soil_layers                     = 4,
  num_land_cat                        = 21,
  sf_urban_physics                    = 0,
+ maxiens                             = 0,
+ maxens                              = 3,
+ maxens2                             = 3,
+ maxens3                             = 16,
+ ensdim                              = 144,
+ sst_update                          = 1,
+ usemonalb                           = .true.
+ fractional_seaice                   = 1,
  /
 
  &fdda

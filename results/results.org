@@ -3,15 +3,33 @@
 #+EMAIL: akyle@cmu.edu
 #+OPTIONS: toc:nil email:t
 
-#+BEGIN_SRC ipython :session :exports code
+#+begin_src ipython :session :exports code
 import numpy as np
 import matplotlib.pyplot as plt
 %matplotlib inline
 %config InlineBackend.figure_format = 'svg'
-#+END_SRC
+#+end_src
 
 #+RESULTS:
-: # Out[68]:
+: # Out[7]:
+
+#+begin_src ipython :session :exports code
+def plot_it(data,meta):
+    for i in range(len(meta)):
+        this_data = data[meta[i][2]:meta[i][3]]
+        sec_step = np.array([d[3] for d in this_data])
+        cpus = np.array([d[8] for d in this_data])
+        gridpoints = e_we * e_sn
+        plt.loglog(gridpoints/cpus, 1/sec_step, '+--',
+                   label=data[meta[i][2]][0][meta[i][0]:meta[i][1]])
+    plt.xlabel("Total grid points / core")
+    plt.ylabel("Time steps / s")
+    plt.legend(loc='upper center', bbox_to_anchor=(1.35, 0.8), ncol=1)
+    #plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=2)
+#+end_src
+
+#+RESULTS:
+: # Out[8]:
 
 * CONUS 12km
 
@@ -19,7 +37,7 @@ import matplotlib.pyplot as plt
 wrf_stats -t -H -w 55 -d conus12km-WRFV3.8.1-*
 #+end_src
 
-#+NAME: wrf-stats
+#+NAME: conus12km
 #+RESULTS:
 | File                                                    | Comp: Total(s) | Steps | Avg.(s/step) |      Speed | I/O: Total(s) | Avg.(s/step) |   XxY | CPUs |
 |---------------------------------------------------------+----------------+-------+--------------+------------+---------------+--------------+-------+------|
@@ -90,7 +108,7 @@ wrf_stats -t -H -w 55 -d conus12km-WRFV3.8.1-*
 | conus12km-WRFV3.8.1-intel18.0.1-mpt2.18-T2-N128/rsl.out |        1.90839 |   149 |      0.01281 | 5621.49246 |      12.89086 |      6.44543 | 64x72 | 4608 |
 | conus12km-WRFV3.8.1-intel18.0.1-mpt2.18-T2-N256/rsl.out |        1.39718 |   149 |      0.00938 | 7678.32348 |      14.10451 |      7.05226 | 96x96 | 9216 |
 
-#+NAME: table-splits
+#+NAME: conus12km-splits
 | Name Start Index | Name End Index | Table Start Index | Table End Index |
 |------------------+----------------+-------------------+-----------------|
 |               20 |             39 |                 0 |               9 |
@@ -102,26 +120,61 @@ wrf_stats -t -H -w 55 -d conus12km-WRFV3.8.1-*
 |               20 |             42 |                50 |              57 |
 |               20 |             42 |                57 |              66 |
 
-#+HEADER: :var data=wrf-stats meta=table-splits e_we=425 e_sn=300
+#+HEADER: :var data=conus12km meta=conus12km-splits e_we=425 e_sn=300
 #+BEGIN_SRC ipython :session :exports both :results raw drawer
-for i in range(len(meta)):
-    this_data = data[meta[i][2]:meta[i][3]]
-    sec_step = np.array([d[3] for d in this_data])
-    cpus = np.array([d[8] for d in this_data])
-    gridpoints = e_we * e_sn
-    plt.loglog(gridpoints/cpus, 1/sec_step, '+--',
-               label=data[meta[i][2]][0][meta[i][0]:meta[i][1]])
-plt.xlabel("Total grid points / core")
-plt.ylabel("Time steps / s")
-plt.legend(loc='upper center', bbox_to_anchor=(1.35, 0.8), ncol=1)
-#plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=2)
-
+plot_it(data, meta)
 plt.title("Scaling results for CONUS 12km with WRFV3.8.1")
 plt.grid(False)
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-# Out[69]:
-[[file:./obipy-resources/28gTT0.svg]]
+# Out[12]:
+[[file:./obipy-resources/4oTm3w.svg]]
+:END:
+
+* NEW CONUS 12km
+
+#+begin_src bash :dir /ssh:cheyenne:~/work/run :results raw
+wrf_stats -t -H -w 55 -d new_conus12km-WRFV4.0-*
+#+end_src
+
+#+NAME: new_conus12km
+#+RESULTS:
+| File                                                    | Comp: Total(s) | Steps | Avg.(s/step) |      Speed | I/O: Total(s) | Avg.(s/step) |   XxY | CPUs |
+|---------------------------------------------------------+----------------+-------+--------------+------------+---------------+--------------+-------+------|
+| new_conus12km-WRFV4.0-gnu6.3.0-mpt2.18-T1-N001/rsl.out. |      357.00459 |   298 |      1.19800 |   60.10007 |      52.56240 |      7.50891 |   6x6 |   36 |
+| new_conus12km-WRFV4.0-gnu6.3.0-mpt2.18-T1-N002/rsl.out. |      181.70973 |   298 |      0.60976 |  118.07843 |      53.21582 |      7.60226 |   8x9 |   72 |
+| new_conus12km-WRFV4.0-gnu6.3.0-mpt2.18-T1-N004/rsl.out. |       94.64736 |   298 |      0.31761 |  226.69412 |      52.76527 |      7.53790 | 12x12 |  144 |
+| new_conus12km-WRFV4.0-gnu6.3.0-mpt2.18-T1-N008/rsl.out. |       48.05647 |   298 |      0.16126 |  446.47474 |      53.13171 |      7.59024 | 16x18 |  288 |
+| new_conus12km-WRFV4.0-gnu6.3.0-mpt2.18-T1-N016/rsl.out. |       26.16013 |   298 |      0.08779 |  820.17941 |      53.55744 |      7.65106 | 24x24 |  576 |
+| new_conus12km-WRFV4.0-gnu6.3.0-mpt2.18-T1-N032/rsl.out. |             -- |    -- |           -- |         -- |            -- |           -- | 32x36 | 1152 |
+| new_conus12km-WRFV4.0-gnu6.3.0-mpt2.18-T1-N064/rsl.out. |             -- |    -- |           -- |         -- |            -- |           -- | 48x48 | 2304 |
+| new_conus12km-WRFV4.0-gnu6.3.0-mpt2.18-T1-N128/rsl.out. |             -- |    -- |           -- |         -- |            -- |           -- | 64x72 | 4608 |
+| new_conus12km-WRFV4.0-intel18.0.1-mpt2.18-T1-N001/rsl.o |      256.93761 |   298 |      0.86221 |   83.50665 |      46.61132 |      6.65876 |   6x6 |   36 |
+| new_conus12km-WRFV4.0-intel18.0.1-mpt2.18-T1-N002/rsl.o |      127.52850 |   298 |      0.42795 |  168.24475 |      47.08555 |      6.72651 |   8x9 |   72 |
+| new_conus12km-WRFV4.0-intel18.0.1-mpt2.18-T1-N004/rsl.o |       63.81769 |   298 |      0.21415 |  336.20772 |      48.25521 |      6.89360 | 12x12 |  144 |
+| new_conus12km-WRFV4.0-intel18.0.1-mpt2.18-T1-N008/rsl.o |       32.04595 |   298 |      0.10754 |  669.53858 |      49.44469 |      7.06353 | 16x18 |  288 |
+| new_conus12km-WRFV4.0-intel18.0.1-mpt2.18-T1-N016/rsl.o |       17.86106 |   298 |      0.05994 | 1201.27249 |      51.29970 |      7.32853 | 24x24 |  576 |
+| new_conus12km-WRFV4.0-intel18.0.1-mpt2.18-T1-N032/rsl.o |             -- |    -- |           -- |         -- |            -- |           -- | 32x36 | 1152 |
+| new_conus12km-WRFV4.0-intel18.0.1-mpt2.18-T1-N064/rsl.o |             -- |    -- |           -- |         -- |            -- |           -- | 48x48 | 2304 |
+| new_conus12km-WRFV4.0-intel18.0.1-mpt2.18-T1-N128/rsl.o |             -- |    -- |           -- |         -- |            -- |           -- | 64x72 | 4608 |
+
+#+NAME: new_conus12km-splits
+| Name Start Index | Name End Index | Table Start Index | Table End Index |
+|------------------+----------------+-------------------+-----------------|
+|               22 |             38 |                 0 |               5 |
+|               22 |             41 |                 8 |              13 |
+
+#+HEADER: :var data=new_conus12km meta=new_conus12km-splits e_we=425 e_sn=300
+#+BEGIN_SRC ipython :session :exports both :results raw drawer
+plot_it(data, meta)
+plt.title("Scaling results for NEW CONUS 12km with WRFV4.0")
+plt.grid(False)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[13]:
+[[file:./obipy-resources/pcqxBB.svg]]
 :END:
