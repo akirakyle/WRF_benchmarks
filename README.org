@@ -2,308 +2,18 @@
 This repo documents the benchmark cases used for assessing the scaling
 performance of WRF on NCAR's Cheyenne Supercomputer.
 
-- ~namelists/~ contains the namelists for WPS and WRF for the various benchmark
+- ~cases/~ contains the namelists for WPS and WRF for the various benchmark
   cases.
 - ~scripts/~ contains useful scripts for automating the compilation, running,
   and analysis of the WRF test cases
+  - ~wrf_compile~ will compile WRF from source with the given options. See
+    ~wrf_compile --help~
+  - ~wrf_run_pbs_jobs~ will create the run directories and pbs job scripts
+    necessary to run the given WRF versions with the given node counts and
+    benchmark cases. See ~wrf_run_pbs_jobs --help~.
 - ~results/~ contains the timing results and analysis and plotting code
-- ~privatemodules/mvapich~ contains a custom module for mvapich since cheyenne
-  currently does not have an mvapich module. See ~.profile~ for adding this
-  custom module to your environment.
 
-** WRF compilation
-~wrf_compile~ will compile WRF from source with the given options. See
-~wrf_compile --help~
-
-Invocations of ~wrf_compile~ on cheyenne:
-
-*** old
-#+begin_src sh
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.9.1.1-intel-serial \
-    --compile 13 \
-    --nest 1 \
-    --modules \
-    ncarenv/1.2 \
-    intel/18.0.1 \
-    ncarcompilers/0.4.1 \
-    netcdf/4.6.0
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 \
-    --compile 15 \
-    --nest 1 \
-    --mpiexec mpiexec_mpt \
-    --modules \
-    ncarenv/1.2 \
-    intel/18.0.1 \
-    ncarcompilers/0.4.1 \
-    mpt/2.18 \
-    netcdf/4.6.0
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.8.1-intel-dmpar-mpt2.18 \
-    --compile 15 \
-    --nest 1 \
-    --mpiexec mpiexec_mpt \
-    --modules \
-    ncarenv/1.2 \
-    intel/18.0.1 \
-    ncarcompilers/0.4.1 \
-    mpt/2.18 \
-    netcdf/4.6.0
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mpt2.18 \
-    --compile 34 \
-    --nest 1 \
-    --mpiexec mpiexec_mpt \
-    --modules \
-    ncarenv/1.2 \
-    gnu/6.3.0 \
-    ncarcompilers/0.4.1 \
-    mpt/2.18 \
-    netcdf/4.6.1
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu-dmpar-mvapich2.2 \
-    --compile 34 \
-    --nest 1 \
-    --mpiexec 'mpirun_rsh -hostfile $PBS_NODEFILE -n $1'  \
-    --modules \
-    ncarenv/1.2 \
-    gnu/6.3.0 \
-    ncarcompilers/0.4.1 \
-    mvapich/2.2 \
-    netcdf/4.6.1
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mvapich2.2 \
-    --compile 34 \
-    --nest 1 \
-    --mpiexec 'mpirun_rsh -hostfile $PBS_NODEFILE -n $1'  \
-    --modules \
-    ncarenv/1.2 \
-    gnu/6.3.0 \
-    ncarcompilers/0.4.1 \
-    mvapich2/2.2 \
-    netcdf/4.6.1
-#+end_src
-
-*** new
-#+begin_src sh
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz \
-    --wrfdir ~/work/WRFs/WRFV3.9.1.1-intel18.0.1 \
-    --compile 13 \
-    --nest 1 \
-    --modules \
-    intel/18.0.1 \
-    netcdf/4.6.0 \
-    ncarcompilers/0.4.1 \
-    ncarenv/1.2
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz \
-    --wrfdir ~/work/WRFs/WRFV3.8.1-intel18.0.1 \
-    --compile 13 \
-    --nest 1 \
-    --modules \
-    intel/18.0.1 \
-    netcdf/4.6.0 \
-    ncarcompilers/0.4.1 \
-    ncarenv/1.2
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV4.0.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 \
-    --compile 15 \
-    --nest 1 \
-    --mpiexec mpiexec_mpt \
-    --modules \
-    intel/18.0.1 \
-    mpt/2.18 \
-    netcdf/4.6.0 \
-    ncarcompilers/0.4.1 \
-    ncarenv/1.2
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.9.1.1-intel18.0.1-mpt2.18 \
-    --compile 15 \
-    --nest 1 \
-    --mpiexec mpiexec_mpt \
-    --modules \
-    intel/18.0.1 \
-    mpt/2.18 \
-    netcdf/4.6.0 \
-    ncarcompilers/0.4.1 \
-    ncarenv/1.2
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.9.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.9-intel18.0.1-mpt2.18 \
-    --compile 15 \
-    --nest 1 \
-    --mpiexec mpiexec_mpt \
-    --modules \
-    intel/18.0.1 \
-    mpt/2.18 \
-    netcdf/4.6.0 \
-    ncarcompilers/0.4.1 \
-    ncarenv/1.2
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.8.1-intel18.0.1-mpt2.18 \
-    --compile 15 \
-    --nest 1 \
-    --mpiexec mpiexec_mpt \
-    --modules \
-    intel/18.0.1 \
-    mpt/2.18 \
-    netcdf/4.6.0 \
-    ncarcompilers/0.4.1 \
-    ncarenv/1.2
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.9.1.1-gnu8.1.0-mpt2.18 \
-    --compile 34 \
-    --nest 1 \
-    --mpiexec mpiexec_mpt \
-    --modules \
-    gnu/8.1.0 \
-    mpt/2.18 \
-    netcdf/4.6.1 \
-    ncarcompilers/0.4.1 \
-    ncarenv/1.2
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mpt2.18 \
-    --compile 34 \
-    --nest 1 \
-    --mpiexec mpiexec_mpt \
-    --modules \
-    gnu/6.3.0 \
-    mpt/2.18 \
-    netcdf/4.6.1 \
-    ncarcompilers/0.4.1 \
-    ncarenv/1.2
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz \
-    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mvapich2.2 \
-    --compile 34 \
-    --nest 1 \
-    --mpiexec 'mpirun_rsh -hostfile $PBS_NODEFILE -n $1'  \
-    --modules \
-    gnu/6.3.0 \
-    mvapich2/2.2 \
-    netcdf/4.6.1 \
-    ncarcompilers/0.4.1 \
-    ncarenv/1.2
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu7.1.0-mpt2.18 \
-    --compile 34 \
-    --nest 1 \
-    --mpiexec mpiexec_mpt \
-    --modules \
-    gnu/7.1.0 \
-    mpt/2.18 \
-    netcdf/4.6.1 \
-    ncarcompilers/0.4.1 \
-    ncarenv/1.2
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu7.1.0-mvapich2.2 \
-    --compile 34 \
-    --nest 1 \
-    --mpiexec 'mpirun_rsh -hostfile $PBS_NODEFILE -n $1'  \
-    --modules \
-    gnu/7.1.0 \
-    mvapich2/2.2 \
-    netcdf/4.6.1 \
-    ncarcompilers/0.4.1 \
-    ncarenv/1.2
-#+end_src
-
-*** failing
-
-#+begin_src sh
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.9.1.1-gnu8.1.0\
-    --compile 32 \
-    --nest 1 \
-    --modules \
-    gnu/8.1.0 \
-    netcdf/4.6.1 \
-    ncarcompilers/0.4.1 \
-    ncarenv/1.2
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu8.1.0\
-    --compile 32 \
-    --nest 1 \
-    --modules \
-    gnu/8.1.0 \
-    netcdf/4.6.1 \
-    ncarcompilers/0.4.1 \
-    ncarenv/1.2
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu8.1.0-mpt2.18 \
-    --compile 34 \
-    --nest 1 \
-    --mpiexec mpiexec_mpt \
-    --modules \
-    gnu/8.1.0 \
-    mpt/2.18 \
-    netcdf/4.6.1 \
-    ncarcompilers/0.4.1 \
-    ncarenv/1.2
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu7.3.0-mpt2.18 \
-    --compile 34 \
-    --nest 1 \
-    --mpiexec mpiexec_mpt \
-    --modules \
-    gnu/7.3.0 \
-    mpt/2.18 \
-    netcdf/4.6.1 \
-    ncarcompilers/0.4.1 \
-    ncarenv/1.2
-
-wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV3.8.1.TAR.gz\
-    --wrfdir ~/work/WRFs/WRFV3.8.1-gnu7.3.0-mpt2.18 \
-    --compile 34 \
-    --nest 1 \
-    --mpiexec mpiexec_mpt \
-    --modules \
-    ncarenv/1.2 \
-    gnu/7.3.0 \
-    ncarcompilers/0.4.1 \
-    mpt/2.18 \
-    netcdf/4.6.1
-#+end_src
-
-** Example pbs job scripts for cheyenne
+** Examples of pbs job scripts for cheyenne
 #+begin_src sh
 #!/bin/bash
 ### Job Name
@@ -348,206 +58,65 @@ perf-report -mpi -n 72 ./wrf.exe
 
 To use ~mvapich~ instead of ~mpt~
 #+begin_src sh
-ml reset
-ml rm mpt/2.15f
-
-export PATH=/glade/u/apps/ch/opt/mvapich2/2.2/gnu/7.1.0/bin/:$PATH
-
+module load mvapich2
 mpirun_rsh -hostfile $PBS_NODEFILE -n 72 ./wrf.exe
 #+end_src
 
 
-** Batch PBS job scripts generation and submission
-~wrf_run_pbs_jobs~ will create the run directories and pbs job scripts necessary
-to run the given WRF versions with the given node counts and benchmark cases.
-See ~wrf_run_pbs_jobs --help~.
 
-Example invocations of ~wrf_run_pbs_jobs~:
-#+begin_src sh
-wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/conus12km -t 1
-wrf_run_pbs_jobs -w WRFs/WRFV3.8.1-intel-dmpar-mpt2.18 -n 2 -c cases/conus12km -t 1
-wrf_run_pbs_jobs -w WRFs/WRFV3.8.1-gnu-dmpar-mvapich2.2 -n 2 -c cases/conus12km -t 1
-wrf_run_pbs_jobs -w WRFs/WRFV3.8.1-intel-dmpar-mpt2.18 -n 2 -c cases/conus2.5km -t 1
-wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/conus2.5km -t 1
-wrf_run_pbs_jobs -w WRFs/WRFV3.7.1-intel-dmpar-mpt2.18 -n 2 -c cases/conus2.5km -t 1
-wrf_run_pbs_jobs -w WRFs/WRFV3.6.1-intel-dmpar-mpt2.18 -n 2 -c cases/conus2.5km -t 1
-wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/katrina-ex -t 1
-wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 8 -c cases/katrina1km -t 1
-wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/katrina3km -t 2 -a '01:00:00'
-wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 2 -c cases/katrina1km -t 2 -a '02:00:00'
-wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel-dmpar-mpt2.18 -n 12 -c cases/katrina1km -t 1 -a '02:00:00'
-
-wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel18.0.1-mpt2.18 -n 2 -c cases/katrina1km -t 1 -a '02:00:00'
-wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel18.0.1-mpt2.18 -n 2 -c cases/katrina3km -t 1 -a '01:00:00'
-wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-gnu8.1.0-mpt2.18 -n 2 -c cases/conus12km -t 1
-wrf_run_pbs_jobs -w WRFs/WRFV3.8.1-gnu6.3.0-mpt2.18 -n 2 -c cases/conus12km -t 2
-
-wrf_run_pbs_jobs -w WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n 2 -c cases/conus12km -t 1
-wrf_run_pbs_jobs -w WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n 2 -c cases/katrina1km -t 1
-wrf_run_pbs_jobs -w WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n 2 -c cases/katrina3km -t 1
-#+end_src
-
-wrf_run_pbs_jobs -w WRFs/WRFV3.9.1.1-intel18.0.1-mpt2.18 -n 2 -c cases/katrina3km -t 6
-
-#+begin_src sh
-wrf_run_pbs_jobs \
-    --wrfs ~/work/WRFs/WRFV3.8.1-gnu-dmpar-mvapich2.2 \
-    --nodes 1 2 4 8 16 32 64 \
-    --cases ~/WRF_benchmarks/cases/conus12km \
-    --trial 1
-wrf_run_pbs_jobs \
-    --wrfs ~/work/WRFs/WRFV3.8.1-intel-dmpar-mpt2.18 \
-    --nodes 1 2 4 8 16 32 64 \
-    --cases ~/WRF_benchmarks/cases/conus12km \
-    --trial 1
-wrf_run_pbs_jobs \
-    --wrfs ~/work/WRFs/WRFV3.8.1-intel18.0.1-mpt2.18 \
-    --nodes 1 2 4 8 16 32 64 128 256 \
-    --cases ~/WRF_benchmarks/cases/conus12km \
-    --trial 1
-wrf_run_pbs_jobs \
-    --wrfs ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mpt2.18 \
-    --nodes 1 2 4 8 16 32 64 128 256 \
-    --cases ~/WRF_benchmarks/cases/conus12km \
-    --trial 2
-wrf_run_pbs_jobs \
-    --wrfs ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mvapich2.2 \
-    --nodes 1 2 4 8 16 32 64 128 256 \
-    --cases ~/WRF_benchmarks/cases/conus12km \
-    --trial 2
-
-wrf_run_pbs_jobs \
-    --wrfs \
-    ~/work/WRFs/WRFV4.0-gnu6.3.0-mpt2.18 \
-    ~/work/WRFs/WRFV4.0-gnu8.1.0-mpt2.18 \
-    ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 \
-    --nodes 1 2 4 8 16 32 64 128 \
-    --cases ~/WRF_benchmarks/cases/new_conus12km \
-    --trial 1
-#+end_src
-
-#+begin_src sh
-wrf_run_pbs_jobs \
-    --wrfs \
-    ~/work/WRFs/WRFV3.9.1.1-intel18.0.1-mpt2.18 \
-    ~/work/WRFs/WRFV3.9.1.1-gnu8.1.0-mpt2.18 \
-    ~/work/WRFs/WRFV3.9.1.1-intel18.0.1-mvapich2.2 \
-    ~/work/WRFs/WRFV3.9.1.1-gnu8.1.0-mvapich2.2 \
-    --nodes 2 4 8 16 32 64 128 256 512 \
-    --cases \
-    ~/WRF_benchmarks/cases/conus12km \
-    ~/WRF_benchmarks/cases/conus2.5km \
-    ~/WRF_benchmarks/cases/katrina1km \
-    ~/WRF_benchmarks/cases/katrina3km \
-    ~/WRF_benchmarks/cases/tracer_simple_01 \
-    ~/WRF_benchmarks/cases/dust_simple_01 \
-    --trial 1
-#+end_src
-
-
-** The benchmark cases
+** Data for the various benchmark cases
 *** katrina (1km, 3km, 30km)
-The Katrina data can be downloaded using curl from the WRF tutorial page
+Data for running the Hurricane Katrina cases can be downloaded from the WRF tutorial page
 
 #+begin_src sh
 curl http://www2.mmm.ucar.edu/wrf/TUTORIAL_DATA/Katrina.tar.gz -o Katrina.tar.gz
 tar -xf Katrina.tar
 #+end_src
 
-To generate the necessary ~wrfbdy_d01~ and ~wrfinput_d01~ WRF input data for
-~wrf_run_pbs_jobs~, one needs to run WPS on the above Katrina data. The
-following script can used to do this. WPS must already be compiled. Note that
-for the larger 1km and 3km domains, running a ~dmpar~ version of ~real.exe~ may
-be necessary since the serial version by encounter a ~SIGSEGV~ from running out
-of memory.
-
-#+begin_src sh
-#!/bin/sh
-set -e
-CASE_NAME=-ex
-DATA_DIR=~/work/raw_data/Katrina
-WPS_DIR=~/work/WPS
-
-RUN_DIR=~/work/case_data/katrina$CASE_NAME
-mkdir -p $RUN_DIR
-cd $RUN_DIR
-
-ln -sf ~/WRF_benchmarks/cases/katrina$CASE_NAME/namelist.* .
-ln -sf $(readlink -f $WPS_DIR)/*.exe .
-ln -sf $WPS_DIR/ungrib/Variable_Tables/Vtable.GFS Vtable
-ln -sf ~/work/WRFs/WRFV3.9.1.1-intel-serial/main/real.exe .
-
-$WPS_DIR/link_grib.csh $DATA_DIR/avn
-
-./ungrib.exe >& ungrib_data.log
-./geogrid.exe
-./metgrid.exe
-./real.exe
-#+end_src
-
-The ~cases~ directory has the namelists for a 1km and 3km resolution case as
-well as the example namelist for a small run used in the tutorial at
+The 30km case is the same namelist as shown in the WRF-ARW tutorial at
 [[http://www2.mmm.ucar.edu/wrf/OnLineTutorial/CASES/SingleDomain/index.html]]
 
-*** maria (1km, 3km)
-#+begin_src sh
-module purge
-module load intel/18.0.1
-module load mpt/2.18
-module load netcdf/4.6.0
-module load ncarcompilers/0.4.1
-module load ncarenv/1.2
-
-mkdir -p ~/work/case_data/maria1km
-cd ~/work/case_data/maria1km
-
-ln -sf ~/WRF_benchmarks/cases/maria1km/namelist.* .
-ln -sf ~/work/WPS-4.0/*.exe .
-ln -sf ~/work/WPS-4.0/ungrib/Variable_Tables/Vtable.GFS Vtable
-ln -sf ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18/main/real.exe .
-
-ln -sf /glade2/collections/rda/data/ds084.1/2018/20180617/gfs.0p25.2018061700.f000.grib2 GRIBFILE.AAA
-ln -sf /glade2/collections/rda/data/ds084.1/2018/20180617/gfs.0p25.2018061700.f003.grib2 GRIBFILE.AAB
-ln -sf /glade2/collections/rda/data/ds084.1/2018/20180617/gfs.0p25.2018061700.f006.grib2 GRIBFILE.AAC
-ln -sf /glade2/collections/rda/data/ds084.1/2018/20180617/gfs.0p25.2018061700.f009.grib2 GRIBFILE.AAD
-ln -sf /glade2/collections/rda/data/ds084.1/2018/20180617/gfs.0p25.2018061700.f012.grib2 GRIBFILE.AAE
-
-
-./ungrib.exe >& ungrib_data.log
-./geogrid.exe
-./metgrid.exe
-
-cat > cheyenne_real.pbs << "EOF"
-#!/bin/bash
-#PBS -N cheyenne_real
-#PBS -A SCSG0002
-#PBS -l walltime=00:30:00
-#PBS -q regular
-#PBS -j oe
-#PBS -l select=8:ncpus=36:mpiprocs=36
-#PBS -m abe
-#PBS -M akirak@ucar.edu
-
-export TMPDIR=/glade/scratch/$USER/temp
-mkdir -p $TMPDIR
-
-module purge
-module load intel/18.0.1
-module load mpt/2.18
-module load netcdf/4.6.0
-module load ncarcompilers/0.4.1
-module load ncarenv/1.2
-
-### Run the executable
-mpiexec_mpt ./real.exe
-EOF
-qsub cheyenne_real.pbs
-#+end_src
+WPS and ~real.exe~ must be run to generate ~wrfbdy_d01~ and ~wrfrst_d01~ for
+these cases
 
 *** conus (12km, 2.5km)
 The ~wrfbdy_d01~ and ~wrfrst_d01~ files for the official CONUS benchmarks at
 12km and 2.5km resolution can be found at:
 [[http://www2.mmm.ucar.edu/wrf/WG2/benchv3/]]
 
+*** maria (1km, 3km) and new_conus (12km, 2.5km)
+The data for these Hurricane Maria cases and CONUS cases comes from the NCEP GFS
+Model Runs which can be downloaded form [[https://rda.ucar.edu/datasets/ds084.1/]].
+However this data already resides on glade, so the WPS scripts just link in the
+appropriate glade directories.
+
+WPS and ~real.exe~ must be run to generate ~wrfbdy_d01~ and ~wrfrst_d01~ for
+these cases
+
 *** ~dust_simple_01~ and ~tracer_simple_01~
 These are wrf-chem cases
+
+** Example workflow for new_conus12km
+Make sure the ~WRF_benchmarks/scripts~ is in your ~$PATH~. As always, make sure
+to change the paths to your directory structure. All the scripts in the
+~srcipts/~ directory do not hardcode paths but the scripts in the ~cases/~
+directory do.
+
+The following will give you a table with timing results on the new_conus12km
+benchmark using WRFV4.0 compiled with gnu8.1.0 and mvapich2.2 for two trials
+scaled across 1, 2, 4, 8 nodes on cheyenne. (cheyenne's 36 cores/node is
+hardcoded into ~wrf_run_pbs_jobs~)
+
+#+begin_src sh
+qsub WRF_benchmarks/WRFs/WRFV4.0-gnu8.1.0-mvapich2.2.pbs
+qstat # wait for job to finish...
+qsub WRF_benchmarks/WPSs/WPSV4.0-gnu8.1.0.pbs
+qstat # wait for job to finish...
+./WRF_benchmarks/cases/new_conus12km.sh
+qstat # wait for job to finish...
+wrf_run_pbs_jobs -w ~/work/WRFs/WRFV4.0-gnu8.1.0-mvapich2.2 -c ~/WRF_benchmarks/cases/new_conus12km -t 1 2 -a '00:30:00'-n 1 2 4 8
+qstat # wait for jobs to finish...
+wrf_summarize -r ~/work/run/new_conus12km-WRFV4.0-gnu8.1.0-mvapich2.2-* -o ~/work/results
+cat ~/work/results/*.tbl
+#+end_src
+

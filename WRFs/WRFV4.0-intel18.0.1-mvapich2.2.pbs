@@ -20,6 +20,6 @@ wrf_compile \
     --modules \
     intel/18.0.1 \
     mvapich2/2.2 \
-    netcdf/4.6.0 \
+    netcdf/4.6.1 \
     ncarcompilers/0.4.1 \
     ncarenv/1.2
