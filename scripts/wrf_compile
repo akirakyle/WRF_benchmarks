@@ -12,6 +12,7 @@ help() {
     echo "    -o, --wrfdir  WRF_DIR               Location to put the compiled WRF files. Should be nonexistent or empty directory."
     echo "    -c, --compile NUM                   Select NUM option from the WRF ./configure compiler options list. Note this number is dependent on the WRF version."
     echo "    -n, --nest NUM                      Select NUM option for nesting from the ./configure nesting options list. Note this number is dependent on the WRF version"
+    echo "    -w, --configure CONFIGURE.WRF       Instead of specifying -c and -n, pass the path to a configure.wrf file and skip the ./configure step."
     echo "    -p, --mpiexec MPIEXEC_CMD           Command to launch an executable using mpi on nodes."
     echo "    -j, --tasks NUM                     Parallel compilation using NUM tasks (default 2)."
     echo "    -m, --modules MODULE1 MODULE2 ...   List of modules to be loaded into the environment for compilation and execution. Note: the order of matters here, prereqs must be loaded first."
@@ -26,32 +27,19 @@ while test $# -gt 0
 do
     case $1 in
         -s|--source)
-            if [ -z "$2" ]; then
-                echo "source directory must be specified." ; help
-            else
-                wrf_source=$2
-            fi
+            wrf_source=$2
             ;;
         -o|--wrfdir)
-            if [ -z "$2" ]; then
-                echo "wrf output directory must be specified." ; help
-            else
-                wrf_dir=$2
-            fi
+            wrf_dir=$2
             ;;
         -c|--compile)
-            if [ -z "$2" ]; then
-                echo "compile num must be specified." ; help
-            else
-                compile_num=$2
-            fi
+            compile_num=$2
             ;;
         -n|--nest)
-            if [ -z "$2" ]; then
-                echo "nest num must be specified." ; help
-            else
-                nest_num=$2
-            fi
+            nest_num=$2
+            ;;
+        -w|--configure)
+            configure_wrf=$2
             ;;
         -j|--tasks)
             n_tasks=$2
@@ -71,7 +59,18 @@ do
 	  shift; shift
 done
 
+if [ -z "$wrf_source" ]; then
+    echo "source directory must be specified." ; help
+elif [ -z "$wrf_dir" ]; then
+    echo "wrf output directory must be specified." ; help
+elif [[ -z "$configure_wrf" && ( -z "$compile_num" || -z "$nest_num" ) ]]; then
+    echo "Either configure.wrf must be specified OR both compile num AND nest num must be specified." ; help
+fi
+
 wrf_source=$(readlink -f $wrf_source)
+if [ ! -z "$configure_wrf" ]; then
+    configure_wrf=$(readlink -f $configure_wrf)
+fi
 
 module purge
 for mod in $modules
@@ -90,7 +89,11 @@ wrf_untar_name=$(ls)
 mv $wrf_untar_name/* .
 rm -r $wrf_untar_name
 
-printf "$compile_num\n$nest_num\n" | ./configure
+if [ -z "$configure_wrf" ]; then
+    printf "$compile_num\n$nest_num\n" | ./configure
+else
+    cp $configure_wrf configure.wrf
+fi
 
 echo "#!/bin/sh" > run/mpirun_wrf
 echo "module purge" >> run/mpirun_wrf

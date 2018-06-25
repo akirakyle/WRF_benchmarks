@@ -1,0 +1,92 @@
+#!/bin/sh
+
+set -e
+
+help() {
+    echo ""
+    echo "Usage: ${0##*/} [OPTIONS]"
+    echo "Configures and compiles WPS from source"
+    echo ""
+    echo "OPTIONS:"
+    echo "    -s, --source  WPS_SOURCE.TAR.gz     gzipped tar file containing the WPS source code"
+    echo "    -o, --wpsdir  WPS_DIR               Location to put the compiled WPS files. Should be nonexistent or empty directory."
+    echo "    -w, --wrfdir  WRF_DIR               Location of already compiled WRF. Must be a path relative to WPS_DIR."
+    echo "    -c, --compile NUM                   Select NUM option from the WRF ./configure compiler options list. Note this number is dependent on the WRF version."
+    echo "    -m, --modules MODULE1 MODULE2 ...   List of modules to be loaded into the environment for compilation and execution. Note: the order of matters here, prereqs must be loaded first."
+    echo "    -h, --help                          This help"
+    echo ""
+    exit 0
+}
+
+if [ $# -eq 0 ]; then help; fi
+
+while test $# -gt 0
+do
+    case $1 in
+        -s|--source)
+            wps_source=$2
+            ;;
+        -o|--wpsdir)
+            wps_dir=$2
+            ;;
+        -w|--wrfdir)
+            wrf_dir=$2
+            ;;
+        -c|--compile)
+            compile_num=$2
+            ;;
+        -m|--modules)
+            shift
+            modules=$@
+            break
+            ;;
+        *|-h|--help)
+            help
+            ;;
+    esac
+	  shift; shift
+done
+
+if [ -z "$wps_source" ]; then
+    echo "source directory must be specified." ; help
+elif [ -z "$wps_dir" ]; then
+    echo "wps output directory must be specified." ; help
+fi
+
+wps_source=$(readlink -f $wps_source)
+
+module purge
+for mod in $modules
+do
+    module load $mod
+done
+
+mkdir $wps_dir
+cd $wps_dir
+cp $wps_source .
+gunzip *
+wps_tar=$(ls)
+tar -xf $wps_tar
+rm $wps_tar
+wps_untar_name=$(ls)
+mv $wps_untar_name/* .
+rm -r $wps_untar_name
+
+echo "#!/bin/sh" > run_wps.exe
+echo "set -e" > run_wps.exe
+echo "module purge" >> run_wps.exe
+for mod in $modules
+do
+    echo "module load $mod" >> run_wps.exe
+done
+echo "./ungrib.exe >& ungrib_data.log" >> run_wps.exe
+echo "./geogrid.exe" >> run_wps.exe
+echo "./metgrid.exe" >> run_wps.exe
+chmod a+x run_wps.exe
+
+printf "$compile_num\n" | ./configure
+
+wrf_dir=$(echo $wrf_dir | sed 's/\//\\\//g')
+sed -i "s/^[[:space:]]*WRF_DIR.*/WRF_DIR = $wrf_dir/" configure.wps
+
+./compile &> compile.log
