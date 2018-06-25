@@ -1,0 +1,25 @@
+#!/bin/bash
+#PBS -A SCSG0002
+#PBS -l walltime=01:00:00
+#PBS -q share
+#PBS -j oe
+#PBS -l select=1:ncpus=6
+#PBS -m abe
+#PBS -M akirak@ucar.edu
+
+export TMPDIR=/glade/scratch/$USER/temp
+mkdir -p $TMPDIR
+
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV4.0.TAR.gz\
+    --wrfdir ~/work/WRFs/WRFV4.0-gnu6.3.0-mvapich2.2 \
+    --tasks 6 \
+    --compile 34 \
+    --nest 1 \
+    --mpiexec 'mpirun_rsh -hostfile $PBS_NODEFILE -n $1'  \
+    --modules \
+    gnu/6.3.0 \
+    mvapich2/2.2 \
+    netcdf/4.6.1 \
+    ncarcompilers/0.4.1 \
+    ncarenv/1.2
