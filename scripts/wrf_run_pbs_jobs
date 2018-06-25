@@ -90,7 +90,10 @@ do
             cd $RUN_DIR/$JOB_NAME
 
             ln -sf $WRF_PATH/run/* .
-            ln -sf $CASE_PATH/* .  # must be second to overwrite default namelist.input
+            ln -sf $CASE_PATH/namelist.input .  # must be second to overwrite default namelist.input
+            ln -sf $CASE_PATH/wrfbdy* .
+            ln -sf $CASE_PATH/wrfinput* .
+            ln -sf $CASE_PATH/wrfrst* .
 
             envsubst '${JOB_NAME},${N},${WALL_TIME},${ENV_STR}' > $JOB_NAME.pbs << EOF
 #!/bin/bash

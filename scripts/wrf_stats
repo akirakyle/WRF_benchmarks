@@ -125,7 +125,7 @@ if [ -n "${table}" ]; then
 fi
 
 if [ -n "${recur}" ]; then
-	file=`find ${dir:-.} -name ${output} -print`
+	file=`find ${dir:-.} -name ${output} -print | sort`
 elif [ "$dir" != "" ]; then
 	file=
 	for d in $dir
