@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 #+end_src
 
 #+begin_src ipython :session
-def plot_it(data, gridpoints, title):
+def plot_it(data, gridpoints, labels, title):
     for name in data:
         sec_step = np.array([d[3] for d in data[name] if d[3] != '--'])
         cpus = np.array([d[9] for d in data[name] if d[3] != '--'])
@@ -39,13 +39,13 @@ wrf_stats_tables() {
         echo
         echo "- *${name}*"
         echo "#+name: $name"
-        cd $base_dir/$(echo $name | sed 's/-/\//g')
+        cd $base_dir/$name
         wrf_stats -s $tstep -f *.rsl
     done
 }
 
 python_var() {
-    echo $1 | sed 's/-/_/g' |sed 's/\./_/g'
+    echo "$1" | sed 's/\/\|\.\|-/_/g'
 }
 make_obipython_blk() {
     e_we=$1
@@ -59,7 +59,7 @@ make_obipython_blk() {
     echo "#+BEGIN_SRC ipython :session :exports both :results raw"
     echo "data = {"
     for name in "${names[@]}"; do
-        echo "'$name' : $(python_var $name),"
+        echo "'$(name_to_label $name)' : $(python_var $name),"
     done
     echo "}"
     echo "plot_it(data, $e_we * $e_sn, \"$title\")"
@@ -82,19 +82,18 @@ wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
 #+end_src
 
 #+name: conus12km-WRFV3.8.1-names
-| Paths                          |
-|--------------------------------|
-| gnu6.3.0-mpt2.18-T1            |
-| gnu6.3.0-mpt2.18-T2            |
-| gnu6.3.0-mvapich2.2-T1         |
-| gnu6.3.0-mvapich2.2-T2         |
-| gnu6.3.0-mvapich2.2gnu7.1.0-T1 |
-| gnu6.3.0-mvapich2.2gnu7.1.0-T2 |
-| intel18.0.1-mpt2.18-T1         |
-| intel18.0.1-mpt2.18-T2         |
+| Paths                                              |
+|----------------------------------------------------|
+| conus12km/WRFV3.8.1/gnu6.3.0/mpt2.18/T1            |
+| conus12km/WRFV3.8.1/gnu6.3.0/mpt2.18/T2            |
+| conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2/T1         |
+| conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2/T2         |
+| conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2gnu7.1.0/T1 |
+| conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2gnu7.1.0/T2 |
+| conus12km/WRFV3.8.1/intel18.0.1/mpt2.18/T1         |
+| conus12km/WRFV3.8.1/intel18.0.1/mpt2.18/T2         |
 
-
-#+begin_src bash :dir /ssh:cheyenne:~/work/results/conus12km-WRFV3.8.1 :results raw drawer
+#+begin_src bash :dir /ssh:cheyenne:~/work/results :results raw drawer
 <<bash_data_fns>>
 wrf_stats_tables 72 ${names[@]}
 #+end_src
@@ -102,8 +101,8 @@ wrf_stats_tables 72 ${names[@]}
 #+RESULTS:
 :RESULTS:
 
-- *gnu6.3.0-mpt2.18-T1*
-#+name: gnu6.3.0-mpt2.18-T1
+- *conus12km/WRFV3.8.1/gnu6.3.0/mpt2.18/T1*
+#+name: conus12km/WRFV3.8.1/gnu6.3.0/mpt2.18/T1
 |      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
 |-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
 |  N001.rsl |      116.21725 |   149 |      0.77998 |     92.30988  |       9.98891 |      4.99446  |   6 |   6 |    36 |
@@ -116,8 +115,8 @@ wrf_stats_tables 72 ${names[@]}
 |  N128.rsl |        2.18854 |   149 |      0.01469 |   4901.89807  |      13.33244 |      6.66622  |  64 |  72 |  4608 |
 |  N256.rsl |        1.77643 |   149 |      0.01192 |   6039.07838  |      15.75393 |      7.87697  |  96 |  96 |  9216 |
 
-- *gnu6.3.0-mpt2.18-T2*
-#+name: gnu6.3.0-mpt2.18-T2
+- *conus12km/WRFV3.8.1/gnu6.3.0/mpt2.18/T2*
+#+name: conus12km/WRFV3.8.1/gnu6.3.0/mpt2.18/T2
 |      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
 |-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
 |  N001.rsl |      116.09852 |   149 |      0.77918 |     92.40428  |      10.05604 |      5.02802  |   6 |   6 |    36 |
@@ -130,8 +129,8 @@ wrf_stats_tables 72 ${names[@]}
 |  N128.rsl |        2.15186 |   149 |      0.01444 |   4985.45444  |      12.66786 |      6.33393  |  64 |  72 |  4608 |
 |  N256.rsl |        1.56549 |   149 |      0.01051 |   6852.80647  |      14.27431 |      7.13715  |  96 |  96 |  9216 |
 
-- *gnu6.3.0-mvapich2.2-T1*
-#+name: gnu6.3.0-mvapich2.2-T1
+- *conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2/T1*
+#+name: conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2/T1
 |      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
 |-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
 |  N001.rsl |      116.59193 |   149 |      0.78250 |     92.01323  |      12.73527 |      6.36763  |   6 |   6 |    36 |
@@ -144,8 +143,8 @@ wrf_stats_tables 72 ${names[@]}
 |  N128.rsl |        2.40573 |   149 |      0.01615 |   4459.35329  |     446.61813 |    446.61813  |  64 |  72 |  4608 |
 |  N256.rsl |             -- |    -- |           -- |            -- |            -- |            -- |  96 |  96 |  9216 |
 
-- *gnu6.3.0-mvapich2.2-T2*
-#+name: gnu6.3.0-mvapich2.2-T2
+- *conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2/T2*
+#+name: conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2/T2
 |      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
 |-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
 |  N001.rsl |      117.09013 |   149 |      0.78584 |     91.62173  |      12.70729 |      6.35365  |   6 |   6 |    36 |
@@ -158,8 +157,8 @@ wrf_stats_tables 72 ${names[@]}
 |  N128.rsl |        2.18053 |   149 |      0.01463 |   4919.90479  |     498.86386 |    498.86386  |  64 |  72 |  4608 |
 |  N256.rsl |             -- |    -- |           -- |            -- |            -- |            -- |  96 |  96 |  9216 |
 
-- *gnu6.3.0-mvapich2.2gnu7.1.0-T1*
-#+name: gnu6.3.0-mvapich2.2gnu7.1.0-T1
+- *conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2gnu7.1.0/T1*
+#+name: conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2gnu7.1.0/T1
 |      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
 |-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
 |  N001.rsl |      161.50068 |   149 |      1.08390 |     66.42696  |      13.01239 |      6.50619  |   6 |   6 |    36 |
@@ -170,8 +169,8 @@ wrf_stats_tables 72 ${names[@]}
 |  N032.rsl |        5.93415 |   149 |      0.03983 |   1807.84106  |      75.27093 |     37.63546  |  32 |  36 |  1152 |
 |  N064.rsl |        4.02350 |   149 |      0.02700 |   2666.33528  |     339.89275 |    169.94638  |  48 |  48 |  2304 |
 
-- *gnu6.3.0-mvapich2.2gnu7.1.0-T2*
-#+name: gnu6.3.0-mvapich2.2gnu7.1.0-T2
+- *conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2gnu7.1.0/T2*
+#+name: conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2gnu7.1.0/T2
 |      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
 |-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
 |  N001.rsl |      157.71430 |   149 |      1.05849 |     68.02173  |      12.63764 |      6.31882  |   6 |   6 |    36 |
@@ -182,8 +181,8 @@ wrf_stats_tables 72 ${names[@]}
 |  N032.rsl |        5.81085 |   149 |      0.03900 |   1846.20150  |      71.40889 |     35.70444  |  32 |  36 |  1152 |
 |  N064.rsl |        3.91272 |   149 |      0.02626 |   2741.82666  |     350.20424 |    175.10212  |  48 |  48 |  2304 |
 
-- *intel18.0.1-mpt2.18-T1*
-#+name: intel18.0.1-mpt2.18-T1
+- *conus12km/WRFV3.8.1/intel18.0.1/mpt2.18/T1*
+#+name: conus12km/WRFV3.8.1/intel18.0.1/mpt2.18/T1
 |      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
 |-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
 |  N001.rsl |       86.57501 |   149 |      0.58104 |    123.91567  |      11.61016 |      5.80508  |   6 |   6 |    36 |
@@ -194,8 +193,8 @@ wrf_stats_tables 72 ${names[@]}
 |  N032.rsl |        3.74614 |   149 |      0.02514 |   2863.74775  |      13.20536 |      6.60268  |  32 |  36 |  1152 |
 |  N064.rsl |        2.46127 |   149 |      0.01652 |   4358.72537  |      12.95793 |      6.47896  |  48 |  48 |  2304 |
 
-- *intel18.0.1-mpt2.18-T2*
-#+name: intel18.0.1-mpt2.18-T2
+- *conus12km/WRFV3.8.1/intel18.0.1/mpt2.18/T2*
+#+name: conus12km/WRFV3.8.1/intel18.0.1/mpt2.18/T2
 |      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
 |-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
 |  N001.rsl |       87.12675 |   149 |      0.58474 |    123.13096  |      11.66714 |      5.83357  |   6 |   6 |    36 |
@@ -209,80 +208,112 @@ wrf_stats_tables 72 ${names[@]}
 |  N256.rsl |        1.39718 |   149 |      0.00938 |   7678.32348  |      14.10451 |      7.05226  |  96 |  96 |  9216 |
 :END:
 
-#+begin_src bash :dir ~/ :results raw
+#+begin_src bash :results raw
 <<bash_data_fns>>
+name_to_label() { echo "${1:20}" ; }
 make_obipython_blk 425 300 "Scaling results for CONUS 12km with WRFV3.8.1" ${names[@]}
 #+end_src
 
 #+RESULTS:
-#+header: :var gnu6_3_0_mpt2_18_T1=gnu6.3.0-mpt2.18-T1
-#+header: :var gnu6_3_0_mpt2_18_T2=gnu6.3.0-mpt2.18-T2
-#+header: :var gnu6_3_0_mvapich2_2_T1=gnu6.3.0-mvapich2.2-T1
-#+header: :var gnu6_3_0_mvapich2_2_T2=gnu6.3.0-mvapich2.2-T2
-#+header: :var gnu6_3_0_mvapich2_2gnu7_1_0_T1=gnu6.3.0-mvapich2.2gnu7.1.0-T1
-#+header: :var gnu6_3_0_mvapich2_2gnu7_1_0_T2=gnu6.3.0-mvapich2.2gnu7.1.0-T2
-#+header: :var intel18_0_1_mpt2_18_T1=intel18.0.1-mpt2.18-T1
-#+header: :var intel18_0_1_mpt2_18_T2=intel18.0.1-mpt2.18-T2
+#+header: :var conus12km_WRFV3_8_1_gnu6_3_0_mpt2_18_T1=conus12km/WRFV3.8.1/gnu6.3.0/mpt2.18/T1
+#+header: :var conus12km_WRFV3_8_1_gnu6_3_0_mpt2_18_T2=conus12km/WRFV3.8.1/gnu6.3.0/mpt2.18/T2
+#+header: :var conus12km_WRFV3_8_1_gnu6_3_0_mvapich2_2_T1=conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2/T1
+#+header: :var conus12km_WRFV3_8_1_gnu6_3_0_mvapich2_2_T2=conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2/T2
+#+header: :var conus12km_WRFV3_8_1_gnu6_3_0_mvapich2_2gnu7_1_0_T1=conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2gnu7.1.0/T1
+#+header: :var conus12km_WRFV3_8_1_gnu6_3_0_mvapich2_2gnu7_1_0_T2=conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2gnu7.1.0/T2
+#+header: :var conus12km_WRFV3_8_1_intel18_0_1_mpt2_18_T1=conus12km/WRFV3.8.1/intel18.0.1/mpt2.18/T1
+#+header: :var conus12km_WRFV3_8_1_intel18_0_1_mpt2_18_T2=conus12km/WRFV3.8.1/intel18.0.1/mpt2.18/T2
 #+BEGIN_SRC ipython :session :exports both :results raw
 data = {
-'gnu6.3.0-mpt2.18-T1' : gnu6_3_0_mpt2_18_T1,
-'gnu6.3.0-mpt2.18-T2' : gnu6_3_0_mpt2_18_T2,
-'gnu6.3.0-mvapich2.2-T1' : gnu6_3_0_mvapich2_2_T1,
-'gnu6.3.0-mvapich2.2-T2' : gnu6_3_0_mvapich2_2_T2,
-'gnu6.3.0-mvapich2.2gnu7.1.0-T1' : gnu6_3_0_mvapich2_2gnu7_1_0_T1,
-'gnu6.3.0-mvapich2.2gnu7.1.0-T2' : gnu6_3_0_mvapich2_2gnu7_1_0_T2,
-'intel18.0.1-mpt2.18-T1' : intel18_0_1_mpt2_18_T1,
-'intel18.0.1-mpt2.18-T2' : intel18_0_1_mpt2_18_T2,
+'gnu6.3.0/mpt2.18/T1' : conus12km_WRFV3_8_1_gnu6_3_0_mpt2_18_T1,
+'gnu6.3.0/mpt2.18/T2' : conus12km_WRFV3_8_1_gnu6_3_0_mpt2_18_T2,
+'gnu6.3.0/mvapich2.2/T1' : conus12km_WRFV3_8_1_gnu6_3_0_mvapich2_2_T1,
+'gnu6.3.0/mvapich2.2/T2' : conus12km_WRFV3_8_1_gnu6_3_0_mvapich2_2_T2,
+'gnu6.3.0/mvapich2.2gnu7.1.0/T1' : conus12km_WRFV3_8_1_gnu6_3_0_mvapich2_2gnu7_1_0_T1,
+'gnu6.3.0/mvapich2.2gnu7.1.0/T2' : conus12km_WRFV3_8_1_gnu6_3_0_mvapich2_2gnu7_1_0_T2,
+'intel18.0.1/mpt2.18/T1' : conus12km_WRFV3_8_1_intel18_0_1_mpt2_18_T1,
+'intel18.0.1/mpt2.18/T2' : conus12km_WRFV3_8_1_intel18_0_1_mpt2_18_T2,
 }
 plot_it(data, 425 * 300, "Scaling results for CONUS 12km with WRFV3.8.1")
 #+end_src
 
 #+RESULTS:
-# Out[5]:
-[[file:./obipy-resources/kL1YYZ.svg]]
+# Out[15]:
+[[file:./obipy-resources/YKMOHc.svg]]
+
 
 * NEW CONUS 12km
+  :PROPERTIES:
+  :header-args:   :noweb yes :var names=new_conus12km-WRFV4.0-names
+  :END:
 
-#+begin_src bash :dir /ssh:cheyenne:~/work/run :results raw
-wrf_stats -t -H -w 55 -d new_conus12km-WRFV4.0-*
+#+name: new_conus12km-WRFV4.0-names
+| Paths                                        |
+|----------------------------------------------|
+| new_conus12km/WRFV4.0/gnu6.3.0/mpt2.18/T1    |
+| new_conus12km/WRFV4.0/intel18.0.1/mpt2.18/T1 |
+| new_conus12km/WRFV4.0/intel18.0.1/mpt2.18/T2 |
+
+
+#+begin_src bash :dir /ssh:cheyenne:~/work/results :results raw drawer
+<<bash_data_fns>>
+wrf_stats_tables 72 ${names[@]}
 #+end_src
-
-#+NAME: new_conus12km
-#+RESULTS:
-| File                                                    | Comp: Total(s) | Steps | Avg.(s/step) |      Speed | I/O: Total(s) | Avg.(s/step) |   XxY | CPUs |
-|---------------------------------------------------------+----------------+-------+--------------+------------+---------------+--------------+-------+------|
-| new_conus12km-WRFV4.0-gnu6.3.0-mpt2.18-T1-N001/rsl.out. |      357.00459 |   298 |      1.19800 |   60.10007 |      52.56240 |      7.50891 |   6x6 |   36 |
-| new_conus12km-WRFV4.0-gnu6.3.0-mpt2.18-T1-N002/rsl.out. |      181.70973 |   298 |      0.60976 |  118.07843 |      53.21582 |      7.60226 |   8x9 |   72 |
-| new_conus12km-WRFV4.0-gnu6.3.0-mpt2.18-T1-N004/rsl.out. |       94.64736 |   298 |      0.31761 |  226.69412 |      52.76527 |      7.53790 | 12x12 |  144 |
-| new_conus12km-WRFV4.0-gnu6.3.0-mpt2.18-T1-N008/rsl.out. |       48.05647 |   298 |      0.16126 |  446.47474 |      53.13171 |      7.59024 | 16x18 |  288 |
-| new_conus12km-WRFV4.0-gnu6.3.0-mpt2.18-T1-N016/rsl.out. |       26.16013 |   298 |      0.08779 |  820.17941 |      53.55744 |      7.65106 | 24x24 |  576 |
-| new_conus12km-WRFV4.0-gnu6.3.0-mpt2.18-T1-N032/rsl.out. |             -- |    -- |           -- |         -- |            -- |           -- | 32x36 | 1152 |
-| new_conus12km-WRFV4.0-gnu6.3.0-mpt2.18-T1-N064/rsl.out. |             -- |    -- |           -- |         -- |            -- |           -- | 48x48 | 2304 |
-| new_conus12km-WRFV4.0-gnu6.3.0-mpt2.18-T1-N128/rsl.out. |             -- |    -- |           -- |         -- |            -- |           -- | 64x72 | 4608 |
-| new_conus12km-WRFV4.0-intel18.0.1-mpt2.18-T1-N001/rsl.o |      256.93761 |   298 |      0.86221 |   83.50665 |      46.61132 |      6.65876 |   6x6 |   36 |
-| new_conus12km-WRFV4.0-intel18.0.1-mpt2.18-T1-N002/rsl.o |      127.52850 |   298 |      0.42795 |  168.24475 |      47.08555 |      6.72651 |   8x9 |   72 |
-| new_conus12km-WRFV4.0-intel18.0.1-mpt2.18-T1-N004/rsl.o |       63.81769 |   298 |      0.21415 |  336.20772 |      48.25521 |      6.89360 | 12x12 |  144 |
-| new_conus12km-WRFV4.0-intel18.0.1-mpt2.18-T1-N008/rsl.o |       32.04595 |   298 |      0.10754 |  669.53858 |      49.44469 |      7.06353 | 16x18 |  288 |
-| new_conus12km-WRFV4.0-intel18.0.1-mpt2.18-T1-N016/rsl.o |       17.86106 |   298 |      0.05994 | 1201.27249 |      51.29970 |      7.32853 | 24x24 |  576 |
-| new_conus12km-WRFV4.0-intel18.0.1-mpt2.18-T1-N032/rsl.o |             -- |    -- |           -- |         -- |            -- |           -- | 32x36 | 1152 |
-| new_conus12km-WRFV4.0-intel18.0.1-mpt2.18-T1-N064/rsl.o |             -- |    -- |           -- |         -- |            -- |           -- | 48x48 | 2304 |
-| new_conus12km-WRFV4.0-intel18.0.1-mpt2.18-T1-N128/rsl.o |             -- |    -- |           -- |         -- |            -- |           -- | 64x72 | 4608 |
-
-#+NAME: new_conus12km-splits
-| Name Start Index | Name End Index | Table Start Index | Table End Index |
-|------------------+----------------+-------------------+-----------------|
-|               22 |             38 |                 0 |               5 |
-|               22 |             41 |                 8 |              13 |
-
-#+HEADER: :var data=new_conus12km meta=new_conus12km-splits e_we=425 e_sn=300
-#+BEGIN_SRC ipython :session :exports both :results raw drawer
-plot_it(data, meta)
-plt.title("Scaling results for NEW CONUS 12km with WRFV4.0")
-plt.grid(False)
-#+END_SRC
 
 #+RESULTS:
 :RESULTS:
-# Out[13]:
-[[file:./obipy-resources/pcqxBB.svg]]
+
+- *new_conus12km/WRFV4.0/gnu6.3.0/mpt2.18/T1*
+#+name: new_conus12km/WRFV4.0/gnu6.3.0/mpt2.18/T1
+|      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
+|-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
+|  N001.rsl |      357.00459 |   298 |      1.19800 |     60.10007  |      52.56240 |      7.50891  |   6 |   6 |    36 |
+|  N002.rsl |      181.70973 |   298 |      0.60976 |    118.07843  |      53.21582 |      7.60226  |   8 |   9 |    72 |
+|  N004.rsl |       94.64736 |   298 |      0.31761 |    226.69412  |      52.76527 |      7.53790  |  12 |  12 |   144 |
+|  N008.rsl |       48.05647 |   298 |      0.16126 |    446.47474  |      53.13171 |      7.59024  |  16 |  18 |   288 |
+|  N016.rsl |       26.16013 |   298 |      0.08779 |    820.17941  |      53.55744 |      7.65106  |  24 |  24 |   576 |
+
+- *new_conus12km/WRFV4.0/intel18.0.1/mpt2.18/T1*
+#+name: new_conus12km/WRFV4.0/intel18.0.1/mpt2.18/T1
+|      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
+|-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
+|  N001.rsl |      256.93761 |   298 |      0.86221 |     83.50665  |      46.61132 |      6.65876  |   6 |   6 |    36 |
+|  N002.rsl |      127.52850 |   298 |      0.42795 |    168.24475  |      47.08555 |      6.72651  |   8 |   9 |    72 |
+|  N004.rsl |       63.81769 |   298 |      0.21415 |    336.20772  |      48.25521 |      6.89360  |  12 |  12 |   144 |
+|  N008.rsl |       32.04595 |   298 |      0.10754 |    669.53858  |      49.44469 |      7.06353  |  16 |  18 |   288 |
+|  N016.rsl |       17.86106 |   298 |      0.05994 |   1201.27249  |      51.29970 |      7.32853  |  24 |  24 |   576 |
+
+- *new_conus12km/WRFV4.0/intel18.0.1/mpt2.18/T2*
+#+name: new_conus12km/WRFV4.0/intel18.0.1/mpt2.18/T2
+|      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
+|-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
+|  N001.rsl |      255.41192 |   298 |      0.85709 |     84.00548  |      46.61044 |      6.65863  |   6 |   6 |    36 |
+|  N002.rsl |      128.37185 |   298 |      0.43078 |    167.13945  |      52.03791 |      7.43399  |   8 |   9 |    72 |
+|  N004.rsl |       63.50844 |   298 |      0.21312 |    337.84486  |      49.52030 |      7.07433  |  12 |  12 |   144 |
+|  N008.rsl |       31.74933 |   298 |      0.10654 |    675.79379  |      49.08376 |      7.01197  |  16 |  18 |   288 |
+|  N016.rsl |       16.45185 |   298 |      0.05521 |   1304.16944  |      50.91501 |      7.27357  |  24 |  24 |   576 |
 :END:
+
+#+begin_src bash :results raw
+<<bash_data_fns>>
+name_to_label() { echo "${1:22}" ; }
+make_obipython_blk 425 300 "Scaling results for CONUS 12km with WRFV3.8.1" ${names[@]}
+#+end_src
+
+#+RESULTS:
+#+header: :var new_conus12km_WRFV4_0_gnu6_3_0_mpt2_18_T1=new_conus12km/WRFV4.0/gnu6.3.0/mpt2.18/T1
+#+header: :var new_conus12km_WRFV4_0_intel18_0_1_mpt2_18_T1=new_conus12km/WRFV4.0/intel18.0.1/mpt2.18/T1
+#+header: :var new_conus12km_WRFV4_0_intel18_0_1_mpt2_18_T2=new_conus12km/WRFV4.0/intel18.0.1/mpt2.18/T2
+#+BEGIN_SRC ipython :session :exports both :results raw
+data = {
+'gnu6.3.0/mpt2.18/T1' : new_conus12km_WRFV4_0_gnu6_3_0_mpt2_18_T1,
+'intel18.0.1/mpt2.18/T1' : new_conus12km_WRFV4_0_intel18_0_1_mpt2_18_T1,
+'intel18.0.1/mpt2.18/T2' : new_conus12km_WRFV4_0_intel18_0_1_mpt2_18_T2,
+}
+plot_it(data, 425 * 300, "Scaling results for CONUS 12km with WRFV3.8.1")
+#+end_src
+
+#+RESULTS:
+# Out[16]:
+[[file:./obipy-resources/vHSqud.svg]]
+

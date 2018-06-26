@@ -3,15 +3,23 @@
 help() {
     echo ""
     echo "Usage: ${0##*/} [-h] [-d DIR] [-t NUM] -w WRF1 WRF2 ... -n X Y Z ... -c CASE1 CASE2 ..."
-    echo "Creates and submits a series of PBS jobs scripts for all combinations of parameters"
+    echo "Summarizes statistics of a series of WRF runs and copies rsl outfiles"
     echo ""
     echo "OPTIONS:"
     echo "    -r, --rundirs RUN_DIR LIST   Directories of completed wrf_runs to check and summarize."
     echo "    -o, --outdir OUT_DIR         Directory in which to put summary files."
     echo "    -t, --testrst                Also diff wrfrst files."
+    echo "    -n, --nostop                 Do not stop if diffs fail. Also will only copy rsl files to outdir."
     echo "    -h, --help                   This help"
     echo ""
     exit 0
+}
+
+maybe_stop() {
+    if [ -z $NO_STOP ]; then
+        echo "stopping..."
+        exit 1
+    fi
 }
 
 reading_list=none
@@ -28,6 +36,10 @@ do
         -t|--testrst)
             reading_list=none
             RST=true
+            ;;
+        -n|--nostop)
+            reading_list=none
+            NO_STOP=true
             ;;
         -h|--help)
             help ;;
@@ -52,20 +64,20 @@ for DIR in "${RUN_DIRS[@]}"
 do
     grep -q "SUCCESS COMPLETE WRF" $DIR/rsl.out.0000
     if [[ $? -ne 0 ]]; then
-        echo "rsl.out.0000 in $DIR does not say 'SUCCESS COMPLETE WRF'. stopping..."
-        exit 1
+        echo "rsl.out.0000 in $DIR does not say 'SUCCESS COMPLETE WRF'"
+        maybe_stop
     fi
 
     cmp ${RUN_DIRS[0]}/namelist.input $DIR/namelist.input
     if [[ $? -ne 0 ]]; then
-        echo "stopping..."; exit 1
+        maybe_stop
     fi
 
     for WRFOUT in $(ls ${RUN_DIRS[0]}/wrfout*); do
         WRFOUT=$(basename $WRFOUT)
         cmp ${RUN_DIRS[0]}/$WRFOUT $DIR/$WRFOUT
         if [[ $? -ne 0 ]]; then
-            echo "stopping..."; exit 1
+            maybe_stop
         fi
     done
     if [ "$RST" = true ]; then
@@ -73,16 +85,18 @@ do
             WRFRST=$(basename $WRFRST)
             cmp ${RUN_DIRS[0]}/$WRFRST $DIR/$WRFRST
             if [[ $? -ne 0 ]]; then
-                echo "stopping..."; exit 1
+                maybe_stop
             fi
         done
     fi
 done
 
 mkdir -p $OUT_DIR
-cp ${RUN_DIRS[0]}/namelist.input $OUT_DIR
-cp ${RUN_DIRS[0]}/wrfout* $OUT_DIR
-cp ${RUN_DIRS[0]}/wrfrst* $OUT_DIR
+if [ -z $NO_STOP ]; then
+    cp ${RUN_DIRS[0]}/namelist.input $OUT_DIR
+    cp ${RUN_DIRS[0]}/wrfout* $OUT_DIR
+    cp ${RUN_DIRS[0]}/wrfrst* $OUT_DIR
+fi
 
 for DIR in "${RUN_DIRS[@]}"
 do
@@ -90,5 +104,4 @@ do
     cp $DIR/rsl.out.0000 $OUT_DIR/$DIR_NAME.rsl
 done
 
-wrf_stats -t -H -r -f *.rsl -d $OUT_DIR # > $OUT_DIR/wrf_stats.tbl
-# cat $OUT_DIR/wrf_stats.tbl
+wrf_stats -f $OUT_DIR/*.rsl
