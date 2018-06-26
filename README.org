@@ -100,7 +100,7 @@ These are wrf-chem cases
 Make sure the ~WRF_benchmarks/scripts~ is in your ~$PATH~. As always, make sure
 to change the paths to your directory structure. All the scripts in the
 ~srcipts/~ directory do not hardcode paths but the scripts in the ~cases/~
-directory do.
+directory and the pbs job scripts do hardcode paths.
 
 The following will give you a table with timing results on the new_conus12km
 benchmark using WRFV4.0 compiled with gnu8.1.0 and mvapich2.2 for two trials

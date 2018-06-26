@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 #+end_src
 
 #+RESULTS:
-: # Out[7]:
+: # Out[9]:
 
 #+begin_src ipython :session :exports code
 def plot_it(data,meta):
@@ -33,19 +33,7 @@ def plot_it(data,meta):
 
 * CONUS 12km
 
-#+begin_src bash
-wrf_run_pbs_jobs \
-    --wrfs \
-    ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mpt2.18 \
-    ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mvapich2.2 \
-    ~/work/WRFs/WRFV3.8.1-gnu6.3.0-mvapich2.2gnu7.1.0 \
-    ~/work/WRFs/WRFV3.8.1-intel18.0.1-mpt2.18 \
-    --nodes 1 2 4 8 16 32 64 128 256 \
-    --cases ~/WRF_benchmarks/cases/conus12km \
-    --trial 1 2
-#+end_src
-
-#+begin_src bash :dir /ssh:cheyenne:~/work/results/conus12km-WRFV3.8.1 :results raw
+#+begin_src bash :dir /ssh:cheyenne:~/work/results/conus12km-WRFV3.8.1/ :results raw
 wrf_stats -t -H -w 55 -d conus12km-WRFV3.8.1-*
 #+end_src
 
@@ -145,6 +133,201 @@ plt.grid(False)
 [[file:./obipy-resources/4oTm3w.svg]]
 :END:
 
+* CONUS 12km test
+
+#+name: conus12km-WRFV3.8.1-names
+| Paths                          |
+|--------------------------------|
+| gnu6.3.0-mpt2.18-T1            |
+| gnu6.3.0-mpt2.18-T2            |
+| gnu6.3.0-mvapich2.2-T1         |
+| gnu6.3.0-mvapich2.2-T2         |
+| gnu6.3.0-mvapich2.2gnu7.1.0-T1 |
+| gnu6.3.0-mvapich2.2gnu7.1.0-T2 |
+| intel18.0.1-mpt2.18-T1         |
+| intel18.0.1-mpt2.18-T2         |
+
+#+header: :var names=conus12km-WRFV3.8.1-names
+#+begin_src bash :dir /ssh:cheyenne:~/ :results raw drawer
+for name in "${names[@]}"; do
+    echo
+    echo "- $name"
+    echo "#+name: $name"
+    cd ~/work/results/conus12km-WRFV3.8.1/$(echo $name | sed 's/-/\//g')
+    wrf_stats -s 72 -f *.rsl
+done
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+
+- gnu6.3.0-mpt2.18-T1
+#+name: gnu6.3.0-mpt2.18-T1
+|      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
+|-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
+|  N001.rsl |      116.21725 |   149 |      0.77998 |     92.30988  |       9.98891 |      4.99446  |   6 |   6 |    36 |
+|  N002.rsl |       58.23755 |   149 |      0.39086 |    184.21105  |      10.15777 |      5.07888  |   8 |   9 |    72 |
+|  N004.rsl |       30.40925 |   149 |      0.20409 |    352.78739  |      11.43522 |      5.71761  |  12 |  12 |   144 |
+|  N008.rsl |       15.25841 |   149 |      0.10241 |    703.08767  |      11.96531 |      5.98265  |  16 |  18 |   288 |
+|  N016.rsl |        8.55777 |   149 |      0.05743 |   1253.59761  |      12.26190 |      6.13095  |  24 |  24 |   576 |
+|  N032.rsl |        4.97061 |   149 |      0.03336 |   2158.28641  |      12.15401 |      6.07700  |  32 |  36 |  1152 |
+|  N064.rsl |        3.25526 |   149 |      0.02185 |   3295.58929  |      12.54158 |      6.27079  |  48 |  48 |  2304 |
+|  N128.rsl |        2.18854 |   149 |      0.01469 |   4901.89807  |      13.33244 |      6.66622  |  64 |  72 |  4608 |
+|  N256.rsl |        1.77643 |   149 |      0.01192 |   6039.07838  |      15.75393 |      7.87697  |  96 |  96 |  9216 |
+
+- gnu6.3.0-mpt2.18-T2
+#+name: gnu6.3.0-mpt2.18-T2
+|      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
+|-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
+|  N001.rsl |      116.09852 |   149 |      0.77918 |     92.40428  |      10.05604 |      5.02802  |   6 |   6 |    36 |
+|  N002.rsl |       58.21806 |   149 |      0.39073 |    184.27272  |       9.92726 |      4.96363  |   8 |   9 |    72 |
+|  N004.rsl |       29.07231 |   149 |      0.19512 |    369.01092  |      11.48687 |      5.74343  |  12 |  12 |   144 |
+|  N008.rsl |       15.33797 |   149 |      0.10294 |    699.44067  |      12.03111 |      6.01555  |  16 |  18 |   288 |
+|  N016.rsl |        8.44070 |   149 |      0.05665 |   1270.98463  |      12.18773 |      6.09387  |  24 |  24 |   576 |
+|  N032.rsl |        4.69174 |   149 |      0.03149 |   2286.57172  |      12.15569 |      6.07784  |  32 |  36 |  1152 |
+|  N064.rsl |        3.22939 |   149 |      0.02167 |   3321.98960  |      14.22543 |      7.11272  |  48 |  48 |  2304 |
+|  N128.rsl |        2.15186 |   149 |      0.01444 |   4985.45444  |      12.66786 |      6.33393  |  64 |  72 |  4608 |
+|  N256.rsl |        1.56549 |   149 |      0.01051 |   6852.80647  |      14.27431 |      7.13715  |  96 |  96 |  9216 |
+
+- gnu6.3.0-mvapich2.2-T1
+#+name: gnu6.3.0-mvapich2.2-T1
+|      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
+|-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
+|  N001.rsl |      116.59193 |   149 |      0.78250 |     92.01323  |      12.73527 |      6.36763  |   6 |   6 |    36 |
+|  N002.rsl |       58.99073 |   149 |      0.39591 |    181.85908  |      12.80697 |      6.40348  |   8 |   9 |    72 |
+|  N004.rsl |       31.05322 |   149 |      0.20841 |    345.47142  |      13.75061 |      6.87531  |  12 |  12 |   144 |
+|  N008.rsl |       15.65141 |   149 |      0.10504 |    685.43345  |      16.55407 |      8.27703  |  16 |  18 |   288 |
+|  N016.rsl |        8.68723 |   149 |      0.05830 |   1234.91608  |      26.62334 |     13.31167  |  24 |  24 |   576 |
+|  N032.rsl |        4.97045 |   149 |      0.03336 |   2158.35588  |      61.73998 |     30.86999  |  32 |  36 |  1152 |
+|  N064.rsl |        3.22999 |   149 |      0.02168 |   3321.37251  |     316.97142 |    158.48571  |  48 |  48 |  2304 |
+|  N128.rsl |        2.40573 |   149 |      0.01615 |   4459.35329  |     446.61813 |    446.61813  |  64 |  72 |  4608 |
+|  N256.rsl |             -- |    -- |           -- |            -- |            -- |            -- |  96 |  96 |  9216 |
+
+- gnu6.3.0-mvapich2.2-T2
+#+name: gnu6.3.0-mvapich2.2-T2
+|      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
+|-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
+|  N001.rsl |      117.09013 |   149 |      0.78584 |     91.62173  |      12.70729 |      6.35365  |   6 |   6 |    36 |
+|  N002.rsl |       58.88835 |   149 |      0.39522 |    182.17525  |      12.86810 |      6.43405  |   8 |   9 |    72 |
+|  N004.rsl |       31.13682 |   149 |      0.20897 |    344.54386  |      14.50065 |      7.25033  |  12 |  12 |   144 |
+|  N008.rsl |       15.69914 |   149 |      0.10536 |    683.34953  |      17.09288 |      8.54644  |  16 |  18 |   288 |
+|  N016.rsl |        8.33983 |   149 |      0.05597 |   1286.35716  |      26.60487 |     13.30243  |  24 |  24 |   576 |
+|  N032.rsl |        4.91646 |   149 |      0.03300 |   2182.05782  |      62.01196 |     31.00598  |  32 |  36 |  1152 |
+|  N064.rsl |        3.06435 |   149 |      0.02057 |   3500.90558  |     334.25953 |    167.12976  |  48 |  48 |  2304 |
+|  N128.rsl |        2.18053 |   149 |      0.01463 |   4919.90479  |     498.86386 |    498.86386  |  64 |  72 |  4608 |
+|  N256.rsl |             -- |    -- |           -- |            -- |            -- |            -- |  96 |  96 |  9216 |
+
+- gnu6.3.0-mvapich2.2gnu7.1.0-T1
+#+name: gnu6.3.0-mvapich2.2gnu7.1.0-T1
+|      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
+|-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
+|  N001.rsl |      161.50068 |   149 |      1.08390 |     66.42696  |      13.01239 |      6.50619  |   6 |   6 |    36 |
+|  N002.rsl |       85.83784 |   149 |      0.57609 |    124.97985  |      13.22285 |      6.61142  |   8 |   9 |    72 |
+|  N004.rsl |       43.80272 |   149 |      0.29398 |    244.91630  |      17.18948 |      8.59474  |  12 |  12 |   144 |
+|  N008.rsl |       20.89827 |   149 |      0.14026 |    513.34393  |      20.27428 |     10.13714  |  16 |  18 |   288 |
+|  N016.rsl |       10.87712 |   149 |      0.07300 |    986.29049  |      26.10210 |     13.05105  |  24 |  24 |   576 |
+|  N032.rsl |        5.93415 |   149 |      0.03983 |   1807.84106  |      75.27093 |     37.63546  |  32 |  36 |  1152 |
+|  N064.rsl |        4.02350 |   149 |      0.02700 |   2666.33528  |     339.89275 |    169.94638  |  48 |  48 |  2304 |
+
+- gnu6.3.0-mvapich2.2gnu7.1.0-T2
+#+name: gnu6.3.0-mvapich2.2gnu7.1.0-T2
+|      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
+|-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
+|  N001.rsl |      157.71430 |   149 |      1.05849 |     68.02173  |      12.63764 |      6.31882  |   6 |   6 |    36 |
+|  N002.rsl |       76.68678 |   149 |      0.51468 |    139.89373  |      12.67668 |      6.33834  |   8 |   9 |    72 |
+|  N004.rsl |       44.31821 |   149 |      0.29744 |    242.06754  |      13.79229 |      6.89614  |  12 |  12 |   144 |
+|  N008.rsl |       21.81602 |   149 |      0.14642 |    491.74872  |      15.77773 |      7.88887  |  16 |  18 |   288 |
+|  N016.rsl |       11.09775 |   149 |      0.07448 |    966.68244  |      25.71347 |     12.85674  |  24 |  24 |   576 |
+|  N032.rsl |        5.81085 |   149 |      0.03900 |   1846.20150  |      71.40889 |     35.70444  |  32 |  36 |  1152 |
+|  N064.rsl |        3.91272 |   149 |      0.02626 |   2741.82666  |     350.20424 |    175.10212  |  48 |  48 |  2304 |
+
+- intel18.0.1-mpt2.18-T1
+#+name: intel18.0.1-mpt2.18-T1
+|      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
+|-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
+|  N001.rsl |       86.57501 |   149 |      0.58104 |    123.91567  |      11.61016 |      5.80508  |   6 |   6 |    36 |
+|  N002.rsl |       42.85328 |   149 |      0.28761 |    250.34256  |      11.68894 |      5.84447  |   8 |   9 |    72 |
+|  N004.rsl |       21.26974 |   149 |      0.14275 |    504.37852  |      12.37127 |      6.18563  |  12 |  12 |   144 |
+|  N008.rsl |       10.91678 |   149 |      0.07327 |    982.70736  |      12.64363 |      6.32181  |  16 |  18 |   288 |
+|  N016.rsl |        6.02415 |   149 |      0.04043 |   1780.83215  |      13.04767 |      6.52384  |  24 |  24 |   576 |
+|  N032.rsl |        3.74614 |   149 |      0.02514 |   2863.74775  |      13.20536 |      6.60268  |  32 |  36 |  1152 |
+|  N064.rsl |        2.46127 |   149 |      0.01652 |   4358.72537  |      12.95793 |      6.47896  |  48 |  48 |  2304 |
+
+- intel18.0.1-mpt2.18-T2
+#+name: intel18.0.1-mpt2.18-T2
+|      File | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |
+|-----------+----------------+-------+--------------+---------------+---------------+---------------+-----+-----+-------|
+|  N001.rsl |       87.12675 |   149 |      0.58474 |    123.13096  |      11.66714 |      5.83357  |   6 |   6 |    36 |
+|  N002.rsl |       42.49758 |   149 |      0.28522 |    252.43790  |      11.44606 |      5.72303  |   8 |   9 |    72 |
+|  N004.rsl |       20.99630 |   149 |      0.14091 |    510.94717  |      11.65413 |      5.82707  |  12 |  12 |   144 |
+|  N008.rsl |       10.51827 |   149 |      0.07059 |   1019.93959  |      11.77526 |      5.88763  |  16 |  18 |   288 |
+|  N016.rsl |        5.82774 |   149 |      0.03911 |   1840.85083  |      12.12312 |      6.06156  |  24 |  24 |   576 |
+|  N032.rsl |        3.63714 |   149 |      0.02441 |   2949.57027  |      12.26838 |      6.13419  |  32 |  36 |  1152 |
+|  N064.rsl |        2.59566 |   149 |      0.01742 |   4133.05287  |      14.11697 |      7.05849  |  48 |  48 |  2304 |
+|  N128.rsl |        1.90839 |   149 |      0.01281 |   5621.49246  |      12.89086 |      6.44543  |  64 |  72 |  4608 |
+|  N256.rsl |        1.39718 |   149 |      0.00938 |   7678.32348  |      14.10451 |      7.05226  |  96 |  96 |  9216 |
+:END:
+
+#+header: :var names=conus12km-WRFV3.8.1-names
+#+begin_src bash :dir ~/ :results raw drawer
+python_var() {
+    echo $1 | sed 's/-/_/g' |sed 's/\./_/g'
+}
+for name in "${names[@]}"; do
+    echo "#+header: :var $(python_var $name)=$name"
+done
+echo "#+BEGIN_SRC ipython :session :exports both :results silent :var e_we=425 e_sn=300"
+echo "data=dict()"
+for name in "${names[@]}"; do
+    echo "data[\"$name\"] = $(python_var $name)"
+done
+echo "#+end_src"
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+#+header: :var gnu6_3_0_mpt2_18_T1=gnu6.3.0-mpt2.18-T1
+#+header: :var gnu6_3_0_mpt2_18_T2=gnu6.3.0-mpt2.18-T2
+#+header: :var gnu6_3_0_mvapich2_2_T1=gnu6.3.0-mvapich2.2-T1
+#+header: :var gnu6_3_0_mvapich2_2_T2=gnu6.3.0-mvapich2.2-T2
+#+header: :var gnu6_3_0_mvapich2_2gnu7_1_0_T1=gnu6.3.0-mvapich2.2gnu7.1.0-T1
+#+header: :var gnu6_3_0_mvapich2_2gnu7_1_0_T2=gnu6.3.0-mvapich2.2gnu7.1.0-T2
+#+header: :var intel18_0_1_mpt2_18_T1=intel18.0.1-mpt2.18-T1
+#+header: :var intel18_0_1_mpt2_18_T2=intel18.0.1-mpt2.18-T2
+#+BEGIN_SRC ipython :session :exports both :results silent :var e_we=425 e_sn=300
+data=dict()
+data["gnu6.3.0-mpt2.18-T1"] = gnu6_3_0_mpt2_18_T1
+data["gnu6.3.0-mpt2.18-T2"] = gnu6_3_0_mpt2_18_T2
+data["gnu6.3.0-mvapich2.2-T1"] = gnu6_3_0_mvapich2_2_T1
+data["gnu6.3.0-mvapich2.2-T2"] = gnu6_3_0_mvapich2_2_T2
+data["gnu6.3.0-mvapich2.2gnu7.1.0-T1"] = gnu6_3_0_mvapich2_2gnu7_1_0_T1
+data["gnu6.3.0-mvapich2.2gnu7.1.0-T2"] = gnu6_3_0_mvapich2_2gnu7_1_0_T2
+data["intel18.0.1-mpt2.18-T1"] = intel18_0_1_mpt2_18_T1
+data["intel18.0.1-mpt2.18-T2"] = intel18_0_1_mpt2_18_T2
+#+end_src
+:END:
+
+
+#+BEGIN_SRC ipython :session :exports both :results raw drawer
+for name in data:
+    sec_step = np.array([d[3] for d in data[name] if d[3] != '--'])
+    cpus = np.array([d[9] for d in data[name] if d[3] != '--'])
+    gridpoints = e_we * e_sn
+    plt.loglog(gridpoints/cpus, 1/sec_step, '+--', label=name)
+plt.xlabel("Total grid points / core")
+plt.ylabel("Time steps / s")
+plt.legend(loc='upper center', bbox_to_anchor=(1.35, 0.8), ncol=1)
+plt.title("Scaling results for CONUS 12km with WRFV3.8.1")
+plt.grid(False)
+#plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=2)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[26]:
+[[file:./obipy-resources/vQX2Mi.svg]]
+:END:
+
 * NEW CONUS 12km
 
 #+begin_src bash :dir /ssh:cheyenne:~/work/run :results raw
@@ -191,6 +374,20 @@ plt.grid(False)
 [[file:./obipy-resources/pcqxBB.svg]]
 :END:
 
+** WRFV3.8.1
+#+begin_src sh
+wrf_run_pbs_jobs \
+    -w ~/work/WRFs/WRFV4.0-gnu8.1.0-mpt2.18 \
+    -c ~/WRF_benchmarks/cases/new_conus12km \
+    -n 1 2 4 8 16 32 64 128 -t 1
+#+end_src
+
+#+begin_src sh
+wrf_run_pbs_jobs \
+    -w ~/work/WRFs/WRFV3.8.1-intel18.0.1-mpt2.18 \
+    -c ~/WRF_benchmarks/cases/new_conus12km_3 \
+    -n 1 2 4 8 16 32 64 128 256  -t 1
+#+end_src
 * test
 
 #+begin_src bash :dir /ssh:cheyenne:~/work/results/conus12km-WRFV3.8.1 :results raw drawer

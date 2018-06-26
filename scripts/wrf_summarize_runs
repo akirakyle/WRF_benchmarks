@@ -41,6 +41,13 @@ do
 	  shift
 done
 
+if [ -z $RUN_DIRS ]; then
+    echo "at least one RUN_DIR must be specified"; help
+fi
+if [ -z $OUT_DIR ]; then
+    echo "OUT_DIR must be specified"; help
+fi
+
 for DIR in "${RUN_DIRS[@]}"
 do
     grep -q "SUCCESS COMPLETE WRF" $DIR/rsl.out.0000
@@ -83,4 +90,5 @@ do
     cp $DIR/rsl.out.0000 $OUT_DIR/$DIR_NAME.rsl
 done
 
-wrf_stats -t -H -r -f *.rsl -d $OUT_DIR > $OUT_DIR/wrf_stats.tbl
+wrf_stats -t -H -r -f *.rsl -d $OUT_DIR # > $OUT_DIR/wrf_stats.tbl
+# cat $OUT_DIR/wrf_stats.tbl
