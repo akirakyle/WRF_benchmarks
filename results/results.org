@@ -1,7 +1,20 @@
-#+TITLE: WRF scaling and timing on Cheyenne
+# -*- org-export-babel-evaluate: nil -*-
+#+TITLE: Weather Research and Forecast (WRF) Scaling, Performance Assessment and Optimization
+#+SUBTITLE: Comparison of Compilers and MPI Libraries on Cheyenne
+#+SUBTITLE: NCAR SIParCS
 #+AUTHOR: Akira Kyle
 #+EMAIL: akyle@cmu.edu
-#+OPTIONS: toc:nil email:t
+#+OPTIONS: H:1 toc:nil num:t
+#+LATEX_HEADER: \graphicspath{{./figs/}{./images/}{./obipy-resources/}}
+#+startup: beamer
+#+LaTeX_CLASS: beamer
+#+BEAMER_THEME: metropolis
+
+* Outline
+- @@beamer:<2->@@ Cases
+- @@beamer:<3->@@ Compilers
+- @@beamer:<4->@@ MPI
+- @@beamer:<5->@@ Results
 
 * Code Snippets
   :PROPERTIES:
@@ -247,6 +260,22 @@ plot_it(data, 425 * 300, "Scaling results for CONUS 12km with WRFV3.8.1")
   :header-args:   :noweb yes :var names=new_conus12km-WRFV4.0-names
   :END:
 
+#+begin_src sh
+wrf_run_pbs_jobs \
+    --wrfs \
+    ~/work/WRFs/WRFV4.0-gnu8.1.0-mvapich2.2 \
+    ~/work/WRFs/WRFV4.0-gnu8.1.0-fma-mvapich2.2 \
+    ~/work/WRFs/WRFV4.0-gnu8.1.0-O3-mvapich2.2 \
+    ~/work/WRFs/WRFV4.0-gnu8.1.0-O3-fma-mvapich2.2 \
+    ~/work/WRFs/WRFV4.0-intel17.0.1-mvapich2.2 \
+    ~/work/WRFs/WRFV4.0-intel18.0.1-mvapich2.2 \
+    --cases ~/WRF_benchmarks/cases/new_conus12km \
+    -n 1 2 4 8 16 -t 1
+
+wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
+                   -o conus12km-WRFV3.8.1/gnu6.3.0/mpt2.18/T1 -t
+#+end_src
+
 #+name: new_conus12km-WRFV4.0-names
 | Paths                                        |
 |----------------------------------------------|
@@ -317,3 +346,36 @@ plot_it(data, 425 * 300, "Scaling results for CONUS 12km with WRFV3.8.1")
 # Out[16]:
 [[file:./obipy-resources/vHSqud.svg]]
 
+* NEW CONUS 2.5km
+
+#+begin_src sh
+
+wrf_run_pbs_jobs \
+    --wrfs \
+    ~/work/WRFs/WRFV4.0-gnu8.1.0-mvapich2.2 \
+    ~/work/WRFs/WRFV4.0-gnu8.1.0-fma-mvapich2.2 \
+    ~/work/WRFs/WRFV4.0-gnu8.1.0-O3-mvapich2.2 \
+    ~/work/WRFs/WRFV4.0-gnu8.1.0-O3-fma-mvapich2.2 \
+    ~/work/WRFs/WRFV4.0-intel17.0.1-mvapich2.2 \
+    ~/work/WRFs/WRFV4.0-intel18.0.1-mvapich2.2 \
+    --cases ~/WRF_benchmarks/cases/new_conus12km \
+    -n 1 2 4 8 16 -t 1
+
+
+wrf_run_pbs_jobs \
+    --wrfs \
+    ~/work/WRFs/WRFV4.0-intel17.0.1-mvapich2.2 \
+    ~/work/WRFs/WRFV4.0-intel18.0.1-mvapich2.2 \
+    ~/work/WRFs/WRFV4.0-gnu6.3.0-mvapich2.2 \
+    ~/work/WRFs/WRFV4.0-gnu8.1.0-mvapich2.2 \
+    ~/work/WRFs/WRFV4.0-gnu8.1.0-O3-fma-mvapich2.2 \
+    ~/work/WRFs/WRFV4.0-gnu8.1.0-mpt2.18 \
+    --cases \
+    ~/WRF_benchmarks/cases/new_conus2.5km \
+    ~/WRF_benchmarks/cases/maria3km \
+    ~/WRF_benchmarks/cases/maria1km \
+    -n 1 2 4 8 16 32 64 128 256 -t 2 -a '04:00:00'
+
+wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
+                   -o conus12km-WRFV3.8.1/gnu6.3.0/mpt2.18/T1 -t
+#+end_src
