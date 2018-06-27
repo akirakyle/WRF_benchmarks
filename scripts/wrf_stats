@@ -2,48 +2,31 @@
 
 help() {
     echo ""
-    echo "Usage: ${0##*/} [OPTIONS]"
-    echo "Analyzes timing output info for WRF runs"
+    echo "Usage: ${0##*/} [OPTIONS] RSL_OUT1 RSL_OUT2 ..."
+    echo "Analyzes timing output info for WRF runs. If no rsl output files are specified"
+    echo "then look for rsl.out.0000 in current directory"
     echo ""
     echo "OPTIONS:"
     echo "    -a, --all                 Includes all timesteps, including those involving disk I/O"
-    echo "    -f, --files RSL1 RSL2 ... Specifies a space-delimited list of output files containing timing info"
-    echo "    -s, --timestep TSTEP      Use TSTEP (seconds) to compute speed"
     echo "    -h, --help                This help"
     echo ""
     exit 0
 }
 
-reading_list=false
 filter=2
 
-while test $# -gt 0
-do
-    case $1 in
-        -f|--files)
-            reading_files=true
-	          shift ;;
-        -a|--all)
-            filter=1
-            reading_files=false
-	          shift ;;
-        -s|--timestep)
-            tstep=$2
-            reading_files=false
-	          shift; shift ;;
-        -h|--help)
-            help ;;
-	      *)
-            if   [ "$reading_files" = true    ] ; then files+=("$1")
-            else
-                help
-            fi
-	          shift ;;
-    esac
-done
+case $1 in
+    -a|--all)
+        filter=1 ; shift ;;
+    -h|--help)
+        help ;;
+	  *)
+esac
 
-if [ -z $files ]; then
-    files=( rsl.out.0000 )
+if [ $# -eq 0 ]; then
+    files=rsl.out.0000
+else
+    files=$@
 fi
 
 if [ ${width} -lt ${min_width} ]; then
@@ -51,18 +34,19 @@ if [ ${width} -lt ${min_width} ]; then
 fi
 
 max_flen=4
-for out in "${files[@]}"; do
+for out in $files; do
     out_len=$(echo "$out" | wc -m)
     max_flen=$(( $max_flen > $out_len ? $max_flen : $out_len ))
 done
 
-printf "| %*s | Comp: Total(s) | Steps | Avg.(s/step) |         Speed | I/O: Total(s) |  Avg.(s/step) |   X |   Y |  CPUs |\n" $max_flen "File"
-printf "| %*s +                +       +              +               +               +               +     +     +       |\n" $max_flen " "|
+printf "| %*s | Comp: Total(s) | Steps |   Avg.(s/step) |  I/O: Total(s) |   Avg.(s/step) |   X |   Y |  CPUs |\n" $max_flen "File"
+printf "| %*s +                +       +                +                +                +     +     +       |\n" $max_flen " "|
     tr " " "-"
 
-for out in "${files[@]}"; do
-    if [ -z "$tstep" ]; then
-		    tstep=$( grep -F 'time_step ' namelist.input | cut -d= -f2 | sed -e"s/,/ /g" -e"s/ //g" )
+for out in $files; do
+    if [ ! -f $out ]; then
+        >&2 echo "$out is not a file"
+        continue
     fi
 
     offset=
@@ -73,13 +57,13 @@ for out in "${files[@]}"; do
 
     printf "| %*s |" $max_flen "$out"
     grep "Timing for main:.*domain  *1" $out 2>/dev/null | tail -n +$filter |
-			  awk ${offset} -v s=${tstep} 'BEGIN{t=0;i=0;}{t=t+$9;i=i+1}\
-			END{t=t-to;i=i-io;if (i>0) {at=t/i;printf("   %12.5f | %5i | %12.5f | %12.5f  |",t,i,at,s/at)}\
-				else {printf("             -- |    -- |           -- |            -- |")}}'
+			  awk ${offset} 'BEGIN{t=0;i=0;}{t=t+$9;i=i+1}END{t=t-to;i=i-io;\
+        if (i>0) {at=t/i;printf(" %14.6f | %5i | %14.8f |",t,i,at)}\
+				   else {printf("             -- |    -- |             -- |")}}'
 		grep Writing $out 2>/dev/null |
 			  awk 'BEGIN{t=0;i=0;}{t=t+$8;i=i+1;}\
-			END{if (i>0) {printf("  %12.5f | %12.5f  |",t,t/i)}\
-				else {printf("            -- |            -- |")}}'
+			END{if (i>0) {printf(" %14.6f | %14.8f |",t,t/i)}\
+				else {printf("             -- |             -- |")}}'
 		grep Ntasks $out 2>/dev/null | sed -e"s/,/ /g" |
 			  awk '{x=$4;y=$8;}END{if (NR>0) {printf(" %3i | %3i | %5i |\n",x,y,x*y)}\
 				else {printf("  -- |  -- |    -- |\n")}}'

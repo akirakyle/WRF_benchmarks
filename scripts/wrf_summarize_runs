@@ -101,7 +101,10 @@ fi
 for DIR in "${RUN_DIRS[@]}"
 do
     DIR_NAME=$(echo $DIR | sed 's/\//-/g')
-    cp $DIR/rsl.out.0000 $OUT_DIR/$DIR_NAME.rsl
+    grep -q "SUCCESS COMPLETE WRF" $DIR/rsl.out.0000
+    if [[ $? -eq 0 ]]; then
+        cp $DIR/rsl.out.0000 $OUT_DIR/$DIR_NAME.rsl
+    fi
 done
 
 wrf_stats -f $OUT_DIR/*.rsl
