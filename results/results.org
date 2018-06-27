@@ -2,7 +2,6 @@
 #+AUTHOR: Akira Kyle
 #+EMAIL: akyle@cmu.edu
 #+OPTIONS: toc:nil email:t
-#+PROPERTY: header-args :results raw drawer :exports both
 
 * Code Snippets
   :PROPERTIES:
@@ -92,7 +91,7 @@ wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
 
 #+header: :var cases=conus12km-cases labels=conus12km-labels
 #+header: :var title="Scaling results for CONUS 12km with WRFV3.8.1"
-#+begin_src ipython :session
+#+begin_src ipython :session :results raw drawer :exports both
 plot_it(cases, labels, title)
 #+end_src
 
@@ -203,7 +202,7 @@ wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
 
 #+header: :var cases=cases-cases labels=cases-labels
 #+header: :var title="Scaling results for CONUS 12km with WRFV3.8.1"
-#+begin_src ipython :session
+#+begin_src ipython :session :results raw drawer :exports both
 plot_it(cases, labels, title)
 #+end_src
 
