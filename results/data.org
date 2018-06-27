@@ -6,17 +6,23 @@
 #+begin_src bash :exports both :results raw drawer
 base_dir=~/work/results
 cd $base_dir
+names=()
 for d in $(find . -type d); do
     cd $d
     d=${d:2}
     if ls *.rsl 1> /dev/null 2>&1; then
-        echo
-        echo "- *$d*"
-        echo "#+name: $d"
-
+        names+=($d)
+        printf "\n- *$d*\n#+name: $d\n"
         wrf_stats -f *.rsl
     fi
     cd $base_dir
+done
+echo
+echo "#+name: names"
+echo "| Names |"
+echo "|-------|"
+for name in "${names[@]}"; do
+    echo "| $name |"
 done
 #+end_src
 
@@ -310,4 +316,35 @@ done
 |  N004.rsl |    8054.721880 |  1438 |     5.60133650 |    1078.572920 |   269.64323000 |  12 |  12 |   144 |
 |  N008.rsl |    4087.881740 |  1438 |     2.84275503 |    1055.861770 |   263.96544250 |  16 |  18 |   288 |
 |  N064.rsl |     563.656460 |  1438 |     0.39197250 |    1567.982240 |   391.99556000 |  48 |  48 |  2304 |
+
+#+name: names
+| Names                                                |
+|------------------------------------------------------|
+| conus12km/WRFV3.8.1/intel18.0.1/mpt2.18/T2           |
+| conus12km/WRFV3.8.1/intel18.0.1/mpt2.18/T1           |
+| conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2/T2           |
+| conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2/T1           |
+| conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2gnu7.1.0/T2   |
+| conus12km/WRFV3.8.1/gnu6.3.0/mvapich2.2gnu7.1.0/T1   |
+| conus12km/WRFV3.8.1/gnu6.3.0/mpt2.18/T2              |
+| conus12km/WRFV3.8.1/gnu6.3.0/mpt2.18/T1              |
+| maria3km/WRFV4.0/gnu8.1.0/mvapich2.2/T1              |
+| maria3km/WRFV4.0/gnu8.1.0/mpt2.18/T1                 |
+| maria3km/WRFV4.0/gnu8.1.0-O3-fma/mvapich2.2/T1       |
+| maria3km/WRFV4.0/gnu6.3.0/mvapich2.2/T1              |
+| new_conus12km_3/WRFV3.8.1/intel18.0.1/mpt2.18/T1     |
+| new_conus12km_3/WRFV3.8.1/gnu6.3.0/mvapich2.2/T1     |
+| new_conus12km_3/WRFV3.8.1/gnu6.3.0/mpt2.18/T1        |
+| new_conus12km/WRFV4.0/gnu8.1.0/mvapich2.2/T1         |
+| new_conus12km/WRFV4.0/gnu8.1.0/O3/mvapich2.2/T1      |
+| new_conus12km/WRFV4.0/gnu8.1.0/O3/fma/mvapich2.2/T1  |
+| new_conus12km/WRFV4.0/gnu8.1.0/mpt2.18/T1            |
+| new_conus12km/WRFV4.0/gnu8.1.0/fma/mvapich2.2/T1     |
+| new_conus12km/WRFV4.0/intel18.0.1/mpt2.18/T2         |
+| new_conus12km/WRFV4.0/intel18.0.1/mpt2.18/T1         |
+| new_conus12km/WRFV4.0/gnu6.3.0/mpt2.18/T1            |
+| new_conus2.5km/WRFV4.0/gnu8.1.0/mvapich2.2/T1        |
+| new_conus2.5km/WRFV4.0/gnu8.1.0/mpt2.18/T1           |
+| new_conus2.5km/WRFV4.0/gnu8.1.0-O3-fma/mvapich2.2/T1 |
+| new_conus2.5km/WRFV4.0/gnu6.3.0/mvapich2.2/T1        |
 :END:
