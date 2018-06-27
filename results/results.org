@@ -283,14 +283,14 @@ wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
 
 #+header: :var cases=new_conus2.5km-cases labels=new_conus2.5km-labels
 #+header: :var title="Scaling results for NEW CONUS 2.5km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus2.5km.svg :exports results
+#+begin_src ipython :session :ipyfile ./imgs/new_conus2-5km.svg :exports results
 plot_it(cases, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[8]:
-[[file:./imgs/new_conus2.5km.svg]]
+[[file:./imgs/new_conus2-5km.svg]]
 :END:
 
 * Maria 3km
