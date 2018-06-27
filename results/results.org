@@ -2,6 +2,8 @@
 #+AUTHOR: Akira Kyle
 #+EMAIL: akyle@cmu.edu
 #+OPTIONS: toc:nil email:t
+#+PROPERTY: header-args :results raw drawer
+
 
 * Code Snippets
   :PROPERTIES:
@@ -19,10 +21,10 @@ import matplotlib.pyplot as plt
 def plot_it(cases, labels, title):
     for case,label in zip(cases,labels):
         runs = getFromDict(data, case)
-        sec_step = np.array([d[2] for _,d in runs.items() if d[2] != '--'])
+        secs = np.array([d[2] for _,d in runs.items() if d[2] != '--'])
         cpus = np.array([d[7] for _,d in runs.items() if d[2] != '--'])
         gridpoints = e_we[case[0]] * e_sn[case[0]]
-        plt.loglog(gridpoints/cpus, 1/sec_step, '+--', label=label[0])
+        plt.loglog(gridpoints/cpus, 1/secs, '+--', label=label[0])
     plt.xlabel("Total grid points / core")
     plt.ylabel("Time steps / s")
     plt.legend(loc='upper center', bbox_to_anchor=(1.35, 0.8), ncol=1)
@@ -49,9 +51,11 @@ for run in raw_data:
 
 e_we = {}
 e_sn = {}
+time_step = {}
 for case in raw_gridpoints:
     e_we[case[0]] = case[1]
     e_sn[case[0]] = case[2]
+    time_step[case[0]] = case[3]
 #+end_src
 
 * CONUS 12km
@@ -91,14 +95,88 @@ wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
 
 #+header: :var cases=conus12km-cases labels=conus12km-labels
 #+header: :var title="Scaling results for CONUS 12km with WRFV3.8.1"
-#+begin_src ipython :session :results raw drawer :exports both
+#+begin_src ipython :session :ipyfile ./imgs/conus12km.svg :exports results
 plot_it(cases, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-# Out[13]:
-[[file:./obipy-resources/zA90Fi.svg]]
+# Out[4]:
+[[file:./imgs/conus12km.svg]]
+:END:
+
+* NEW CONUS 12km WRFV3.8.1
+
+#+name: new_conus12km_3-cases
+| case            | WRF version | compiler    | mpi        | trial |
+|-----------------+-------------+-------------+------------+-------|
+| new_conus12km_3 | WRFV3.8.1   | gnu6.3.0    | mpt2.18    |     1 |
+| new_conus12km_3 | WRFV3.8.1   | gnu6.3.0    | mvapich2.2 |     1 |
+| new_conus12km_3 | WRFV3.8.1   | intel18.0.1 | mpt2.18    |     1 |
+
+#+name: new_conus12km_3-labels
+| label               |
+|---------------------|
+| gnu6.3.0/mpt2.18    |
+| gnu6.3.0/mvapich2.2 |
+| intel18.0.1/mpt2.18 |
+| intel18.0.1/mpt2.18 |
+
+#+header: :var cases=new_conus12km_3-cases labels=new_conus12km_3-labels
+#+header: :var title="Scaling results for NEW CONUS 12km with WRFV3.8.1"
+#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_3.svg :exports results
+plot_it(cases, labels, title)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[5]:
+[[file:./imgs/new_conus12km_3.svg]]
+:END:
+
+* OLD CONUS 12km vs NEW CONUS 12km WRFV3.8.1
+
+#+name: old-vs-new-conus12km-cases
+| case            | WRF version | compiler    | mpi                | trial |
+|-----------------+-------------+-------------+--------------------+-------|
+| conus12km       | WRFV3.8.1   | gnu6.3.0    | mpt2.18            |     1 |
+| conus12km       | WRFV3.8.1   | gnu6.3.0    | mpt2.18            |     2 |
+| conus12km       | WRFV3.8.1   | gnu6.3.0    | mvapich2.2         |     1 |
+| conus12km       | WRFV3.8.1   | gnu6.3.0    | mvapich2.2         |     2 |
+| conus12km       | WRFV3.8.1   | gnu6.3.0    | mvapich2.2gnu7.1.0 |     1 |
+| conus12km       | WRFV3.8.1   | gnu6.3.0    | mvapich2.2gnu7.1.0 |     2 |
+| conus12km       | WRFV3.8.1   | intel18.0.1 | mpt2.18            |     1 |
+| conus12km       | WRFV3.8.1   | intel18.0.1 | mpt2.18            |     2 |
+| new_conus12km_3 | WRFV3.8.1   | gnu6.3.0    | mpt2.18            |     1 |
+| new_conus12km_3 | WRFV3.8.1   | gnu6.3.0    | mvapich2.2         |     1 |
+| new_conus12km_3 | WRFV3.8.1   | intel18.0.1 | mpt2.18            |     1 |
+
+#+name: old-vs-new-conus12km-labels
+| label                          |
+|--------------------------------|
+| gnu6.3.0/mpt2.18/T1            |
+| gnu6.3.0/mpt2.18/T2            |
+| gnu6.3.0/mvapich2.2/T1         |
+| gnu6.3.0/mvapich2.2/T2         |
+| gnu6.3.0/mvapich2.2gnu7.1.0/T1 |
+| gnu6.3.0/mvapich2.2gnu7.1.0/T2 |
+| intel18.0.1/mpt2.18/T1         |
+| intel18.0.1/mpt2.18/T2         |
+| gnu6.3.0/mpt2.18               |
+| gnu6.3.0/mvapich2.2            |
+| intel18.0.1/mpt2.18            |
+| intel18.0.1/mpt2.18            |
+
+#+header: :var cases=old-vs-new-conus12km-cases labels=old-vs-new-conus12km-labels
+#+header: :var title="Scaling results for OLD CONUS 12km vs NEW CONUS 12km with WRFV3.8.1"
+#+begin_src ipython :session :ipyfile ./imgs/old_vs_new_conus12km_3.svg :exports results
+plot_it(cases, labels, title)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[6]:
+[[file:./imgs/old_vs_new_conus12km_3.svg]]
 :END:
 
 * NEW CONUS 12km
@@ -119,35 +197,44 @@ wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
 #+end_src
 
 #+name: new_conus12km-cases
-| case          | WRF version | compiler    | mpi     | trial |
-|---------------+-------------+-------------+---------+-------|
-| new_conus12km | WRFV4.0     | gnu6.3.0    | mpt2.18 |     1 |
-| new_conus12km | WRFV4.0     | intel18.0.1 | mpt2.18 |     1 |
-| new_conus12km | WRFV4.0     | intel18.0.1 | mpt2.18 |     2 |
+| case          | WRF version | compiler        | mpi        | trial |
+|---------------+-------------+-----------------+------------+-------|
+| new_conus12km | WRFV4.0     | gnu6.3.0        | mpt2.18    |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0        | mpt2.18    |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0        | mvapich2.2 |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0-O3     | mvapich2.2 |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0-fma    | mvapich2.2 |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0-O3-fma | mvapich2.2 |     1 |
+| new_conus12km | WRFV4.0     | intel18.0.1     | mpt2.18    |     1 |
+| new_conus12km | WRFV4.0     | intel18.0.1     | mpt2.18    |     2 |
 
 #+name: new_conus12km-labels
-| label                  |
-|------------------------|
-| gnu6.3.0/mpt2.18/T1    |
-| intel18.0.1/mpt2.18/T1 |
-| intel18.0.1/mpt2.18/T2 |
+| label                      |
+|----------------------------|
+| gnu6.3.0/mpt2.18           |
+| gnu8.1.0/mpt2.18           |
+| gnu8.1.0/mvapich2.2        |
+| gnu8.1.0-O/mvapich2.2      |
+| gnu8.1.0-fma/mvapich2.2    |
+| gnu8.1.0-O3-fma/mvapich2.2 |
+| intel18.0.1/mpt2.18/T1     |
+| intel18.0.1/mpt2.18/T2     |
 
 #+header: :var cases=new_conus12km-cases labels=new_conus12km-labels
-#+header: :var title="Scaling results for CONUS 12km with WRFV3.8.1"
-#+begin_src ipython :session :results raw drawer :exports both
+#+header: :var title="Scaling results for NEW CONUS 12km with WRFV4.0"
+#+begin_src ipython :session :ipyfile ./imgs/new_conus12km.svg :exports results
 plot_it(cases, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-# Out[14]:
-[[file:./obipy-resources/m8I4Os.svg]]
+# Out[7]:
+[[file:./imgs/new_conus12km.svg]]
 :END:
 
 * NEW CONUS 2.5km
 
 #+begin_src sh :eval no
-
 wrf_run_pbs_jobs \
     --wrfs \
     ~/work/WRFs/WRFV4.0-gnu8.1.0-mvapich2.2 \
@@ -178,36 +265,88 @@ wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
                    -o conus12km-WRFV3.8.1/gnu6.3.0/mpt2.18/T1 -t
 #+end_src
 
-* Cases
+#+name: new_conus2.5km-cases
+| case          | WRF version | compiler        | mpi        | trial |
+|---------------+-------------+-----------------+------------+-------|
+| new_conus12km | WRFV4.0     | gnu6.3.0        | mvapich2.2 |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0        | mpt2.18    |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0        | mvapich2.2 |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0-O3-fma | mvapich2.2 |     1 |
 
-#+name: cases-cases
-| case           | WRF version | compiler | mpi        | trial |
-|----------------+-------------+----------+------------+-------|
-| new_conus12km  | WRFV4.0     | gnu8.1.0 | mpt2.18    |     1 |
-| new_conus12km  | WRFV4.0     | gnu8.1.0 | mvapich2.2 |     1 |
-| new_conus2.5km | WRFV4.0     | gnu8.1.0 | mpt2.18    |     1 |
-| new_conus2.5km | WRFV4.0     | gnu8.1.0 | mvapich2.2 |     1 |
-| maria3km       | WRFV4.0     | gnu8.1.0 | mpt2.18    |     1 |
-| maria3km       | WRFV4.0     | gnu8.1.0 | mvapich2.2 |     1 |
+#+name: new_conus2.5km-labels
+| label                      |
+|----------------------------|
+| gnu6.3.0/mvapich2.2        |
+| gnu8.1.0/mpt2.18           |
+| gnu8.1.0/mvapich2.2        |
+| gnu8.1.0-O3-fma/mvapich2.2 |
 
-#+name: cases-labels
-| label                     |
-|---------------------------|
-| new_conus12km/mpt2.18     |
-| new_conus12km/mvapich2.2  |
-| new_conus2.5km/mpt2.18    |
-| new_conus2.5km/mvapich2.2 |
-| maria3km/mpt2.18          |
-| maria3km/mvapich2.2       |
-
-#+header: :var cases=cases-cases labels=cases-labels
-#+header: :var title="Scaling results for CONUS 12km with WRFV3.8.1"
-#+begin_src ipython :session :results raw drawer :exports both
+#+header: :var cases=new_conus2.5km-cases labels=new_conus2.5km-labels
+#+header: :var title="Scaling results for NEW CONUS 2.5km with WRFV4.0"
+#+begin_src ipython :session :ipyfile ./imgs/new_conus2.5km.svg :exports results
 plot_it(cases, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-# Out[15]:
-[[file:./obipy-resources/6PTkk1.svg]]
+# Out[8]:
+[[file:./imgs/new_conus2.5km.svg]]
+:END:
+
+* Maria 3km
+
+#+name: maria3km-cases
+| case     | WRF version | compiler        | mpi        | trial |
+|----------+-------------+-----------------+------------+-------|
+| maria3km | WRFV4.0     | gnu6.3.0        | mvapich2.2 |     1 |
+| maria3km | WRFV4.0     | gnu8.1.0        | mpt2.18    |     1 |
+| maria3km | WRFV4.0     | gnu8.1.0        | mvapich2.2 |     1 |
+| maria3km | WRFV4.0     | gnu8.1.0-O3-fma | mvapich2.2 |     1 |
+
+#+name: maria3km-labels
+| label                      |
+|----------------------------|
+| gnu6.3.0/mvapich2.2        |
+| gnu8.1.0/mpt2.18           |
+| gnu8.1.0/mvapich2.2        |
+| gnu8.1.0-O3-fma/mvapich2.2 |
+
+#+header: :var cases=maria3km-cases labels=maria3km-labels
+#+header: :var title="Scaling results for Maria 3km with WRFV4.0"
+#+begin_src ipython :session :ipyfile ./imgs/maria3km.svg :exports results
+plot_it(cases, labels, title)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[9]:
+[[file:./imgs/maria3km.svg]]
+:END:
+
+* Cases
+
+#+name: cases-cases
+| case           | WRF version | compiler | mpi        | trial |
+|----------------+-------------+----------+------------+-------|
+| new_conus12km  | WRFV4.0     | gnu8.1.0 | mvapich2.2 |     1 |
+| new_conus2.5km | WRFV4.0     | gnu8.1.0 | mvapich2.2 |     1 |
+| maria3km       | WRFV4.0     | gnu8.1.0 | mvapich2.2 |     1 |
+
+#+name: cases-labels
+| label          |
+|----------------|
+| new_conus12km  |
+| new_conus2.5km |
+| maria3km       |
+
+#+header: :var cases=cases-cases labels=cases-labels
+#+header: :var title="Scaling results for WRFV4.0/gnu8.1.0/mvapich2.2"
+#+begin_src ipython :session :ipyfile ./imgs/cases.svg :exports results
+plot_it(cases, labels, title)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[10]:
+[[file:./imgs/cases.svg]]
 :END:
