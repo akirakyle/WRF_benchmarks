@@ -240,6 +240,8 @@ wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
                    -o conus12km-WRFV3.8.1/gnu6.3.0/mpt2.18/T1 -t
 #+end_src
 
+#+RESULTS:
+
 #+name: conus12km-cases
 | case      | WRF version | compiler    | mpi                | trial |
 |-----------+-------------+-------------+--------------------+-------|
@@ -272,8 +274,8 @@ plot_it(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[6]:
-[[file:./obipy-resources/tpLgRY.svg]]
+# Out[16]:
+[[file:./obipy-resources/skrVLR.svg]]
 :END:
 
 * NEW CONUS 12km
@@ -292,6 +294,8 @@ wrf_run_pbs_jobs \
 wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
                    -o conus12km-WRFV3.8.1/gnu6.3.0/mpt2.18/T1 -t
 #+end_src
+
+#+RESULTS:
 
 #+name: new_conus12km-cases
 | case          | WRF version | compiler    | mpi     | trial |
@@ -315,8 +319,8 @@ plot_it(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[9]:
-[[file:./obipy-resources/xscKkU.svg]]
+# Out[17]:
+[[file:./obipy-resources/z3MX8b.svg]]
 :END:
 
 * NEW CONUS 2.5km
@@ -353,6 +357,8 @@ wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
                    -o conus12km-WRFV3.8.1/gnu6.3.0/mpt2.18/T1 -t
 #+end_src
 
+#+RESULTS:
+
 * Cases
 
 #+name: cases-cases
@@ -383,6 +389,6 @@ plot_it(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[12]:
-[[file:./obipy-resources/WWJJaB.svg]]
+# Out[18]:
+[[file:./obipy-resources/WOvEas.svg]]
 :END:
