@@ -1,0 +1,100 @@
+#+title: Weather Research and Forecast (WRF) Scaling, Performance Assessment and Optimization
+#+subtitle: Comparison of Compilers and MPI Libraries on Cheyenne
+#+subtitle: NCAR SIParCS Program
+#+date: August 3, 2018
+#+author: Akira Kyle
+#+email: akyle@cmu.edu
+#+options: H:2 toc:t num:t author:nil
+#+latex_header: \author[shortname]{Akira Kyle\inst{1}, Davide Del Vento \inst{2}, Brian Vanderwende \inst{2}, Negin Sobhani \inst{2}, Dixit Patel \inst{3}}
+#+latex_header: \institute[shortinst]{\inst{1} Carnegie Mellon University \and \inst{2} National Center for Atmospheric Research \and \inst{3} University of Colorado Boulder}
+#+latex_header: \graphicspath{{./figs/}{./images/}{./obipy-resources/}}
+#+startup: beamer
+#+latex_class: beamer
+# #+beamer_theme: Pittsburgh
+# \usecolortheme[snowy]{owl}
+# #+beamer_color_theme: owl
+#+beamer_theme: metropolis
+# plt.style.use('dark_background')
+
+* Background
+** WRF
+
+WRF is a state-of-the-art atmospheric modeling system designed for both
+meteorological research and numerical weather prediction. It offers a host of
+options for atmospheric processes and can run on a variety of computing
+platforms. WRF excels in a broad range of applications across scales ranging
+from tens of meters to thousands of kilometers, including the following.
+
+#+BEAMER: \pause
+– Meteorological studies
+
+#+BEAMER: \pause
+– Real-time NWP
+
+#+BEAMER: \pause
+– Idealized simulations
+
+#+BEAMER: \pause
+– Data assimilation
+
+#+BEAMER: \pause
+– Earth system model coupling
+
+#+BEAMER: \pause
+– Model training and educational support
+
+** Flowchart
+#+ATTR_LATEX: :width 0.9\linewidth
+[[./figs/WRF_flow_chart-ARW_v4.png]]
+
+* Intro
+** Test cases
+- ~conus12km~
+- ~conus2.5km~
+- ~new_conus12km~
+- ~new_conus2.5km~
+- ~katrina1km~
+- ~katrina3km~
+- ~maria1km~
+- ~maria3km~
+
+** Compilers and MPI Libraries
+- GNU Compiler Collection (GCC) versions 6.3.0, 8.1.0
+  - WRF compiles with -O2 default
+    - Tried -O3 and -mfma (enables FMA instruction set)
+    - Use -ofast?
+- Intel Compiler versions 17.0.1, 18.0.1
+- MPT, MVAPICH
+
+** Settings
+- MVAPICH
+
+http://mvapich.cse.ohio-state.edu/static/media/mvapich/mvapich2-2.3rc2-userguide.html#x1-19100011.15
+
+* Results
+** CONUS 12km
+[[file:./imgs/conus12km.svg]]
+
+** NEW CONUS 12km WRFV3.8.1
+[[file:./imgs/new_conus12km_3.svg]]
+
+** Old CONUS 12km vs New CONUS 12km WRFV3.8.1
+[[file:./imgs/old_vs_new_conus12km_3.svg]]
+
+** New CONUS 12km
+[[file:./imgs/new_conus12km.svg]]
+
+** New CONUS 2.5km
+[[file:./imgs/new_conus2-5km.svg]]
+
+** Maria 3km
+[[file:./imgs/maria3km.svg]]
+
+** Case comparison
+[[file:./imgs/cases.svg]]
+
+* Summary
+** Conclusions?
+- Brownian motion begins with a random walk
+- $\langle R_{N}^2 \rangle = NL^2$ can be related to physical quantities through forces
+  - Randomness is very helpful: it allows us to average out a terms[fn:: The Feynman Lectures on Physics, Vol. I]
