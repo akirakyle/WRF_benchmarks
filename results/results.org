@@ -281,14 +281,14 @@ for case in cases:
     sec = getFromDict(data, case+[1])[2]
     secs.append(sec if isinstance(sec, float) else 0.0)
 
-np.array(secs)
+secs = np.array(secs)
 labels = [l[0] for l in labels]
 y_pos = np.arange(len(cases))
 error = np.zeros(len(cases))
 
 fig, ax = plt.subplots()
 
-ax.barh(y_pos, secs_normal)
+ax.barh(y_pos, 1/secs)
 ax.set_yticks(y_pos)
 ax.set_yticklabels(labels)
 ax.invert_yaxis()
@@ -298,7 +298,7 @@ ax.set_title('Performance for normal number of nodes')
 
 #+RESULTS:
 :RESULTS:
-# Out[29]:
+# Out[32]:
 : Text(0.5,1,'Performance for normal number of nodes')
 [[file:./imgs/new_conus12km_bar_normal.svg]]
 :END:
@@ -312,14 +312,14 @@ for case in cases:
     sec = getFromDict(data, case+[16])[2]
     secs.append(sec if isinstance(sec, float) else 0.0)
 
-np.array(secs)
+secs = np.array(secs)
 labels = [l[0] for l in labels]
 y_pos = np.arange(len(cases))
 error = np.zeros(len(cases))
 
 fig, ax = plt.subplots()
 
-ax.barh(y_pos, secs_normal)
+ax.barh(y_pos, 1/secs)
 ax.set_yticks(y_pos)
 ax.set_yticklabels(labels)
 ax.invert_yaxis()
@@ -329,7 +329,7 @@ ax.set_title('Performance for large number of nodes')
 
 #+RESULTS:
 :RESULTS:
-# Out[30]:
+# Out[33]:
 : Text(0.5,1,'Performance for large number of nodes')
 [[file:./imgs/new_conus12km_bar_large.svg]]
 :END:
