@@ -89,6 +89,14 @@ http://mvapich.cse.ohio-state.edu/static/media/mvapich/mvapich2-2.3rc2-userguide
 #+attr_latex: :width 1.0\linewidth
 [[file:./imgs/new_conus12km.svg]]
 
+** New CONUS 12km Normal
+#+attr_latex: :width 1.0\linewidth
+[[file:./imgs/new_conus12km_bar_normal.svg]]
+
+** New CONUS 12km Large
+#+attr_latex: :width 1.0\linewidth
+[[file:./imgs/new_conus12km_bar_large.svg]]
+
 ** New CONUS 2.5km
 #+attr_latex: :width 1.0\linewidth
 [[file:./imgs/new_conus2-5km.svg]]
