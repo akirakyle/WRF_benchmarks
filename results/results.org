@@ -44,7 +44,8 @@ tree = lambda: defaultdict(tree)
 
 data = tree()
 for run in raw_data:
-    keys = run[0].split('/')[1:]
+    keys = run[0].split('-')
+    keys[0] = keys[0][2:]
     keys[-1] = int(keys[-1][1:-4])
     keys[-2] = int(keys[-2][1:])
     d = getFromDict(data,keys[:-1])
@@ -198,16 +199,19 @@ wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
 #+end_src
 
 #+name: new_conus12km-cases
-| case          | WRF version | compiler        | mpi        | trial |
-|---------------+-------------+-----------------+------------+-------|
-| new_conus12km | WRFV4.0     | gnu6.3.0        | mpt2.18    |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0        | mpt2.18    |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0        | mvapich2.2 |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0-O3     | mvapich2.2 |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0-fma    | mvapich2.2 |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0-O3-fma | mvapich2.2 |     1 |
-| new_conus12km | WRFV4.0     | intel18.0.1     | mpt2.18    |     1 |
-| new_conus12km | WRFV4.0     | intel18.0.1     | mpt2.18    |     2 |
+| case          | WRF version | compiler        | mpi            | trial |
+|---------------+-------------+-----------------+----------------+-------|
+| new_conus12km | WRFV4.0     | gnu6.3.0        | mpt2.18        |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0        | mpt2.18        |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0        | mvapich2.2     |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0        | openmpi3.1.0   |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_O3     | mvapich2.2     |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_fma    | mvapich2.2     |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_O3_fma | mvapich2.2     |     1 |
+| new_conus12km | WRFV4.0     | intel18.0.1     | mpt2.18        |     1 |
+| new_conus12km | WRFV4.0     | intel18.0.1     | mpt2.18        |     2 |
+| new_conus12km | WRFV4.0     | intel18.0.1     | openmpi3.1.0   |     1 |
+| new_conus12km | WRFV4.0     | intel18.0.1     | impi2018.1.163 |     1 |
 
 #+name: new_conus12km-labels
 | label                      |
@@ -215,11 +219,14 @@ wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
 | gnu6.3.0/mpt2.18           |
 | gnu8.1.0/mpt2.18           |
 | gnu8.1.0/mvapich2.2        |
-| gnu8.1.0-O/mvapich2.2      |
+| gnu8.1.0/openmpi3.1.0      |
+| gnu8.1.0-O3/mvapich2.2     |
 | gnu8.1.0-fma/mvapich2.2    |
 | gnu8.1.0-O3-fma/mvapich2.2 |
 | intel18.0.1/mpt2.18/T1     |
 | intel18.0.1/mpt2.18/T2     |
+| intel18.0.1/openmpi3.1.0   |
+| intel18.0.1/impi2018.1.163 |
 
 #+header: :var cases=new_conus12km-cases labels=new_conus12km-labels
 #+header: :var title="Scaling results for NEW CONUS 12km with WRFV4.0"
@@ -229,8 +236,102 @@ plot_it(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[35]:
+# Out[43]:
 [[file:./imgs/new_conus12km.svg]]
+:END:
+
+# #+header: :var cases=new_conus12km-cases labels=new_conus12km-labels
+# #+header: :var title="Scaling results for NEW CONUS 12km with WRFV4.0"
+# #+begin_src ipython :session :ipyfile ./imgs/new_conus12km_bar.svg :exports results
+# 
+# secs_normal = []
+# secs_large = []
+# for case in cases:
+#     normal = getFromDict(data, case+[1])[2]
+#     large = getFromDict(data, case+[16])[2]
+#     secs_normal.append(normal if isinstance(normal, float) else 0.0)
+#     secs_large.append(large if isinstance(large, float) else 0.0)
+# 
+# secs_normal = np.array(secs_normal)
+# secs_large = np.array(secs_large)
+# 
+# labels = [l[0] for l in labels]
+# y_pos = np.arange(len(cases))
+# error = np.zeros(len(cases))
+# 
+# fig, ax = plt.subplots()
+# width = 0.4
+# 
+# ax.barh(y_pos, secs_normal, width, color='blue', label='normal')
+# ax.barh(y_pos+width, secs_large, width, color='red', label='large')
+# ax.set_yticks(y_pos)
+# ax.set_yticklabels(labels)
+# # ax.invert_yaxis()  # labels read top-to-bottom
+# ax.set_xlabel('Time steps/s')
+# ax.set_title('Performance for normal number of nodes')
+# ax.legend()
+# #+end_src
+
+#+header: :var cases=new_conus12km-cases labels=new_conus12km-labels
+#+header: :var title="Scaling results for NEW CONUS 12km with WRFV4.0"
+#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_bar_normal.svg :exports results
+
+secs = []
+for case in cases:
+    sec = getFromDict(data, case+[1])[2]
+    secs.append(sec if isinstance(sec, float) else 0.0)
+
+np.array(secs)
+labels = [l[0] for l in labels]
+y_pos = np.arange(len(cases))
+error = np.zeros(len(cases))
+
+fig, ax = plt.subplots()
+
+ax.barh(y_pos, secs_normal)
+ax.set_yticks(y_pos)
+ax.set_yticklabels(labels)
+ax.invert_yaxis()
+ax.set_xlabel('Time steps/s')
+ax.set_title('Performance for normal number of nodes')
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[29]:
+: Text(0.5,1,'Performance for normal number of nodes')
+[[file:./imgs/new_conus12km_bar_normal.svg]]
+:END:
+
+#+header: :var cases=new_conus12km-cases labels=new_conus12km-labels
+#+header: :var title="Scaling results for NEW CONUS 12km with WRFV4.0"
+#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_bar_large.svg :exports results
+
+secs = []
+for case in cases:
+    sec = getFromDict(data, case+[16])[2]
+    secs.append(sec if isinstance(sec, float) else 0.0)
+
+np.array(secs)
+labels = [l[0] for l in labels]
+y_pos = np.arange(len(cases))
+error = np.zeros(len(cases))
+
+fig, ax = plt.subplots()
+
+ax.barh(y_pos, secs_normal)
+ax.set_yticks(y_pos)
+ax.set_yticklabels(labels)
+ax.invert_yaxis()
+ax.set_xlabel('Time steps/s')
+ax.set_title('Performance for large number of nodes')
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[30]:
+: Text(0.5,1,'Performance for large number of nodes')
+[[file:./imgs/new_conus12km_bar_large.svg]]
 :END:
 
 * NEW CONUS 2.5km
@@ -272,7 +373,8 @@ wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
 | new_conus12km | WRFV4.0     | gnu6.3.0        | mvapich2.2 |     1 |
 | new_conus12km | WRFV4.0     | gnu8.1.0        | mpt2.18    |     1 |
 | new_conus12km | WRFV4.0     | gnu8.1.0        | mvapich2.2 |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0-O3-fma | mvapich2.2 |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_O3_fma | mvapich2.2 |     1 |
+| new_conus12km | WRFV4.0     | intel18.0.1     | mpt2.18    |     1 |
 
 #+name: new_conus2.5km-labels
 | label                      |
@@ -281,6 +383,7 @@ wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
 | gnu8.1.0/mpt2.18           |
 | gnu8.1.0/mvapich2.2        |
 | gnu8.1.0-O3-fma/mvapich2.2 |
+| intel18.0.1/mpt2.18        |
 
 #+header: :var cases=new_conus2.5km-cases labels=new_conus2.5km-labels
 #+header: :var title="Scaling results for NEW CONUS 2.5km with WRFV4.0"
@@ -290,7 +393,7 @@ plot_it(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[36]:
+# Out[42]:
 [[file:./imgs/new_conus2-5km.svg]]
 :END:
 
@@ -302,7 +405,8 @@ plot_it(cases, labels, title)
 | maria3km | WRFV4.0     | gnu6.3.0        | mvapich2.2 |     1 |
 | maria3km | WRFV4.0     | gnu8.1.0        | mpt2.18    |     1 |
 | maria3km | WRFV4.0     | gnu8.1.0        | mvapich2.2 |     1 |
-| maria3km | WRFV4.0     | gnu8.1.0-O3-fma | mvapich2.2 |     1 |
+| maria3km | WRFV4.0     | gnu8.1.0_O3_fma | mvapich2.2 |     1 |
+| maria3km | WRFV4.0     | intel18.0.1     | mpt2.18    |     1 |
 
 #+name: maria3km-labels
 | label                      |
@@ -311,6 +415,7 @@ plot_it(cases, labels, title)
 | gnu8.1.0/mpt2.18           |
 | gnu8.1.0/mvapich2.2        |
 | gnu8.1.0-O3-fma/mvapich2.2 |
+| intel18.0.1/mpt2.18        |
 
 #+header: :var cases=maria3km-cases labels=maria3km-labels
 #+header: :var title="Scaling results for Maria 3km with WRFV4.0"
@@ -320,7 +425,7 @@ plot_it(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[37]:
+# Out[41]:
 [[file:./imgs/maria3km.svg]]
 :END:
 
@@ -348,6 +453,6 @@ plot_it(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[38]:
+# Out[40]:
 [[file:./imgs/cases.svg]]
 :END:
