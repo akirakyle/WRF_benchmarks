@@ -63,10 +63,10 @@ mpirun_rsh -hostfile $PBS_NODEFILE -n 72 ./wrf.exe
 #+end_src
 
 
-
 ** Data for the various benchmark cases
 *** katrina (1km, 3km, 30km)
-Data for running the Hurricane Katrina cases can be downloaded from the WRF tutorial page
+Data for running the Hurricane Katrina cases can be downloaded from the WRF
+tutorial page
 
 #+begin_src sh
 curl http://www2.mmm.ucar.edu/wrf/TUTORIAL_DATA/Katrina.tar.gz -o Katrina.tar.gz

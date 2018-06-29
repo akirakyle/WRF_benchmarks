@@ -15,6 +15,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 %matplotlib inline
 %config InlineBackend.figure_format = 'svg'
+# plt.style.use('dark_background')
 #+end_src
 
 #+begin_src ipython :session
@@ -101,7 +102,7 @@ plot_it(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[4]:
+# Out[32]:
 [[file:./imgs/conus12km.svg]]
 :END:
 
@@ -130,7 +131,7 @@ plot_it(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[5]:
+# Out[33]:
 [[file:./imgs/new_conus12km_3.svg]]
 :END:
 
@@ -175,7 +176,7 @@ plot_it(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[6]:
+# Out[34]:
 [[file:./imgs/old_vs_new_conus12km_3.svg]]
 :END:
 
@@ -228,7 +229,7 @@ plot_it(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[7]:
+# Out[35]:
 [[file:./imgs/new_conus12km.svg]]
 :END:
 
@@ -289,7 +290,7 @@ plot_it(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[8]:
+# Out[36]:
 [[file:./imgs/new_conus2-5km.svg]]
 :END:
 
@@ -319,7 +320,7 @@ plot_it(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[9]:
+# Out[37]:
 [[file:./imgs/maria3km.svg]]
 :END:
 
@@ -347,6 +348,6 @@ plot_it(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[10]:
+# Out[38]:
 [[file:./imgs/cases.svg]]
 :END:
