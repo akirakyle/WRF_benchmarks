@@ -1,5 +1,8 @@
 #!/bin/sh
 
+RUN_DIR=~/scratch/run
+WALL_TIME='00:30:00'
+
 help() {
 echo ""
 echo "Usage: ${0##*/} [-h] [-r DIR] [-a 'HH:MM:SS'] [-e VAR1 VAR2 ...] [-t N1 N2 ...]"
@@ -13,8 +16,8 @@ echo "                                    namelist.input, wrfbdy, and wrfinput o
 echo "    -n, --nodes NUM_NODES LIST   Number of nodes to use."
 echo "    -t, --trials NUM LIST        Run each combination for each trial number, avoids overwriting "
 echo "                                    previous runs with the same parameters. [default 1]"
-echo "    -r, --rundir RUN_DIR         Directory to which to place run output. [default ~/work/run]"
-echo "    -a, --walltime 'HH:MM:SS'    Walltime for all submitted jobs. [default 00:30:00]"
+echo "    -r, --rundir RUN_DIR         Directory to which to place run output. [default $RUN_DIR]"
+echo "    -a, --walltime 'HH:MM:SS'    Walltime for all submitted jobs. [default $WALL_TIME]"
 echo "    -e, --envvars ENV_VAR LIST   Environment variables to be set."
 echo "    -h, --help                   This help"
 echo ""
@@ -22,9 +25,6 @@ exit 0
 }
 
 reading_list=none
-RUN_DIR=~/work/run
-WALL_TIME='00:30:00'
-
 while test $# -gt 0
 do
     case $1 in
@@ -101,10 +101,7 @@ for TRIAL_NUM in "${TRIALS[@]}"; do
                 cd $RUN_DIR/$JOB_NAME
 
                 ln -sf $WRF_PATH/run/* .
-                ln -sf $CASE_PATH/namelist.input .  # must be second to overwrite default namelist.input
-                ln -sf $CASE_PATH/wrfbdy* .
-                ln -sf $CASE_PATH/wrfinput* .
-                ln -sf $CASE_PATH/wrfrst* .
+                ln -sf $CASE_PATH/* .  # must be second to overwrite default namelist.input
 
                 envsubst '${JOB_NAME},${N},${WALL_TIME},${ENV_STR}' > $JOB_NAME.pbs << EOF
 #!/bin/bash

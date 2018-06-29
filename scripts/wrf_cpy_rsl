@@ -1,0 +1,66 @@
+#!/bin/sh
+
+help() {
+    echo ""
+    echo "Usage: ${0##*/} [-h] -o OUT_DIR -r RUN_DIR1 RUN_DIR2 ..."
+    echo "Copies rsl outfiles iff they report a successful run."
+    echo ""
+    echo "OPTIONS:"
+    echo "    -a, --archive ARCHIVE_DIR    Move successfully completed wrf runs to this directory."
+    echo "    -o, --outdir OUT_DIR         Directory in which to put summary files."
+    echo "    -r, --rundirs RUN_DIR LIST   Directories of completed wrf_runs"
+    echo "    -h, --help                   This help"
+    echo ""
+    exit 0
+}
+
+reading_list=none
+
+while test $# -gt 0
+do
+    case $1 in
+        -r|--rundirs)
+            reading_list=rundirs ;;
+        -o|--outdir)
+            reading_list=none
+            OUT_DIR=$2
+            shift ;;
+        -a|--archive)
+            reading_list=none
+            ARCHIVE_DIR=$2
+            shift ;;
+        -h|--help)
+            help ;;
+	      *)
+            if   [ "$reading_list" = rundirs    ] ; then RUN_DIRS+=("$1")
+            else
+                help
+            fi
+	          ;;
+    esac
+	  shift
+done
+
+if [ -z $RUN_DIRS ]; then
+    echo "at least one RUN_DIR must be specified"; help
+fi
+if [ -z $OUT_DIR ]; then
+    echo "OUT_DIR must be specified"; help
+fi
+if [ ! -z $ARCHIVE_DIR ]; then
+    mkdir -p $ARCHIVE_DIR
+fi
+
+mkdir -p $OUT_DIR
+
+for DIR in "${RUN_DIRS[@]}"
+do
+    DIR_NAME=$(echo $DIR | sed 's/\//-/g')
+    grep -q -s "SUCCESS COMPLETE WRF" $DIR/rsl.out.0000
+    if [[ $? -eq 0 ]]; then
+        cp $DIR/rsl.out.0000 $OUT_DIR/$DIR_NAME.rsl
+        if [ ! -z $ARCHIVE_DIR ]; then
+            mv $DIR $ARCHIVE_DIR/
+        fi
+    fi
+done

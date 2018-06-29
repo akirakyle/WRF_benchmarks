@@ -1,0 +1,72 @@
+#!/bin/sh
+
+help() {
+    echo ""
+    echo "Usage: ${0##*/} [-h] [-t] [-n] RUN_DIR1 RUN_DIR2 ..."
+    echo "Compare many wrfout runs to see if they are bit-for-bit identical"
+    echo ""
+    echo "OPTIONS:"
+    echo "    -r, --rundirs RUN_DIR LIST   Directories of completed wrf_runs to compare"
+    echo "    -t, --testrst                Also diff wrfrst files."
+    echo "    -n, --nostop                 Do not stop on first failure."
+    echo "    -h, --help                   This help"
+    echo ""
+    exit 0
+}
+
+maybe_stop() {
+    if [ -z $NO_STOP ]; then
+        echo "stopping..."
+        exit 1
+    fi
+}
+
+while test $# -gt 0; do
+    case $1 in
+        -t|--testrst)
+            RST=true; shift ;;
+        -n|--nostop)
+            NO_STOP=true; shift ;;
+        -h|--help)
+            help ;;
+	      *)
+            break ;;
+    esac
+done
+
+if [ $# -eq 0 ]; then
+    echo "at least one RUN_DIR must be specified"; help
+    help
+fi
+
+RUN_DIRS=$@
+FIRST_DIR=$1
+for DIR in $RUN_DIRS; do
+    grep -q "SUCCESS COMPLETE WRF" $DIR/rsl.out.0000
+    if [[ $? -ne 0 ]]; then
+        echo "rsl.out.0000 in $DIR does not say 'SUCCESS COMPLETE WRF'"
+        maybe_stop
+    fi
+
+    cmp $FIRST_DIR/namelist.input $DIR/namelist.input
+    if [[ $? -ne 0 ]]; then
+        maybe_stop
+    fi
+
+    for WRFOUT in $(ls $FIRST_DIR/wrfout*); do
+        WRFOUT=$(basename $WRFOUT)
+        cmp $FIRST_DIR/$WRFOUT $DIR/$WRFOUT
+        if [[ $? -ne 0 ]]; then
+            maybe_stop
+        fi
+    done
+    if [ "$RST" = true ]; then
+        for WRFRST in $(ls $FIRST_DIR/wrfrst*); do
+            WRFRST=$(basename $WRFRST)
+            cmp $FIRST_DIR/$WRFRST $DIR/$WRFRST
+            if [[ $? -ne 0 ]]; then
+                maybe_stop
+            fi
+        done
+    fi
+done

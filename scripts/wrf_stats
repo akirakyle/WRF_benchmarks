@@ -20,7 +20,6 @@ case $1 in
         filter=1 ; shift ;;
     -h|--help)
         help ;;
-	  *)
 esac
 
 if [ $# -eq 0 ]; then
