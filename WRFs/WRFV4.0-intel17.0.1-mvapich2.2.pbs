@@ -3,7 +3,7 @@
 #PBS -l walltime=02:00:00
 #PBS -q share
 #PBS -j oe
-#PBS -l select=1:ncpus=6
+#PBS -l select=1:ncpus=4
 #PBS -m abe
 #PBS -M akirak@ucar.edu
 
@@ -11,12 +11,12 @@ export TMPDIR=/glade/scratch/$USER/temp
 mkdir -p $TMPDIR
 
 wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV4.0.TAR.gz\
+    --source ~wrfhelp/SOURCE_CODE/WRFV4.0.TAR.gz \
     --wrfdir ~/work/WRFs/WRFV4.0-intel17.0.1-mvapich2.2 \
-    --tasks 6 \
+    --tasks 4 \
     --compile 15 \
     --nest 1 \
-    --mpiexec 'mpirun_rsh -hostfile $PBS_NODEFILE -n $1'  \
+    --mpiexec mpirun \
     --modules \
     intel/17.0.1 \
     mvapich2/2.2 \

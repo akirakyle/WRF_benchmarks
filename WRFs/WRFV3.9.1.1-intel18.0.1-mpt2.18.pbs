@@ -3,7 +3,7 @@
 #PBS -l walltime=02:00:00
 #PBS -q share
 #PBS -j oe
-#PBS -l select=1:ncpus=6
+#PBS -l select=1:ncpus=4
 #PBS -m abe
 #PBS -M akirak@ucar.edu
 
@@ -13,7 +13,7 @@ mkdir -p $TMPDIR
 wrf_compile \
     --source ~wrfhelp/SOURCE_CODE/WRFV3.9.1.1.TAR.gz \
     --wrfdir ~/work/WRFs/WRFV3.9.1.1-intel18.0.1-mpt2.18 \
-    --tasks 6 \
+    --tasks 4 \
     --compile 15 \
     --nest 1 \
     --mpiexec mpiexec_mpt \
