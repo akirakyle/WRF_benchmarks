@@ -12,14 +12,14 @@ mkdir -p $TMPDIR
 
 wrf_compile \
     --source ~wrfhelp/SOURCE_CODE/WRFV4.0.TAR.gz \
-    --wrfdir ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 \
+    --wrfdir ~/work/WRFs/WRFV4.0-intel18.0.1-impi2018.1.163 \
     --tasks 4 \
     --compile 15 \
     --nest 1 \
-    --mpiexec mpiexec_mpt \
+    --mpiexec 'mpirun -n $1'  \
     --modules \
     intel/18.0.1 \
-    mpt/2.18 \
+    impi/2018.1.163 \
     netcdf/4.6.1 \
     ncarcompilers/0.4.1 \
     ncarenv/1.2

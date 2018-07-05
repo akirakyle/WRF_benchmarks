@@ -53,7 +53,7 @@ do
             elif [ "$reading_list" = nodes   ] ; then NODES+=($1)
             elif [ "$reading_list" = cases   ] ; then CASES+=("$1")
             elif [ "$reading_list" = envvars ] ; then ENVVARS+=("$1")
-            elif [ "$reading_list" = trials  ] ; then TRIALSS+=("$1")
+            elif [ "$reading_list" = trials  ] ; then TRIALS+=($1)
             else
                 help
             fi

@@ -1,9 +1,9 @@
 #!/bin/bash
 #PBS -A SCSG0002
-#PBS -l walltime=00:30:00
+#PBS -l walltime=02:00:00
 #PBS -q share
 #PBS -j oe
-#PBS -l select=1:ncpus=6
+#PBS -l select=1:ncpus=4
 #PBS -m abe
 #PBS -M akirak@ucar.edu
 
@@ -11,9 +11,9 @@ export TMPDIR=/glade/scratch/$USER/temp
 mkdir -p $TMPDIR
 
 wrf_compile \
-    --source ~wrfhelp/SOURCE_CODE/WRFV4.0.TAR.gz\
+    --source ~wrfhelp/SOURCE_CODE/WRFV4.0.TAR.gz \
     --wrfdir ~/work/WRFs/WRFV4.0-gnu6.3.0-mpt2.18 \
-    --tasks 6 \
+    --tasks 4 \
     --compile 34 \
     --nest 1 \
     --mpiexec mpiexec_mpt \

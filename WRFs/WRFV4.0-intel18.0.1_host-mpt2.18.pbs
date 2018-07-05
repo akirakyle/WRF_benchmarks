@@ -12,10 +12,9 @@ mkdir -p $TMPDIR
 
 wrf_compile \
     --source ~wrfhelp/SOURCE_CODE/WRFV4.0.TAR.gz \
-    --wrfdir ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 \
+    --wrfdir ~/work/WRFs/WRFV4.0-intel18.0.1_host-mpt2.18 \
     --tasks 4 \
-    --compile 15 \
-    --nest 1 \
+    --configure WRFV4.0-intel18.0.1_host-mpt2.18.configure.wrf \
     --mpiexec mpiexec_mpt \
     --modules \
     intel/18.0.1 \
