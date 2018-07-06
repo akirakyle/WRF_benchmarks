@@ -20,7 +20,7 @@
  history_interval                    = 60,
  frames_per_outfile                  = 5,
  restart                             = .false.,
- restart_interval                    = 60,
+ restart_interval                    = 120,
  io_form_history                     = 2, 
  io_form_restart                     = 2,
  io_form_input                       = 2,

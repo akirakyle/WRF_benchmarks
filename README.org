@@ -99,8 +99,9 @@ These are wrf-chem cases
 ** Example workflow for new_conus12km
 Make sure the ~WRF_benchmarks/scripts~ is in your ~$PATH~. As always, make sure
 to change the paths to your directory structure. All the scripts in the
-~srcipts/~ directory do not hardcode paths but the scripts in the ~cases/~
-directory and the pbs job scripts do hardcode paths.
+~srcipts/~ directory do not hardcode paths (except ~wrf_run_pbs_jobs~ has a
+default run directory) but the scripts in the ~cases/~ directory do hardcode
+paths.
 
 The following will give you a table with timing results on the new_conus12km
 benchmark using WRFV4.0 compiled with gnu8.1.0 and mvapich2.2 for two trials
@@ -108,15 +109,17 @@ scaled across 1, 2, 4, 8 nodes on cheyenne. (cheyenne's 36 cores/node is
 hardcoded into ~wrf_run_pbs_jobs~)
 
 #+begin_src sh
-qsub WRF_benchmarks/WRFs/WRFV4.0-gnu8.1.0-mvapich2.2.pbs
+qsub WRF_benchmarks/WRFs/WRFV4.0-intel18.0.1-mpt2.18.pbs
 qstat # wait for job to finish...
-qsub WRF_benchmarks/WPSs/WPSV4.0-gnu8.1.0.pbs
+qsub WRF_benchmarks/WPSs/WPSV4.0-intel18.0.1.pbs
 qstat # wait for job to finish...
-./WRF_benchmarks/cases/new_conus12km.sh
+./WRF_benchmarks/cases/make_cases_new.sh
 qstat # wait for job to finish...
-wrf_run_pbs_jobs -w ~/work/WRFs/WRFV4.0-gnu8.1.0-mvapich2.2 -c ~/WRF_benchmarks/cases/new_conus12km -t 1 2 -a '00:30:00'-n 1 2 4 8
+wrf_run_pbs_jobs -w ~/work/WRFs/WRFV4.0-gnu8.1.0-mvapich2.2 -c ~/WRF_benchmarks/cases/new_conus12km -t 1 2 -a '00:30:00'-n 1 2 4 8 -r ~/scratch/run
 qstat # wait for jobs to finish...
-wrf_summarize -r ~/work/run/new_conus12km-WRFV4.0-gnu8.1.0-mvapich2.2-* -o ~/work/results
-cat ~/work/results/*.tbl
+cd ~/scratch/run
+wrf_cpy_rsl -a ../archive -o ~/results -r *
+cd ~/results
+wrf_stats *
 #+end_src
 

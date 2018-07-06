@@ -2,6 +2,8 @@
 
 RUN_DIR=~/scratch/run
 WALL_TIME='00:30:00'
+MPIPROCS=36
+OMPTHREADS=
 
 help() {
 echo ""
@@ -16,6 +18,8 @@ echo "                                    namelist.input, wrfbdy, and wrfinput o
 echo "    -n, --nodes NUM_NODES LIST   Number of nodes to use."
 echo "    -t, --trials NUM LIST        Run each combination for each trial number, avoids overwriting "
 echo "                                    previous runs with the same parameters. [default 1]"
+echo "    -m, --mpiprocs NUM           Set mpiprocs=NUM in pbs job script. [default $MPIPROCS]"
+echo "    -o, --ompthreads NUM         Set ompthreads=NUM in pbs job script. [default none]"
 echo "    -r, --rundir RUN_DIR         Directory to which to place run output. [default $RUN_DIR]"
 echo "    -a, --walltime 'HH:MM:SS'    Walltime for all submitted jobs. [default $WALL_TIME]"
 echo "    -e, --envvars ENV_VAR LIST   Environment variables to be set."
@@ -45,6 +49,14 @@ do
         -a|--walltime)
             reading_list=none
             WALL_TIME=$2
+            shift ;;
+        -m|--mpiprocs)
+            reading_list=none
+            MPIPROCS=$2
+            shift ;;
+        -o|--ompthreads)
+            reading_list=none
+            OMPTHREADS=$2
             shift ;;
         -h|--help)
             help ;;
@@ -77,6 +89,9 @@ fi
 if [ -z $TRIALS ]; then
     TRIALS=( 1 )
 fi
+if [ ! -z $OMPTHREADS ]; then
+    OMPTHREADS=":ompthreads=$OMPTHREADS"
+fi
 
 PWD=$(pwd)
 
@@ -103,14 +118,14 @@ for TRIAL_NUM in "${TRIALS[@]}"; do
                 ln -sf $WRF_PATH/run/* .
                 ln -sf $CASE_PATH/* .  # must be second to overwrite default namelist.input
 
-                envsubst '${JOB_NAME},${N},${WALL_TIME},${ENV_STR}' > $JOB_NAME.pbs << EOF
+                envsubst '${JOB_NAME},${N},${MPIPROCS},${OMPTHREADS}${WALL_TIME},${ENV_STR}' > $JOB_NAME.pbs << EOF
 #!/bin/bash
 #PBS -N ${JOB_NAME}
 #PBS -A SCSG0002
 #PBS -l walltime=${WALL_TIME}
 #PBS -q regular
 #PBS -j oe
-#PBS -l select=${N}:ncpus=36:mpiprocs=36
+#PBS -l select=${N}:ncpus=36:mpiprocs=${MPIPROCS}${OMPTHREADS}
 #PBS -m abe
 #PBS -M akirak@ucar.edu
 
