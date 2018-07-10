@@ -89,7 +89,9 @@ fi
 if [ -z $TRIALS ]; then
     TRIALS=( 1 )
 fi
+OMP_LABEL=
 if [ ! -z $OMPTHREADS ]; then
+    OMP_LABEL=_m${MPIPROCS}_o${OMPTHREADS}
     OMPTHREADS=":ompthreads=$OMPTHREADS"
 fi
 
@@ -111,7 +113,7 @@ for TRIAL_NUM in "${TRIALS[@]}"; do
                     exit 1
                 fi
 
-                JOB_NAME=$(basename $CASE_DIR)-$(basename $WRF_DIR)-T$TRIAL_NUM-N$(printf "%03d" $N)
+                JOB_NAME=$(basename $CASE_DIR)-$(basename $WRF_DIR)$OMP_LABEL-T$TRIAL_NUM-N$(printf "%03d" $N)
                 mkdir -p $RUN_DIR/$JOB_NAME
                 cd $RUN_DIR/$JOB_NAME
 
