@@ -1,0 +1,695 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-07-10 Tue 00:29 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Weather Research and Forecast (WRF) Scaling, Performance Assessment and Optimization</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Akira Kyle" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="styles/readtheorg/css/readtheorg.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="styles/readtheorg/js/readtheorg.js"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2018 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Weather Research and Forecast (WRF) Scaling, Performance Assessment and Optimization</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org5d5847e">Background</a>
+<ul>
+<li><a href="#orgfcbf6b6">The Weather Research and Forecast Model</a></li>
+<li><a href="#org582bc03">WRF Flowchart</a></li>
+</ul>
+</li>
+<li><a href="#orgb2378df">Intro</a>
+<ul>
+<li><a href="#org5813a97">Test cases</a></li>
+<li><a href="#org539dffe">Compilers and MPI Libraries</a></li>
+<li><a href="#org5c8d06b">Settings</a></li>
+</ul>
+</li>
+<li><a href="#orgc3994ba">Results</a>
+<ul>
+<li><a href="#orgdc83e98">CONUS 12km</a></li>
+<li><a href="#org77af177">NEW CONUS 12km WRFV3.8.1</a></li>
+<li><a href="#org73aed45">OLD CONUS 12km vs NEW CONUS 12km WRFV3.8.1</a></li>
+<li><a href="#org30db683">NEW CONUS 12km</a></li>
+<li><a href="#orgfe317ba">NEW CONUS 2.5km</a></li>
+<li><a href="#orgb631a48">Maria 3km</a></li>
+<li><a href="#org7631849">Cases</a></li>
+<li><a href="#org377d1e6">MPIs</a></li>
+<li><a href="#org5935416">Compilers</a></li>
+<li><a href="#orga23739d">Hybrid</a></li>
+</ul>
+</li>
+<li><a href="#orgb13c4ba">WRF scaling and timing on Cheyenne</a>
+<ul>
+<li><a href="#org55b6da7">Scaling Results</a></li>
+<li><a href="#orgc59d31a">Run time results</a></li>
+</ul>
+</li>
+<li><a href="#org62229ad">Summary</a>
+<ul>
+<li><a href="#org0f17291">Conclusions?</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org5d5847e" class="outline-2">
+<h2 id="org5d5847e">Background</h2>
+<div class="outline-text-2" id="text-org5d5847e">
+</div>
+<div id="outline-container-orgfcbf6b6" class="outline-3">
+<h3 id="orgfcbf6b6">The Weather Research and Forecast Model</h3>
+<div class="outline-text-3" id="text-orgfcbf6b6">
+<p>
+&ldquo;WRF is a state-of-the-art atmospheric modeling system designed for both
+meteorological research and numerical weather prediction. It offers a host of
+options for atmospheric processes and can run on a variety of computing
+platforms. WRF excels in a broad range of applications across scales ranging
+from tens of meters to thousands of kilometers, including the following.&rdquo;
+</p>
+
+<p>
+– Meteorological studies
+</p>
+
+<p>
+– Real-time NWP
+</p>
+
+<p>
+– Idealized simulations
+</p>
+
+<p>
+– Data assimilation
+</p>
+
+<p>
+– Earth system model coupling
+</p>
+
+<p>
+– Model training and educational support
+</p>
+</div>
+</div>
+
+<div id="outline-container-org582bc03" class="outline-3">
+<h3 id="org582bc03">WRF Flowchart</h3>
+<div class="outline-text-3" id="text-org582bc03">
+
+<div class="figure">
+<p><img src="./figs/WRF_flow_chart-ARW_v4.png" alt="WRF_flow_chart-ARW_v4.png" />
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb2378df" class="outline-2">
+<h2 id="orgb2378df">Intro</h2>
+<div class="outline-text-2" id="text-orgb2378df">
+</div>
+<div id="outline-container-org5813a97" class="outline-3">
+<h3 id="org5813a97">Test cases</h3>
+<div class="outline-text-3" id="text-org5813a97">
+<ul class="org-ul">
+<li><code>conus12km</code></li>
+<li><code>conus2.5km</code></li>
+<li><code>new_conus12km</code></li>
+<li><code>new_conus2.5km</code></li>
+<li><code>katrina1km</code></li>
+<li><code>katrina3km</code></li>
+<li><code>maria1km</code></li>
+<li><code>maria3km</code></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org539dffe" class="outline-3">
+<h3 id="org539dffe">Compilers and MPI Libraries</h3>
+<div class="outline-text-3" id="text-org539dffe">
+<ul class="org-ul">
+<li>GNU Compiler Collection (GCC) versions 6.3.0, 8.1.0
+<ul class="org-ul">
+<li>WRF compiles with -O2 default
+<ul class="org-ul">
+<li>Tried -O3 and -mfma (enables FMA instruction set)</li>
+<li>Use -ofast?</li>
+</ul></li>
+</ul></li>
+<li>Intel Compiler versions 17.0.1, 18.0.1</li>
+<li>MPT, MVAPICH</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org5c8d06b" class="outline-3">
+<h3 id="org5c8d06b">Settings</h3>
+<div class="outline-text-3" id="text-org5c8d06b">
+<ul class="org-ul">
+<li>MVAPICH</li>
+</ul>
+
+<p>
+<a href="http://mvapich.cse.ohio-state.edu/static/media/mvapich/mvapich2-2.3rc2-userguide.html#x1-19100011.15">http://mvapich.cse.ohio-state.edu/static/media/mvapich/mvapich2-2.3rc2-userguide.html#x1-19100011.15</a>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc3994ba" class="outline-2">
+<h2 id="orgc3994ba">Results</h2>
+<div class="outline-text-2" id="text-orgc3994ba">
+</div>
+<div id="outline-container-orgdc83e98" class="outline-3">
+<h3 id="orgdc83e98">CONUS 12km</h3>
+<div class="outline-text-3" id="text-orgdc83e98">
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./imgs/conus12km.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org77af177" class="outline-3">
+<h3 id="org77af177">NEW CONUS 12km WRFV3.8.1</h3>
+<div class="outline-text-3" id="text-org77af177">
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./imgs/new_conus12km_3.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org73aed45" class="outline-3">
+<h3 id="org73aed45">OLD CONUS 12km vs NEW CONUS 12km WRFV3.8.1</h3>
+<div class="outline-text-3" id="text-org73aed45">
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./imgs/old_vs_new_conus12km_3.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org30db683" class="outline-3">
+<h3 id="org30db683">NEW CONUS 12km</h3>
+<div class="outline-text-3" id="text-org30db683">
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./imgs/new_conus12km.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgfe317ba" class="outline-3">
+<h3 id="orgfe317ba">NEW CONUS 2.5km</h3>
+<div class="outline-text-3" id="text-orgfe317ba">
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./imgs/new_conus2-5km.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb631a48" class="outline-3">
+<h3 id="orgb631a48">Maria 3km</h3>
+<div class="outline-text-3" id="text-orgb631a48">
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./imgs/maria3km.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org7631849" class="outline-3">
+<h3 id="org7631849">Cases</h3>
+<div class="outline-text-3" id="text-org7631849">
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./imgs/cases.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org377d1e6" class="outline-3">
+<h3 id="org377d1e6">MPIs</h3>
+<div class="outline-text-3" id="text-org377d1e6">
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./imgs/new_conus12km_mpi.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./imgs/new_conus2-5km_mpi.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./imgs/new_conus12km_bar_normal.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./imgs/new_conus12km_bar_large.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org5935416" class="outline-3">
+<h3 id="org5935416">Compilers</h3>
+<div class="outline-text-3" id="text-org5935416">
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./imgs/new_conus12km_compiler.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./imgs/new_conus2-5km_compiler.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./imgs/new_conus12km_gnu.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./imgs/new_conus12km_intel.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga23739d" class="outline-3">
+<h3 id="orga23739d">Hybrid</h3>
+<div class="outline-text-3" id="text-orga23739d">
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./imgs/hybrid.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb13c4ba" class="outline-2">
+<h2 id="orgb13c4ba">WRF scaling and timing on Cheyenne<sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup></h2>
+<div class="outline-text-2" id="text-orgb13c4ba">
+<ul class="org-ul">
+<li>&ldquo;Is it possible to solve a problem with such-and-such resolution in a timely
+manner?&rdquo;</li>
+<li>&ldquo;If I use more cores I will have the results more quickly, but with this
+resolution will my run be in the efficient strong-scaling regime, an
+intermediate one, or in the very inefficient one dominated by I/O and
+initialization instead of computing?&rdquo;</li>
+</ul>
+
+<p>
+Numbers from the figures below can help you develop some back-of-the-envelope
+estimates of what will happen if you increase or decrease the core counts of
+your runs, so that you can find one that is optimal for you both in terms of
+time-to-solution and in terms of your allocation.
+</p>
+
+<hr />
+</div>
+
+<div id="outline-container-org55b6da7" class="outline-3">
+<h3 id="org55b6da7">Scaling Results</h3>
+<div class="outline-text-3" id="text-org55b6da7">
+<p>
+Figure <a href="#orgd4e6434">18</a> shows scaling results from the Katrina simulations at two
+different resolutions and also includes the official CONUS benchmarks from
+<a href="http://www2.mmm.ucar.edu/wrf/WG2/bench/">http://www2.mmm.ucar.edu/wrf/WG2/bench/</a> at 12km and 2.5km resolution. For
+comparison, a New Zealand case with different physics parametrization and a
+higher number of vertical levels is also included. When expressed this way, all
+the cases scale similarly. Note that both axes are logarithmic, so a small
+distance between points corresponds to a large difference in values. Figure 1 -
+</p>
+
+
+<div id="orgd4e6434" class="figure">
+<p><object type="image/svg+xml" data="./imgs/cases.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
+</p>
+<p><span class="figure-number">Figure 18: </span>WRF scaling</p>
+</div>
+
+<p>
+As you can see, there are three regimes:
+</p>
+
+<ul class="org-ul">
+<li>large number of grid points per core - <b>Total grid points / core &gt; 105</b> (small
+core count)</li>
+<li>intermediate number of grid points per core - <b>104 &lt; Total grid points / core
+&lt; 105</b> (intermediate core count)</li>
+<li>small number of grid points per core - <b>Total grid points / core &lt; 104</b> (large
+core count)</li>
+</ul>
+
+<p>
+For a small number of cores, the WRF computation kernel is in a strong scaling
+regime. Increasing the core count will make the simulation go faster while it
+consumes approximately the same amount of core-hours (ignoring time spent in
+initialization and I/O). Time-to-solution will also depend on the wait in queue,
+which may be larger for larger jobs.
+</p>
+
+<p>
+For an intermediate number of cores, WRF scaling increasingly departs from
+linear strong scaling. Running the same simulation on larger core counts will
+require more core-hours even though it will still run faster (again, ignoring
+time spent in initialization, I/O, and wait in queue).
+</p>
+
+<p>
+We do not recommend running WRF on extremely large core counts, because in this
+regime the speed benefits diminish, the time will be dominated by initialization
+and I/O (as well as wait in queue), and there will be larger core-hours charges
+for solving the same problem.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc59d31a" class="outline-3">
+<h3 id="orgc59d31a">Run time results</h3>
+<div class="outline-text-3" id="text-orgc59d31a">
+<p>
+Figure 2 below shows the total run time for WRF jobs using increasing numbers of
+cores. Initialization time, computation time, and writing time also are shown
+for runs using up to 8,192 cores. Initialization and writing time rendered
+larger jobs impractical. Using a different output algorithm (CSG used the
+default) may yield better results for large jobs. Compare this to Figure 1,
+where only the computing time (represented in Figure 2 by the green triangles)
+has been taken into account to make the plot.
+</p>
+
+<p>
+These results are based on simulations of Hurricane Katrina (2005) at 1km
+resolution.
+</p>
+
+<p>
+As illustrated, initialization and writing output times may be more expensive
+than computing time for larger core counts. Times shown are for a single restart
+and single output file of the Katrina 1km case, which used a domain of about 372
+million grid points. If you have more restarts and output files, your numbers
+will be different but the trend will be similar. Figure 2 - WRF timing Figure 2
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org62229ad" class="outline-2">
+<h2 id="org62229ad">Summary</h2>
+<div class="outline-text-2" id="text-org62229ad">
+</div>
+<div id="outline-container-org0f17291" class="outline-3">
+<h3 id="org0f17291">Conclusions?</h3>
+<div class="outline-text-3" id="text-org0f17291">
+<ul class="org-ul">
+<li>openMPI, MPT, and MVAPICH show similar runtime performance.</li>
+<li>intel consistently faster than gnu</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <div class="footpara"><a href="https://www2.cisl.ucar.edu/software/community-models/wrf-scaling-and-timing">A similar study for Yellowstone</a></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p class="author">Author: Akira Kyle</p>
+<p class="email">Email: <a href="mailto:akyle@cmu.edu">akyle@cmu.edu</a></p>
+<p class="date">Created: 2018-07-10 Tue 00:29</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

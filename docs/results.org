@@ -1,11 +1,84 @@
-#+TITLE: WRF scaling and timing on Cheyenne
-#+AUTHOR: Akira Kyle
-#+EMAIL: akyle@cmu.edu
-#+OPTIONS: toc:nil email:t
-#+PROPERTY: header-args :results raw drawer
+# -*- org-html-htmlize-output-type: css; -*-
+#+title: Weather Research and Forecast (WRF) Scaling, Performance Assessment and Optimization
+# #+subtitle: Comparison of Compilers and MPI Libraries on Cheyenne \vspace{-.2cm}
+# #+subtitle: NCAR SIParCS Program
+#+date: August 3, 2018
+#+author: Akira Kyle
+#+email: akyle@cmu.edu
+#+property: header-args :results raw drawer :exports results :eval never-export
+# #+options: H:2 toc:t num:t author:nil
+#+options: toc:t num:nil email:t author:t date:nil
+#+setupfile: theme-readtheorg-local.setup
+# #+html_head: <style type="text/css">body{ max-width:50em; margin-left:auto; margin-right:auto; }</style>
+#+latex_header: \author[shortname]{\vspace{-.4cm} Akira Kyle\inst{1}, Davide Del Vento \inst{2}, Brian Vanderwende \inst{2}, Negin Sobhani \inst{2}, Dixit Patel \inst{3}}
+# #+latex_header: \institute[shortinst]{\inst{1} Carnegie Mellon University \and \inst{2} National Center for Atmospheric Research \and \inst{3} University of Colorado Boulder}
+#+latex_header: \titlegraphic{\begin{picture}(0,0) \put(315,-150){\makebox(0,0)[rt]{\includegraphics[width=0.25\linewidth]{Updated-SIParCS-logo.png} \includegraphics[width=0.25\linewidth]{NSF_4-Color_vector_Logo.pdf}}} \end{picture}}
+#+latex_header: \institute[shortinst]{\inst{1} \includegraphics[width=0.4\linewidth]{CMU_Logo_Horiz_Red.pdf} \vspace{-.1cm} \and \inst{2} \includegraphics[width=0.34\linewidth]{ncar-logo2.pdf} \vspace{-.2cm} \and \inst{3} \includegraphics[width=0.46\linewidth]{boulder-one-line.png}}
+#+latex_header: \graphicspath{{./figs/}{./images/}{./obipy-resources/}}
+#+latex_class: beamer
+#+beamer_theme: metropolis
+# #+startup: beamer
+# #+beamer_theme: Pittsburgh
+# \usecolortheme[snowy]{owl}
+# #+beamer_color_theme: owl
 
+* Background
+** The Weather Research and Forecast Model
 
-* Code Snippets
+"WRF is a state-of-the-art atmospheric modeling system designed for both
+meteorological research and numerical weather prediction. It offers a host of
+options for atmospheric processes and can run on a variety of computing
+platforms. WRF excels in a broad range of applications across scales ranging
+from tens of meters to thousands of kilometers, including the following."
+
+#+BEAMER: \pause
+– Meteorological studies
+
+#+BEAMER: \pause
+– Real-time NWP
+
+#+BEAMER: \pause
+– Idealized simulations
+
+#+BEAMER: \pause
+– Data assimilation
+
+#+BEAMER: \pause
+– Earth system model coupling
+
+#+BEAMER: \pause
+– Model training and educational support
+
+** WRF Flowchart
+#+ATTR_LATEX: :width 0.9\linewidth
+[[./figs/WRF_flow_chart-ARW_v4.png]]
+
+* Intro
+** Test cases
+- ~conus12km~
+- ~conus2.5km~
+- ~new_conus12km~
+- ~new_conus2.5km~
+- ~katrina1km~
+- ~katrina3km~
+- ~maria1km~
+- ~maria3km~
+
+** Compilers and MPI Libraries
+- GNU Compiler Collection (GCC) versions 6.3.0, 8.1.0
+  - WRF compiles with -O2 default
+    - Tried -O3 and -mfma (enables FMA instruction set)
+    - Use -ofast?
+- Intel Compiler versions 17.0.1, 18.0.1
+- MPT, MVAPICH
+
+** Settings
+- MVAPICH
+
+http://mvapich.cse.ohio-state.edu/static/media/mvapich/mvapich2-2.3rc2-userguide.html#x1-19100011.15
+
+* Results
+** Code Snippets                                                   :noexport:
   :PROPERTIES:
   :header-args: :results silent :exports code
   :END:
@@ -115,7 +188,7 @@ for case in raw_gridpoints:
     time_step[case[0]] = case[3]
 #+end_src
 
-* CONUS 12km
+** CONUS 12km :noexport:
 
 #+begin_src sh :eval no
 wrf_run_pbs_jobs \
@@ -150,9 +223,10 @@ wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
 | intel18.0.1/mpt2.18/T1         |
 | intel18.0.1/mpt2.18/T2         |
 
+** CONUS 12km
 #+header: :var cases=conus12km-cases labels=conus12km-labels
 #+header: :var title="Scaling results for CONUS 12km with WRFV3.8.1"
-#+begin_src ipython :session :ipyfile ./imgs/conus12km.svg :exports results
+#+begin_src ipython :session :ipyfile ./imgs/conus12km.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
@@ -162,7 +236,7 @@ plot_scaling(cases, labels, title)
 [[file:./imgs/conus12km.svg]]
 :END:
 
-* NEW CONUS 12km WRFV3.8.1
+** NEW CONUS 12km WRFV3.8.1 :noexport:
 
 #+name: new_conus12km_3-cases
 | case            | WRF version | compiler    | mpi        | trial |
@@ -179,9 +253,10 @@ plot_scaling(cases, labels, title)
 | intel18.0.1/mpt2.18 |
 | intel18.0.1/mpt2.18 |
 
+** NEW CONUS 12km WRFV3.8.1
 #+header: :var cases=new_conus12km_3-cases labels=new_conus12km_3-labels
 #+header: :var title="Scaling results for NEW CONUS 12km with WRFV3.8.1"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_3.svg :exports results
+#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_3.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
@@ -191,7 +266,7 @@ plot_scaling(cases, labels, title)
 [[file:./imgs/new_conus12km_3.svg]]
 :END:
 
-* OLD CONUS 12km vs NEW CONUS 12km WRFV3.8.1
+** OLD CONUS 12km vs NEW CONUS 12km WRFV3.8.1 :noexport:
 
 #+name: old-vs-new-conus12km-cases
 | case            | WRF version | compiler    | mpi                | trial |
@@ -224,9 +299,10 @@ plot_scaling(cases, labels, title)
 | intel18.0.1/mpt2.18            |
 | intel18.0.1/mpt2.18            |
 
+** OLD CONUS 12km vs NEW CONUS 12km WRFV3.8.1
 #+header: :var cases=old-vs-new-conus12km-cases labels=old-vs-new-conus12km-labels
 #+header: :var title="Scaling results for OLD CONUS 12km vs NEW CONUS 12km with WRFV3.8.1"
-#+begin_src ipython :session :ipyfile ./imgs/old_vs_new_conus12km_3.svg :exports results
+#+begin_src ipython :session :ipyfile ./imgs/old_vs_new_conus12km_3.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
@@ -236,7 +312,7 @@ plot_scaling(cases, labels, title)
 [[file:./imgs/old_vs_new_conus12km_3.svg]]
 :END:
 
-* NEW CONUS 12km
+** NEW CONUS 12km :noexport:
 #+begin_src sh :eval no
 wrf_run_pbs_jobs \
     --wrfs \
@@ -289,9 +365,10 @@ wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
 | intel18.0.1  - impi2018.1.163 |
 | intel18.0.1_host - mpt2.18    |
 
+** NEW CONUS 12km
 #+header: :var cases=new_conus12km-cases labels=new_conus12km-labels
 #+header: :var title="Scaling results for NEW CONUS 12km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km.svg :exports results
+#+begin_src ipython :session :ipyfile ./imgs/new_conus12km.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
@@ -301,7 +378,7 @@ plot_scaling(cases, labels, title)
 [[file:./imgs/new_conus12km.svg]]
 :END:
 
-* NEW CONUS 2.5km
+** NEW CONUS 2.5km :noexport:
 
 #+begin_src sh :eval no
 wrf_run_pbs_jobs \
@@ -352,9 +429,10 @@ wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
 | gnu8.1.0-O3-fma/mvapich2.2 |
 | intel18.0.1/mpt2.18        |
 
+** NEW CONUS 2.5km
 #+header: :var cases=new_conus2.5km-cases labels=new_conus2.5km-labels
 #+header: :var title="Scaling results for NEW CONUS 2.5km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus2-5km.svg :exports results
+#+begin_src ipython :session :ipyfile ./imgs/new_conus2-5km.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
@@ -364,7 +442,7 @@ plot_scaling(cases, labels, title)
 [[file:./imgs/new_conus2-5km.svg]]
 :END:
 
-* Maria 3km
+** Maria 3km :noexport:
 
 #+name: maria3km-cases
 | case     | WRF version | compiler        | mpi        | trial |
@@ -384,9 +462,10 @@ plot_scaling(cases, labels, title)
 | gnu8.1.0-O3-fma/mvapich2.2 |
 | intel18.0.1/mpt2.18        |
 
+** Maria 3km
 #+header: :var cases=maria3km-cases labels=maria3km-labels
 #+header: :var title="Scaling results for Maria 3km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/maria3km.svg :exports results
+#+begin_src ipython :session :ipyfile ./imgs/maria3km.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
@@ -396,8 +475,7 @@ plot_scaling(cases, labels, title)
 [[file:./imgs/maria3km.svg]]
 :END:
 
-* Cases
-
+** Cases table :noexport:
 #+name: cases-cases
 | case           | WRF version | compiler    | mpi     | trial |
 |----------------+-------------+-------------+---------+-------|
@@ -414,18 +492,21 @@ plot_scaling(cases, labels, title)
 | maria3km       |
 | maria31m       |
 
+** Cases
 #+header: :var cases=cases-cases labels=cases-labels
 #+header: :var title="Scaling results for WRFV4.0/gnu8.1.0/mvapich2.2"
-#+begin_src ipython :session :ipyfile ./imgs/cases.svg :exports results
+#+begin_src ipython :session :ipyfile ./imgs/cases.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
+#+attr_latex: :width 1.0\linewidth
 #+RESULTS:
 :RESULTS:
-# Out[52]:
+# Out[78]:
 [[file:./imgs/cases.svg]]
 :END:
-* MPIs
+
+** MPIs :noexport:
 #+name: new_conus12km-cases-mpi
 | case           | WRF version | compiler    | mpi            | trial |
 |----------------+-------------+-------------+----------------+-------|
@@ -474,9 +555,10 @@ plot_scaling(cases, labels, title)
 | intel18.0.1  - openmpi3.1.0   |
 | intel18.0.1  - impi2018.1.163 |
 
+** MPIs
 #+header: :var cases=new_conus12km-cases-mpi labels=new_conus12km-labels-mpi
 #+header: :var title="Scaling results for NEW CONUS 12km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_mpi.svg :exports results
+#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_mpi.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
@@ -488,19 +570,19 @@ plot_scaling(cases, labels, title)
 
 #+header: :var cases=new_conus2.5km-cases-mpi labels=new_conus2.5km-labels-mpi
 #+header: :var title="Scaling results for NEW CONUS 2.5km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus2.5km_mpi.svg :exports results
+#+begin_src ipython :session :ipyfile ./imgs/new_conus2-5km_mpi.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-# Out[58]:
-[[file:./imgs/new_conus2.5km_mpi.svg]]
+# Out[16]:
+[[file:./imgs/new_conus2-5km_mpi.svg]]
 :END:
 
 #+header: :var cases=new_conus12km-cases-mpi labels=new_conus12km-labels-mpi
 #+header: :var title="Performance for normal number of nodes"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_bar_normal.svg :exports results
+#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_bar_normal.svg
 plot_bar(cases, 16, labels, title)
 #+end_src
 
@@ -512,7 +594,7 @@ plot_bar(cases, 16, labels, title)
 
 #+header: :var cases=new_conus2.5km-cases-mpi labels=new_conus2.5km-labels-mpi
 #+header: :var title="Performance for large number of nodes"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_bar_large.svg :exports results
+#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_bar_large.svg
 plot_bar(cases, 4, labels, title)
 #+end_src
 
@@ -522,7 +604,7 @@ plot_bar(cases, 4, labels, title)
 [[file:./imgs/new_conus12km_bar_large.svg]]
 :END:
 
-* Compilers
+** Compilers :noexport:
 #+name: new_conus12km-cases-compiler
 | case          | WRF version | compiler           | mpi            | trial |
 |---------------+-------------+--------------------+----------------+-------|
@@ -549,18 +631,6 @@ plot_bar(cases, 4, labels, title)
 | intel18.0.1 - mpt2.18         |
 | intel18.0.1_host - mpt2.18    |
 
-#+header: :var cases=new_conus12km-cases-compiler labels=new_conus12km-labels-compiler
-#+header: :var title="Scaling results for NEW CONUS 12km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_compiler.svg :exports results
-plot_scaling(cases, labels, title)
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-# Out[64]:
-[[file:./imgs/new_conus12km_compiler.svg]]
-:END:
-
 #+name: new_conus2.5km-cases-compiler
 | case           | WRF version | compiler           | mpi        | trial |
 |----------------+-------------+--------------------+------------+-------|
@@ -586,18 +656,6 @@ plot_scaling(cases, labels, title)
 | gnu8.1.0_Ofast - mpt2.18      |
 | intel18.0.1 - mpt2.18         |
 | intel18.0.1_host - mpt2.18    |
-
-#+header: :var cases=new_conus2.5km-cases-compiler labels=new_conus2.5km-labels-compiler
-#+header: :var title="Scaling results for NEW CONUS 2.5km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus2.5km_compiler.svg :exports results
-plot_scaling(cases, labels, title)
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-# Out[71]:
-[[file:./imgs/new_conus2.5km_compiler.svg]]
-:END:
 
 #+name: new_conus12km-cases-gnu
 | case          | WRF version | compiler           | mpi            | trial |
@@ -627,18 +685,6 @@ plot_scaling(cases, labels, title)
 | gnu8.1.0_O3_native - mpt2.18  |
 | gnu8.1.0_Ofast - mpt2.18      |
 
-#+header: :var cases=new_conus12km-cases-gnu labels=new_conus12km-labels-gnu
-#+header: :var title="Scaling results for NEW CONUS 12km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_gnu.svg :exports results
-plot_scaling(cases, labels, title)
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-# Out[65]:
-[[file:./imgs/new_conus12km_gnu.svg]]
-:END:
-
 #+name: new_conus12km-cases-intel
 | case          | WRF version | compiler           | mpi            | trial |
 |---------------+-------------+--------------------+----------------+-------|
@@ -657,9 +703,46 @@ plot_scaling(cases, labels, title)
 | intel18.0.1  - openmpi3.1.0   |
 | intel18.0.1  - impi2018.1.163 |
 
+** Compilers
+#+header: :var cases=new_conus12km-cases-compiler labels=new_conus12km-labels-compiler
+#+header: :var title="Scaling results for NEW CONUS 12km with WRFV4.0"
+#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_compiler.svg
+plot_scaling(cases, labels, title)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[64]:
+[[file:./imgs/new_conus12km_compiler.svg]]
+:END:
+
+#+header: :var cases=new_conus2.5km-cases-compiler labels=new_conus2.5km-labels-compiler
+#+header: :var title="Scaling results for NEW CONUS 2.5km with WRFV4.0"
+#+begin_src ipython :session :ipyfile ./imgs/new_conus2-5km_compiler.svg
+plot_scaling(cases, labels, title)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[15]:
+[[file:./imgs/new_conus2-5km_compiler.svg]]
+:END:
+
+#+header: :var cases=new_conus12km-cases-gnu labels=new_conus12km-labels-gnu
+#+header: :var title="Scaling results for NEW CONUS 12km with WRFV4.0"
+#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_gnu.svg
+plot_scaling(cases, labels, title)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[65]:
+[[file:./imgs/new_conus12km_gnu.svg]]
+:END:
+
 #+header: :var cases=new_conus12km-cases-intel labels=new_conus12km-labels-intel
 #+header: :var title="Scaling results for NEW CONUS 12km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_intel.svg :exports results
+#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_intel.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
@@ -669,7 +752,7 @@ plot_scaling(cases, labels, title)
 [[file:./imgs/new_conus12km_intel.svg]]
 :END:
 
-* Hybrid
+** Hybrid :noexport:
 #+name: cases-omp
 | case           | WRF version | compiler    | mpi         | trial |
 |----------------+-------------+-------------+-------------+-------|
@@ -686,9 +769,10 @@ plot_scaling(cases, labels, title)
 | new_conus2.5km       |
 | new_conus2.5km - omp |
 
+** Hybrid
 #+header: :var cases=cases-omp labels=labels-omp
 #+header: :var title="Scaling results for Hybrid WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/hybrid.svg :exports results
+#+begin_src ipython :session :ipyfile ./imgs/hybrid.svg
 plot_scaling(cases, labels, title)#, shifts=[1, 18, 1, 18])
 #+end_src
 
@@ -697,3 +781,80 @@ plot_scaling(cases, labels, title)#, shifts=[1, 18, 1, 18])
 # Out[14]:
 [[file:./imgs/hybrid.svg]]
 :END:
+* WRF scaling and timing on Cheyenne[fn:: [[https://www2.cisl.ucar.edu/software/community-models/wrf-scaling-and-timing][A similar study for Yellowstone]]]
+- "Is it possible to solve a problem with such-and-such resolution in a timely
+  manner?"
+- "If I use more cores I will have the results more quickly, but with this
+  resolution will my run be in the efficient strong-scaling regime, an
+  intermediate one, or in the very inefficient one dominated by I/O and
+  initialization instead of computing?"
+
+Numbers from the figures below can help you develop some back-of-the-envelope
+estimates of what will happen if you increase or decrease the core counts of
+your runs, so that you can find one that is optimal for you both in terms of
+time-to-solution and in terms of your allocation.
+
+--------------------------------------------------------------------------------
+
+** Scaling Results
+
+Figure [[wrf_scaling]] shows scaling results from the Katrina simulations at two
+different resolutions and also includes the official CONUS benchmarks from
+http://www2.mmm.ucar.edu/wrf/WG2/bench/ at 12km and 2.5km resolution. For
+comparison, a New Zealand case with different physics parametrization and a
+higher number of vertical levels is also included. When expressed this way, all
+the cases scale similarly. Note that both axes are logarithmic, so a small
+distance between points corresponds to a large difference in values. Figure 1 -
+
+#+name: wrf_scaling
+#+caption: WRF scaling
+[[file:./imgs/cases.svg]]
+
+As you can see, there are three regimes:
+
+- large number of grid points per core - *Total grid points / core > 105* (small
+  core count)
+- intermediate number of grid points per core - *104 < Total grid points / core
+  < 105* (intermediate core count)
+- small number of grid points per core - *Total grid points / core < 104* (large
+  core count)
+
+For a small number of cores, the WRF computation kernel is in a strong scaling
+regime. Increasing the core count will make the simulation go faster while it
+consumes approximately the same amount of core-hours (ignoring time spent in
+initialization and I/O). Time-to-solution will also depend on the wait in queue,
+which may be larger for larger jobs.
+
+For an intermediate number of cores, WRF scaling increasingly departs from
+linear strong scaling. Running the same simulation on larger core counts will
+require more core-hours even though it will still run faster (again, ignoring
+time spent in initialization, I/O, and wait in queue).
+
+We do not recommend running WRF on extremely large core counts, because in this
+regime the speed benefits diminish, the time will be dominated by initialization
+and I/O (as well as wait in queue), and there will be larger core-hours charges
+for solving the same problem.
+
+** Run time results
+
+Figure 2 below shows the total run time for WRF jobs using increasing numbers of
+cores. Initialization time, computation time, and writing time also are shown
+for runs using up to 8,192 cores. Initialization and writing time rendered
+larger jobs impractical. Using a different output algorithm (CSG used the
+default) may yield better results for large jobs. Compare this to Figure 1,
+where only the computing time (represented in Figure 2 by the green triangles)
+has been taken into account to make the plot.
+
+These results are based on simulations of Hurricane Katrina (2005) at 1km
+resolution.
+
+As illustrated, initialization and writing output times may be more expensive
+than computing time for larger core counts. Times shown are for a single restart
+and single output file of the Katrina 1km case, which used a domain of about 372
+million grid points. If you have more restarts and output files, your numbers
+will be different but the trend will be similar. Figure 2 - WRF timing Figure 2
+
+* Summary
+** Conclusions?
+- openMPI, MPT, and MVAPICH show similar runtime performance.
+- intel consistently faster than gnu

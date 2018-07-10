@@ -1,0 +1,135 @@
+# -*- org-html-htmlize-output-type: css; -*-
+#+title: Weather Research and Forecast (WRF) Scaling, Performance Assessment and Optimization
+#+subtitle: NCAR SIParCS Program 2018
+#+author: Akira Kyle
+#+email: akyle@cmu.edu
+#+options: toc:t num:nil email:t author:t
+#+export_file_name: index
+#+setupfile: theme-readtheorg-local.setup
+
+* Benchmarks for WRF
+This repo contains the benchmark cases and scripts used for assessing the
+scaling performance of WRF on NCAR's Cheyenne Supercomputer.
+
+[[file:results.html][The results of this study can be found here.]]
+
+** git directories
+- ~cases/~ contains the namelists for WPS and WRF for the various benchmark
+  cases along with scripts for generating the ~wrfbdy~ and ~wrfinput~ files for
+  each case.
+- ~scripts/~ contains useful scripts for automating the compilation, running,
+  and analysis of the WRF test cases. Pass the ~--help~ flag to see how to use
+  each.
+- ~WRFs~ contains job scripts for compiling the various combinations of WRF
+  versions, compiler versions and options, and MPI versions used in these
+  performance assessments.
+- ~WPSs~ contains job scripts for compiling the various WPS versions used to
+  generate WRF input data.
+- ~docs/~ contains this documentation along with the timing and scaling results
+  and associated analysis and plotting code used to generate the results.
+
+** Example of how to run the ~new_conus12km~ benchmark case
+Make sure the ~WRF_benchmarks/scripts~ is in your ~$PATH~. As always, make sure
+to change the paths to your directory structure. All the scripts in the
+~srcipts/~ directory do not hardcode paths (except ~wrf_run_pbs_jobs~ has a
+default run directory) but the scripts in the ~cases/~ directory do hardcode
+paths.
+
+The following will give you a table with timing results on the new_conus12km
+benchmark using WRFV4.0 compiled with gnu8.1.0 and mvapich2.2 for two trials
+scaled across 1, 2, 4, 8 nodes on cheyenne. (cheyenne's 36 cores/node is
+hardcoded into ~wrf_run_pbs_jobs~)
+
+#+begin_src sh
+qsub WRF_benchmarks/WRFs/WRFV4.0-intel18.0.1-mpt2.18.pbs
+qstat # wait for job to finish...
+qsub WRF_benchmarks/WPSs/WPSV4.0-intel18.0.1.pbs
+qstat # wait for job to finish...
+./WRF_benchmarks/cases/make_cases_new.sh
+qstat # wait for job to finish...
+wrf_run_pbs_jobs -w ~/work/WRFs/WRFV4.0-gnu8.1.0-mvapich2.2 -c ~/WRF_benchmarks/cases/new_conus12km -t 1 2 -a '00:30:00'-n 1 2 4 8 -r ~/scratch/run
+qstat # wait for jobs to finish...
+cd ~/scratch/run
+wrf_cpy_rsl -a ../archive -o ~/results -r *
+cd ~/results
+wrf_stats *
+#+end_src
+
+** Data for the various benchmark cases
+*** ~katrina~ (1km, 3km, 30km)
+Data for running the Hurricane Katrina cases can be downloaded from the WRF
+tutorial page
+
+#+begin_src sh
+curl http://www2.mmm.ucar.edu/wrf/TUTORIAL_DATA/Katrina.tar.gz -o Katrina.tar.gz
+tar -xf Katrina.tar
+#+end_src
+
+The 30km case is the same namelist as shown in the WRF-ARW tutorial at
+[[http://www2.mmm.ucar.edu/wrf/OnLineTutorial/CASES/SingleDomain/index.html]]
+
+WPS and ~real.exe~ must be run to generate ~wrfbdy_d01~ and ~wrfrst_d01~ for
+these cases
+
+*** ~conus12km~ and ~conus2.5km~
+The ~wrfbdy_d01~ and ~wrfrst_d01~ files for the official CONUS benchmarks at
+12km and 2.5km resolution can be found at:
+[[http://www2.mmm.ucar.edu/wrf/WG2/benchv3/]]
+
+*** ~maria1km~, ~maria3km~, and ~new_conus12km~ and ~new_conus2.5km~
+The data for these Hurricane Maria cases and CONUS cases comes from the NCEP GFS
+Model Runs which can be downloaded form [[https://rda.ucar.edu/datasets/ds084.1/]].
+However this data already resides on glade, so the WPS scripts just link in the
+appropriate glade directories.
+
+WPS and ~real.exe~ must be run to generate ~wrfbdy_d01~ and ~wrfrst_d01~ for
+these cases
+
+** Examples of pbs job scripts for cheyenne
+#+begin_src sh
+#!/bin/bash
+### Job Name
+#PBS -N cheyenne_wrf
+### Project code
+#PBS -A SCSG0002
+#PBS -l walltime=00:20:00
+#PBS -q regular
+### Merge output and error files
+#PBS -j oe
+### Select 2 nodes with 36 CPUs each for a total of 72 MPI processes
+#PBS -l select=2:ncpus=36:mpiprocs=36
+### Send email on abort, begin and end
+#PBS -m abe
+### Specify mail recipient
+#PBS -M akirak@ucar.edu
+
+export TMPDIR=/glade/scratch/$USER/temp
+mkdir -p $TMPDIR
+
+### Run the executable
+mpiexec_mpt ./wrf.exe
+#+end_src
+
+~real.exe~ must also be run with mpi
+#+begin_src sh
+mpiexec_mpt ./real.exe
+#+end_src
+
+To profile with ~arm-map~
+#+begin_src sh
+module load arm-forge/18.1.2
+# map --connect ./wrf.exe # for live, interactive profiling
+map --profile ./wrf.exe # for generating profile file to be loaded later
+#+end_src
+
+To profile with ~arm-reports~
+#+begin_src sh
+module load arm-reports/18.1.2
+perf-report -mpi -n 72 ./wrf.exe
+#+end_src
+
+To use ~mvapich~ instead of ~mpt~
+#+begin_src sh
+module load mvapich2
+mpirun_rsh -hostfile $PBS_NODEFILE -n 72 ./wrf.exe
+#+end_src
