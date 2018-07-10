@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2018-07-10 Tue 00:56 -->
+<!-- 2018-07-10 Tue 10:07 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Weather Research and Forecast (WRF) Scaling, Performance Assessment and Optimization</title>
@@ -240,55 +240,72 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgdc8e850">Background</a>
+<li><a href="#orgd2926a5">Background</a>
 <ul>
-<li><a href="#org684a67d">The Weather Research and Forecast Model</a></li>
-<li><a href="#orge93cb3e">WRF Flowchart</a></li>
+<li><a href="#orgd319455">The Weather Research and Forecast Model</a></li>
+<li><a href="#org4fc0d59">WRF Flowchart</a></li>
 </ul>
 </li>
-<li><a href="#orgf1236d2">Intro</a>
+<li><a href="#org4b07a2c">Intro</a>
 <ul>
-<li><a href="#org063f1cc">Test cases</a></li>
-<li><a href="#org8c15182">Compilers and MPI Libraries</a></li>
-<li><a href="#org75d3710">Settings</a></li>
+<li><a href="#org6671bbd">Test cases</a></li>
+<li><a href="#org5e93c88">Compilers and MPI Libraries</a></li>
+<li><a href="#org482ca25">Settings</a></li>
 </ul>
 </li>
-<li><a href="#org180208d">Results</a>
+<li><a href="#orge541d9f">Observations:</a>
 <ul>
-<li><a href="#org216f1d6">CONUS 12km</a></li>
-<li><a href="#org0cab14c">NEW CONUS 12km WRFV3.8.1</a></li>
-<li><a href="#org09e0204">OLD CONUS 12km vs NEW CONUS 12km WRFV3.8.1</a></li>
-<li><a href="#org5c41c0c">NEW CONUS 12km</a></li>
-<li><a href="#orge7ce28c">NEW CONUS 2.5km</a></li>
-<li><a href="#org784efae">Maria 3km</a></li>
-<li><a href="#orge292d28">Cases</a></li>
-<li><a href="#org6a25d89">MPIs</a></li>
-<li><a href="#org7cbfea9">Compilers</a></li>
-<li><a href="#org3447e53">Hybrid</a></li>
+<li><a href="#orgb34c907">Compilation issue with gnu &gt; 6.3.0 and WRF &lt; V4.0</a></li>
+<li><a href="#orgd25e015">new<sub>conus12km</sub> on WRFV4.0 exceeds minimum patch size on &gt;= 32 nodes (36 cpus per node)</a></li>
+<li><a href="#orge1bf134">Likely not enough memory for small node count on large cases</a></li>
+<li><a href="#orgf9dda22">Intel takes ~2x as long to compile wrf then gnu</a></li>
+<li><a href="#org27302d6">run issue with intel18 and intel17 + mvapich2.2</a></li>
+<li><a href="#org663812a">WRF compilation option 66/67</a></li>
+<li><a href="#org6b7a062">maria1km-WRFV4.0-intel18.0.1-mpt2.18-T3-N512</a></li>
 </ul>
 </li>
-<li><a href="#orgc96aae9">WRF scaling and timing on Cheyenne</a>
+<li><a href="#orgc42cd0e">Results</a>
 <ul>
-<li><a href="#org3decec1">Scaling Results</a></li>
-<li><a href="#org6e5e892">Run time results</a></li>
+<li><a href="#org33026d8">CONUS 12km</a></li>
+<li><a href="#org6820e9b">NEW CONUS 12km WRFV3.8.1</a></li>
+<li><a href="#orgd9d4748">OLD CONUS 12km vs NEW CONUS 12km WRFV3.8.1</a></li>
+<li><a href="#org00413db">NEW CONUS 12km</a></li>
+<li><a href="#org347c0b0">NEW CONUS 2.5km</a></li>
+<li><a href="#org5bd4c9d">Maria 3km</a></li>
+<li><a href="#org55b735f">Cases</a></li>
+<li><a href="#org9149e6c">MPIs</a></li>
+<li><a href="#orgaef538f">Compilers</a></li>
+<li><a href="#orgdb5059a">Hybrid</a></li>
 </ul>
 </li>
-<li><a href="#org749f19e">Summary</a>
+<li><a href="#org37b45ed">WRF scaling and timing on Cheyenne</a>
 <ul>
-<li><a href="#org74200aa">Conclusions?</a></li>
+<li><a href="#org3b0be7d">Scaling Results</a></li>
+<li><a href="#orgd5bbd90">Run time results</a></li>
+</ul>
+</li>
+<li><a href="#org574d9da">Summary</a>
+<ul>
+<li><a href="#orge3e6894">Conclusions?</a></li>
 </ul>
 </li>
 </ul>
 </div>
+</div>
+<div class="warning">
+<p>
+This is still very much a work in progress!
+</p>
+
 </div>
 
-<div id="outline-container-orgdc8e850" class="outline-2">
-<h2 id="orgdc8e850">Background</h2>
-<div class="outline-text-2" id="text-orgdc8e850">
+<div id="outline-container-orgd2926a5" class="outline-2">
+<h2 id="orgd2926a5">Background</h2>
+<div class="outline-text-2" id="text-orgd2926a5">
 </div>
-<div id="outline-container-org684a67d" class="outline-3">
-<h3 id="org684a67d">The Weather Research and Forecast Model</h3>
-<div class="outline-text-3" id="text-org684a67d">
+<div id="outline-container-orgd319455" class="outline-3">
+<h3 id="orgd319455">The Weather Research and Forecast Model</h3>
+<div class="outline-text-3" id="text-orgd319455">
 <p>
 &ldquo;WRF is a state-of-the-art atmospheric modeling system designed for both
 meteorological research and numerical weather prediction. It offers a host of
@@ -323,9 +340,9 @@ from tens of meters to thousands of kilometers, including the following.&rdquo;
 </div>
 </div>
 
-<div id="outline-container-orge93cb3e" class="outline-3">
-<h3 id="orge93cb3e">WRF Flowchart</h3>
-<div class="outline-text-3" id="text-orge93cb3e">
+<div id="outline-container-org4fc0d59" class="outline-3">
+<h3 id="org4fc0d59">WRF Flowchart</h3>
+<div class="outline-text-3" id="text-org4fc0d59">
 
 <div class="figure">
 <p><img src="./figs/WRF_flow_chart-ARW_v4.png" alt="WRF_flow_chart-ARW_v4.png" />
@@ -335,29 +352,115 @@ from tens of meters to thousands of kilometers, including the following.&rdquo;
 </div>
 </div>
 
-<div id="outline-container-orgf1236d2" class="outline-2">
-<h2 id="orgf1236d2">Intro</h2>
-<div class="outline-text-2" id="text-orgf1236d2">
+<div id="outline-container-org4b07a2c" class="outline-2">
+<h2 id="org4b07a2c">Intro</h2>
+<div class="outline-text-2" id="text-org4b07a2c">
 </div>
-<div id="outline-container-org063f1cc" class="outline-3">
-<h3 id="org063f1cc">Test cases</h3>
-<div class="outline-text-3" id="text-org063f1cc">
+<div id="outline-container-org6671bbd" class="outline-3">
+<h3 id="org6671bbd">Test cases</h3>
+<div class="outline-text-3" id="text-org6671bbd">
 <ul class="org-ul">
-<li><code>conus12km</code></li>
-<li><code>conus2.5km</code></li>
-<li><code>new_conus12km</code></li>
-<li><code>new_conus2.5km</code></li>
+<li><code>conus12km</code> and <code>conus2.5km</code>
+<ul class="org-ul">
+<li>Official CONUS benchmarks - no longer maintained</li>
+<li>Only works on WRFV3.8.1 or later</li>
+<li><code>wrfbdy</code> generated using WRFV2.2 and <code>wrfrst</code> generated using WRFV3.2beta
+provided</li>
+</ul></li>
+<li><code>new_conus12km</code>
+<ul class="org-ul">
+<li>12km vertical and horizontal resolution</li>
+<li>CONUS Physics suite</li>
+</ul></li>
+<li><code>new_conus2.5km</code>
+<ul class="org-ul">
+<li>2.5km vertical and horizontal resolution</li>
+<li>CONUS Physics suite with <code>cu_physics</code> disabled</li>
+</ul></li>
 <li><code>katrina1km</code></li>
 <li><code>katrina3km</code></li>
-<li><code>maria1km</code></li>
-<li><code>maria3km</code></li>
+<li><code>maria1km</code>
+<ul class="org-ul">
+<li>1km vertical and horizontal resolution</li>
+<li>TROPICAL Physics suite with <code>cu_physics</code> disabled and <code>sf_sfclay_physics = 1</code></li>
+</ul></li>
+<li><code>maria3km</code>
+<ul class="org-ul">
+<li>3km vertical and horizontal resolution</li>
+<li>TROPICAL Physics suite with <code>cu_physics</code> disabled and <code>sf_sfclay_physics = 1</code></li>
+</ul></li>
 </ul>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">case</th>
+<th scope="col" class="org-right">e<sub>we</sub></th>
+<th scope="col" class="org-right">e<sub>sn</sub></th>
+<th scope="col" class="org-right">timestep</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">conus12km</td>
+<td class="org-right">425</td>
+<td class="org-right">300</td>
+<td class="org-right">72</td>
+</tr>
+
+<tr>
+<td class="org-left">new<sub>conus12km</sub><sub>3</sub></td>
+<td class="org-right">425</td>
+<td class="org-right">300</td>
+<td class="org-right">72</td>
+</tr>
+
+<tr>
+<td class="org-left">new<sub>conus12km</sub></td>
+<td class="org-right">425</td>
+<td class="org-right">300</td>
+<td class="org-right">72</td>
+</tr>
+
+<tr>
+<td class="org-left">new<sub>conus2.5km</sub></td>
+<td class="org-right">1901</td>
+<td class="org-right">1301</td>
+<td class="org-right">15</td>
+</tr>
+
+<tr>
+<td class="org-left">maria1km</td>
+<td class="org-right">3665</td>
+<td class="org-right">2894</td>
+<td class="org-right">3</td>
+</tr>
+
+<tr>
+<td class="org-left">maria3km</td>
+<td class="org-right">1396</td>
+<td class="org-right">1384</td>
+<td class="org-right">9</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
-<div id="outline-container-org8c15182" class="outline-3">
-<h3 id="org8c15182">Compilers and MPI Libraries</h3>
-<div class="outline-text-3" id="text-org8c15182">
+<div id="outline-container-org5e93c88" class="outline-3">
+<h3 id="org5e93c88">Compilers and MPI Libraries</h3>
+<div class="outline-text-3" id="text-org5e93c88">
 <ul class="org-ul">
 <li>GNU Compiler Collection (GCC) versions 6.3.0, 8.1.0
 <ul class="org-ul">
@@ -373,9 +476,9 @@ from tens of meters to thousands of kilometers, including the following.&rdquo;
 </div>
 </div>
 
-<div id="outline-container-org75d3710" class="outline-3">
-<h3 id="org75d3710">Settings</h3>
-<div class="outline-text-3" id="text-org75d3710">
+<div id="outline-container-org482ca25" class="outline-3">
+<h3 id="org482ca25">Settings</h3>
+<div class="outline-text-3" id="text-org482ca25">
 <ul class="org-ul">
 <li>MVAPICH</li>
 </ul>
@@ -387,13 +490,136 @@ from tens of meters to thousands of kilometers, including the following.&rdquo;
 </div>
 </div>
 
-<div id="outline-container-org180208d" class="outline-2">
-<h2 id="org180208d">Results</h2>
-<div class="outline-text-2" id="text-org180208d">
+<div id="outline-container-orge541d9f" class="outline-2">
+<h2 id="orge541d9f">Observations:</h2>
+<div class="outline-text-2" id="text-orge541d9f">
 </div>
-<div id="outline-container-org216f1d6" class="outline-3">
-<h3 id="org216f1d6">CONUS 12km</h3>
-<div class="outline-text-3" id="text-org216f1d6">
+<div id="outline-container-orgb34c907" class="outline-3">
+<h3 id="orgb34c907">Compilation issue with gnu &gt; 6.3.0 and WRF &lt; V4.0</h3>
+<div class="outline-text-3" id="text-orgb34c907">
+<p>
+This likely require a source patch to fix, not an environment or compiler issue
+</p>
+<pre class="example">
+module_cu_g3.f90:3132:41:
+
+                    call random_seed (PUT=seed)
+                                         1
+Error: Size of ‘put’ argument of ‘random_seed’ intrinsic at (1) too small (12/33)
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgd25e015" class="outline-3">
+<h3 id="orgd25e015">new<sub>conus12km</sub> on WRFV4.0 exceeds minimum patch size on &gt;= 32 nodes (36 cpus per node)</h3>
+<div class="outline-text-3" id="text-orgd25e015">
+<pre class="example">
+taskid: 0 hostname: r14i1n17
+ module_io_quilt_old.F        2931 F
+Quilting with   1 groups of   0 I/O tasks.
+ Ntasks in X           32 , ntasks in Y           36
+*************************************
+Configuring physics suite 'conus'
+
+         mp_physics:      8
+         cu_physics:      6
+      ra_lw_physics:      4
+      ra_sw_physics:      4
+     bl_pbl_physics:      2
+  sf_sfclay_physics:      2
+ sf_surface_physics:      2
+*************************************
+   For domain            1 , the domain size is too small for this many processors, or the decomposition aspect ratio is poor.
+   Minimum decomposed computational patch size, either x-dir or y-dir, is 10 grid cells.
+  e_we =   425, nproc_x =   32, with cell width in x-direction =   13
+  e_sn =   300, nproc_y =   36, with cell width in y-direction =    8
+  --- ERROR: Reduce the MPI rank count, or redistribute the tasks.
+-------------- FATAL CALLED ---------------
+FATAL CALLED FROM FILE:  &lt;stdin&gt;  LINE:    1726
+NOTE:       1 namelist settings are wrong. Please check and reset these options
+-------------------------------------------
+</pre>
+</div>
+</div>
+<div id="outline-container-orge1bf134" class="outline-3">
+<h3 id="orge1bf134">Likely not enough memory for small node count on large cases</h3>
+<div class="outline-text-3" id="text-orge1bf134">
+<p>
+For WRFV4.0 usually see jobs SIGKILLed at various points during startup for
+</p>
+<ul class="org-ul">
+<li>new<sub>conus2.5</sub> on &lt;= 2 nodes</li>
+<li>maria3km on 1 nodes</li>
+<li>maria1km on &lt;= 8 nodes</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgf9dda22" class="outline-3">
+<h3 id="orgf9dda22">Intel takes ~2x as long to compile wrf then gnu</h3>
+</div>
+<div id="outline-container-org27302d6" class="outline-3">
+<h3 id="org27302d6">run issue with intel18 and intel17 + mvapich2.2</h3>
+<div class="outline-text-3" id="text-org27302d6">
+<pre class="example">
+===================================================================================
+=   BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES
+=   PID 32468 RUNNING AT r8i6n12.ib0.cheyenne.ucar.edu
+=   EXIT CODE: 174
+=   CLEANING UP REMAINING PROCESSES
+=   YOU CAN IGNORE THE BELOW CLEANUP MESSAGES
+===================================================================================
+[proxy:0:0@r8i6n9] HYD_pmcd_pmip_control_cmd_cb (pm/pmiserv/pmip_cb.c:909): assert (!closed) failed
+[proxy:0:0@r8i6n9] HYDT_dmxu_poll_wait_for_event (tools/demux/demux_poll.c:76): callback returned error status
+[proxy:0:0@r8i6n9] main (pm/pmiserv/pmip.c:206): demux engine error waiting for event
+[mpiexec@r8i6n9] HYDT_bscu_wait_for_completion (tools/bootstrap/utils/bscu_wait.c:76): one of the processes terminated badly; aborting
+[mpiexec@r8i6n9] HYDT_bsci_wait_for_completion (tools/bootstrap/src/bsci_wait.c:23): launcher returned error waiting for completion
+[mpiexec@r8i6n9] HYD_pmci_wait_for_completion (pm/pmiserv/pmiserv_pmci.c:218): launcher returned error waiting for completion
+[mpiexec@r8i6n9] main (ui/mpich/mpiexec.c:344): process manager error waiting for completion
+</pre>
+</div>
+</div>
+<div id="outline-container-org663812a" class="outline-3">
+<h3 id="org663812a">WRF compilation option 66/67</h3>
+<div class="outline-text-3" id="text-org663812a">
+<pre class="example">
+5c5
+&lt; # Compiler choice: 15
+---
+&gt; # Compiler choice: 66
+161,163c128,130
+&lt; ARCH_LOCAL      =       -DNONSTANDARD_SYSTEM_FUNC  -DWRF_USE_CLM $(NETCDF4_IO_OPTS)
+&lt; CFLAGS_LOCAL    =       -w -O3 -ip #-xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -no-multibyte-chars
+&lt; LDFLAGS_LOCAL   =       -ip #-xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -align all -fno-alias -fno-common
+---
+&gt; ARCH_LOCAL      =       -DNONSTANDARD_SYSTEM_FUNC -DWRF_USE_CLM $(NETCDF4_IO_OPTS)
+&gt; CFLAGS_LOCAL    =       -w -O3 -ip -xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -no-multibyte-chars -xCORE-AVX2
+&gt; LDFLAGS_LOCAL   =       -ip -xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -align all -fno-alias -fno-common -xCORE-AVX2
+175c142
+&lt; FCBASEOPTS_NO_G =       -ip -fp-model precise -w -ftz -align all -fno-alias $(FORMAT_FREE) $(BYTESWAPIO) #-xHost -fp-model fast=2 -no-heap-arrays -no-prec-div -no-prec-sqrt -fno-common
+---
+&gt; FCBASEOPTS_NO_G =       -ip -fp-model precise -w -ftz -align all -fno-alias $(FORMAT_FREE) $(BYTESWAPIO) -xHost -fp-model fast=2 -no-heap-arrays -no-prec-div -no-prec-sqrt -fno-common -xCORE-AVX2
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org6b7a062" class="outline-3">
+<h3 id="org6b7a062">maria1km-WRFV4.0-intel18.0.1-mpt2.18-T3-N512</h3>
+<div class="outline-text-3" id="text-org6b7a062">
+<pre class="example">
+rsl_lite error ("buf_for_proc.c":119) Bad P argument to buffer_for_proc.  P = 18088. Has RSL_MESH been called?
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgc42cd0e" class="outline-2">
+<h2 id="orgc42cd0e">Results</h2>
+<div class="outline-text-2" id="text-orgc42cd0e">
+</div>
+<div id="outline-container-org33026d8" class="outline-3">
+<h3 id="org33026d8">CONUS 12km</h3>
+<div class="outline-text-3" id="text-org33026d8">
 
 <div class="figure">
 <p><object type="image/svg+xml" data="./imgs/conus12km.svg" class="org-svg">
@@ -403,9 +629,9 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-org0cab14c" class="outline-3">
-<h3 id="org0cab14c">NEW CONUS 12km WRFV3.8.1</h3>
-<div class="outline-text-3" id="text-org0cab14c">
+<div id="outline-container-org6820e9b" class="outline-3">
+<h3 id="org6820e9b">NEW CONUS 12km WRFV3.8.1</h3>
+<div class="outline-text-3" id="text-org6820e9b">
 
 <div class="figure">
 <p><object type="image/svg+xml" data="./imgs/new_conus12km_3.svg" class="org-svg">
@@ -415,9 +641,9 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-org09e0204" class="outline-3">
-<h3 id="org09e0204">OLD CONUS 12km vs NEW CONUS 12km WRFV3.8.1</h3>
-<div class="outline-text-3" id="text-org09e0204">
+<div id="outline-container-orgd9d4748" class="outline-3">
+<h3 id="orgd9d4748">OLD CONUS 12km vs NEW CONUS 12km WRFV3.8.1</h3>
+<div class="outline-text-3" id="text-orgd9d4748">
 
 <div class="figure">
 <p><object type="image/svg+xml" data="./imgs/old_vs_new_conus12km_3.svg" class="org-svg">
@@ -427,9 +653,9 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-org5c41c0c" class="outline-3">
-<h3 id="org5c41c0c">NEW CONUS 12km</h3>
-<div class="outline-text-3" id="text-org5c41c0c">
+<div id="outline-container-org00413db" class="outline-3">
+<h3 id="org00413db">NEW CONUS 12km</h3>
+<div class="outline-text-3" id="text-org00413db">
 
 <div class="figure">
 <p><object type="image/svg+xml" data="./imgs/new_conus12km.svg" class="org-svg">
@@ -439,9 +665,9 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-orge7ce28c" class="outline-3">
-<h3 id="orge7ce28c">NEW CONUS 2.5km</h3>
-<div class="outline-text-3" id="text-orge7ce28c">
+<div id="outline-container-org347c0b0" class="outline-3">
+<h3 id="org347c0b0">NEW CONUS 2.5km</h3>
+<div class="outline-text-3" id="text-org347c0b0">
 
 <div class="figure">
 <p><object type="image/svg+xml" data="./imgs/new_conus2-5km.svg" class="org-svg">
@@ -451,9 +677,9 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-org784efae" class="outline-3">
-<h3 id="org784efae">Maria 3km</h3>
-<div class="outline-text-3" id="text-org784efae">
+<div id="outline-container-org5bd4c9d" class="outline-3">
+<h3 id="org5bd4c9d">Maria 3km</h3>
+<div class="outline-text-3" id="text-org5bd4c9d">
 
 <div class="figure">
 <p><object type="image/svg+xml" data="./imgs/maria3km.svg" class="org-svg">
@@ -463,9 +689,9 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-orge292d28" class="outline-3">
-<h3 id="orge292d28">Cases</h3>
-<div class="outline-text-3" id="text-orge292d28">
+<div id="outline-container-org55b735f" class="outline-3">
+<h3 id="org55b735f">Cases</h3>
+<div class="outline-text-3" id="text-org55b735f">
 
 <div class="figure">
 <p><object type="image/svg+xml" data="./imgs/cases.svg" class="org-svg">
@@ -475,9 +701,9 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-org6a25d89" class="outline-3">
-<h3 id="org6a25d89">MPIs</h3>
-<div class="outline-text-3" id="text-org6a25d89">
+<div id="outline-container-org9149e6c" class="outline-3">
+<h3 id="org9149e6c">MPIs</h3>
+<div class="outline-text-3" id="text-org9149e6c">
 
 <div class="figure">
 <p><object type="image/svg+xml" data="./imgs/new_conus12km_mpi.svg" class="org-svg">
@@ -508,9 +734,9 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-org7cbfea9" class="outline-3">
-<h3 id="org7cbfea9">Compilers</h3>
-<div class="outline-text-3" id="text-org7cbfea9">
+<div id="outline-container-orgaef538f" class="outline-3">
+<h3 id="orgaef538f">Compilers</h3>
+<div class="outline-text-3" id="text-orgaef538f">
 
 <div class="figure">
 <p><object type="image/svg+xml" data="./imgs/new_conus12km_compiler.svg" class="org-svg">
@@ -541,9 +767,9 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-org3447e53" class="outline-3">
-<h3 id="org3447e53">Hybrid</h3>
-<div class="outline-text-3" id="text-org3447e53">
+<div id="outline-container-orgdb5059a" class="outline-3">
+<h3 id="orgdb5059a">Hybrid</h3>
+<div class="outline-text-3" id="text-orgdb5059a">
 
 <div class="figure">
 <p><object type="image/svg+xml" data="./imgs/hybrid.svg" class="org-svg">
@@ -553,9 +779,10 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 </div>
-<div id="outline-container-orgc96aae9" class="outline-2">
-<h2 id="orgc96aae9">WRF scaling and timing on Cheyenne<sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup></h2>
-<div class="outline-text-2" id="text-orgc96aae9">
+
+<div id="outline-container-org37b45ed" class="outline-2">
+<h2 id="org37b45ed">WRF scaling and timing on Cheyenne<sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup></h2>
+<div class="outline-text-2" id="text-org37b45ed">
 <ul class="org-ul">
 <li>&ldquo;Is it possible to solve a problem with such-and-such resolution in a timely
 manner?&rdquo;</li>
@@ -575,11 +802,11 @@ time-to-solution and in terms of your allocation.
 <hr />
 </div>
 
-<div id="outline-container-org3decec1" class="outline-3">
-<h3 id="org3decec1">Scaling Results</h3>
-<div class="outline-text-3" id="text-org3decec1">
+<div id="outline-container-org3b0be7d" class="outline-3">
+<h3 id="org3b0be7d">Scaling Results</h3>
+<div class="outline-text-3" id="text-org3b0be7d">
 <p>
-Figure <a href="#org9009b0c">18</a> shows scaling results from the Katrina simulations at two
+Figure <a href="#org421da22">18</a> shows scaling results from the Katrina simulations at two
 different resolutions and also includes the official CONUS benchmarks from
 <a href="http://www2.mmm.ucar.edu/wrf/WG2/bench/">http://www2.mmm.ucar.edu/wrf/WG2/bench/</a> at 12km and 2.5km resolution. For
 comparison, a New Zealand case with different physics parametrization and a
@@ -589,7 +816,7 @@ distance between points corresponds to a large difference in values. Figure 1 -
 </p>
 
 
-<div id="org9009b0c" class="figure">
+<div id="org421da22" class="figure">
 <p><object type="image/svg+xml" data="./imgs/cases.svg" class="org-svg">
 Sorry, your browser does not support SVG.</object>
 </p>
@@ -633,42 +860,45 @@ for solving the same problem.
 </div>
 </div>
 
-<div id="outline-container-org6e5e892" class="outline-3">
-<h3 id="org6e5e892">Run time results</h3>
-<div class="outline-text-3" id="text-org6e5e892">
+<div id="outline-container-orgd5bbd90" class="outline-3">
+<h3 id="orgd5bbd90">Run time results</h3>
+<div class="outline-text-3" id="text-orgd5bbd90">
 <p>
-Figure 2 below shows the total run time for WRF jobs using increasing numbers of
-cores. Initialization time, computation time, and writing time also are shown
-for runs using up to 8,192 cores. Initialization and writing time rendered
-larger jobs impractical. Using a different output algorithm (CSG used the
-default) may yield better results for large jobs. Compare this to Figure 1,
-where only the computing time (represented in Figure 2 by the green triangles)
-has been taken into account to make the plot.
+Figure <a href="#orgc81b702">1</a> below shows the total run time for WRF jobs using increasing
+numbers of cores. Initialization time, computation time, and writing time also
+are shown for runs using up to 8,192 cores. 
 </p>
 
 <p>
-These results are based on simulations of Hurricane Katrina (2005) at 1km
+These results are based on simulations of Hurricane Maria (2017) at 1km
 resolution.
 </p>
 
 <p>
 As illustrated, initialization and writing output times may be more expensive
-than computing time for larger core counts. Times shown are for a single restart
-and single output file of the Katrina 1km case, which used a domain of about 372
-million grid points. If you have more restarts and output files, your numbers
-will be different but the trend will be similar. Figure 2 - WRF timing Figure 2
+than computing time for larger core counts. Times shown are for a and single
+output file of the Maria 1km case, which used a domain of about 372 million grid
+points. If you have more restarts and output files, your numbers will be
+different but the trend will be similar.
+</p>
+
+
+<div class="figure">
+<p><object type="image/svg+xml" data="./imgs/maria1km_runtime.svg" class="org-svg">
+Sorry, your browser does not support SVG.</object>
 </p>
 </div>
 </div>
 </div>
-
-<div id="outline-container-org749f19e" class="outline-2">
-<h2 id="org749f19e">Summary</h2>
-<div class="outline-text-2" id="text-org749f19e">
 </div>
-<div id="outline-container-org74200aa" class="outline-3">
-<h3 id="org74200aa">Conclusions?</h3>
-<div class="outline-text-3" id="text-org74200aa">
+
+<div id="outline-container-org574d9da" class="outline-2">
+<h2 id="org574d9da">Summary</h2>
+<div class="outline-text-2" id="text-org574d9da">
+</div>
+<div id="outline-container-orge3e6894" class="outline-3">
+<h3 id="orge3e6894">Conclusions?</h3>
+<div class="outline-text-3" id="text-orge3e6894">
 <ul class="org-ul">
 <li>openMPI, MPT, and MVAPICH show similar runtime performance.</li>
 <li>intel consistently faster than gnu</li>
@@ -688,7 +918,7 @@ will be different but the trend will be similar. Figure 2 - WRF timing Figure 2
 <div id="postamble" class="status">
 <p class="author">Author: Akira Kyle</p>
 <p class="email">Email: <a href="mailto:akyle@cmu.edu">akyle@cmu.edu</a></p>
-<p class="date">Created: 2018-07-10 Tue 00:56</p>
+<p class="date">Created: 2018-07-10 Tue 10:07</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

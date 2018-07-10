@@ -22,6 +22,10 @@
 # \usecolortheme[snowy]{owl}
 # #+beamer_color_theme: owl
 
+#+begin_warning
+This is still very much a work in progress!
+#+end_warning
+
 * Background
 ** The Weather Research and Forecast Model
 
@@ -55,14 +59,34 @@ from tens of meters to thousands of kilometers, including the following."
 
 * Intro
 ** Test cases
-- ~conus12km~
-- ~conus2.5km~
+- ~conus12km~ and ~conus2.5km~
+  - Official CONUS benchmarks - no longer maintained
+  - Only works on WRFV3.8.1 or later
+  - ~wrfbdy~ generated using WRFV2.2 and ~wrfrst~ generated using WRFV3.2beta
+    provided
 - ~new_conus12km~
+  - 12km vertical and horizontal resolution
+  - CONUS Physics suite
 - ~new_conus2.5km~
+  - 2.5km vertical and horizontal resolution
+  - CONUS Physics suite with ~cu_physics~ disabled
 - ~katrina1km~
 - ~katrina3km~
 - ~maria1km~
+  - 1km vertical and horizontal resolution
+  - TROPICAL Physics suite with ~cu_physics~ disabled and ~sf_sfclay_physics = 1~
 - ~maria3km~
+  - 3km vertical and horizontal resolution
+  - TROPICAL Physics suite with ~cu_physics~ disabled and ~sf_sfclay_physics = 1~
+
+| case            | e_we | e_sn | timestep |
+|-----------------+------+------+----------|
+| conus12km       |  425 |  300 |       72 |
+| new_conus12km_3 |  425 |  300 |       72 |
+| new_conus12km   |  425 |  300 |       72 |
+| new_conus2.5km  | 1901 | 1301 |       15 |
+| maria1km        | 3665 | 2894 |        3 |
+| maria3km        | 1396 | 1384 |        9 |
 
 ** Compilers and MPI Libraries
 - GNU Compiler Collection (GCC) versions 6.3.0, 8.1.0
@@ -76,6 +100,93 @@ from tens of meters to thousands of kilometers, including the following."
 - MVAPICH
 
 http://mvapich.cse.ohio-state.edu/static/media/mvapich/mvapich2-2.3rc2-userguide.html#x1-19100011.15
+
+* Observations:
+** Compilation issue with gnu > 6.3.0 and WRF < V4.0
+ This likely require a source patch to fix, not an environment or compiler issue
+#+begin_example
+module_cu_g3.f90:3132:41:
+
+                    call random_seed (PUT=seed)
+                                         1
+Error: Size of ‘put’ argument of ‘random_seed’ intrinsic at (1) too small (12/33)
+#+end_example
+
+** new_conus12km on WRFV4.0 exceeds minimum patch size on >= 32 nodes (36 cpus per node)
+#+begin_example
+taskid: 0 hostname: r14i1n17
+ module_io_quilt_old.F        2931 F
+Quilting with   1 groups of   0 I/O tasks.
+ Ntasks in X           32 , ntasks in Y           36
+*************************************
+Configuring physics suite 'conus'
+
+         mp_physics:      8
+         cu_physics:      6
+      ra_lw_physics:      4
+      ra_sw_physics:      4
+     bl_pbl_physics:      2
+  sf_sfclay_physics:      2
+ sf_surface_physics:      2
+*************************************
+   For domain            1 , the domain size is too small for this many processors, or the decomposition aspect ratio is poor.
+   Minimum decomposed computational patch size, either x-dir or y-dir, is 10 grid cells.
+  e_we =   425, nproc_x =   32, with cell width in x-direction =   13
+  e_sn =   300, nproc_y =   36, with cell width in y-direction =    8
+  --- ERROR: Reduce the MPI rank count, or redistribute the tasks.
+-------------- FATAL CALLED ---------------
+FATAL CALLED FROM FILE:  <stdin>  LINE:    1726
+NOTE:       1 namelist settings are wrong. Please check and reset these options
+-------------------------------------------
+#+end_example
+** Likely not enough memory for small node count on large cases
+For WRFV4.0 usually see jobs SIGKILLed at various points during startup for
+- new_conus2.5 on <= 2 nodes
+- maria3km on 1 nodes
+- maria1km on <= 8 nodes
+
+** Intel takes ~2x as long to compile wrf then gnu
+** run issue with intel18 and intel17 + mvapich2.2
+#+begin_example
+===================================================================================
+=   BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES
+=   PID 32468 RUNNING AT r8i6n12.ib0.cheyenne.ucar.edu
+=   EXIT CODE: 174
+=   CLEANING UP REMAINING PROCESSES
+=   YOU CAN IGNORE THE BELOW CLEANUP MESSAGES
+===================================================================================
+[proxy:0:0@r8i6n9] HYD_pmcd_pmip_control_cmd_cb (pm/pmiserv/pmip_cb.c:909): assert (!closed) failed
+[proxy:0:0@r8i6n9] HYDT_dmxu_poll_wait_for_event (tools/demux/demux_poll.c:76): callback returned error status
+[proxy:0:0@r8i6n9] main (pm/pmiserv/pmip.c:206): demux engine error waiting for event
+[mpiexec@r8i6n9] HYDT_bscu_wait_for_completion (tools/bootstrap/utils/bscu_wait.c:76): one of the processes terminated badly; aborting
+[mpiexec@r8i6n9] HYDT_bsci_wait_for_completion (tools/bootstrap/src/bsci_wait.c:23): launcher returned error waiting for completion
+[mpiexec@r8i6n9] HYD_pmci_wait_for_completion (pm/pmiserv/pmiserv_pmci.c:218): launcher returned error waiting for completion
+[mpiexec@r8i6n9] main (ui/mpich/mpiexec.c:344): process manager error waiting for completion
+#+end_example
+** WRF compilation option 66/67
+#+begin_example
+5c5
+< # Compiler choice: 15
+---
+> # Compiler choice: 66
+161,163c128,130
+< ARCH_LOCAL      =       -DNONSTANDARD_SYSTEM_FUNC  -DWRF_USE_CLM $(NETCDF4_IO_OPTS)
+< CFLAGS_LOCAL    =       -w -O3 -ip #-xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -no-multibyte-chars
+< LDFLAGS_LOCAL   =       -ip #-xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -align all -fno-alias -fno-common
+---
+> ARCH_LOCAL      =       -DNONSTANDARD_SYSTEM_FUNC -DWRF_USE_CLM $(NETCDF4_IO_OPTS)
+> CFLAGS_LOCAL    =       -w -O3 -ip -xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -no-multibyte-chars -xCORE-AVX2
+> LDFLAGS_LOCAL   =       -ip -xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -align all -fno-alias -fno-common -xCORE-AVX2
+175c142
+< FCBASEOPTS_NO_G =       -ip -fp-model precise -w -ftz -align all -fno-alias $(FORMAT_FREE) $(BYTESWAPIO) #-xHost -fp-model fast=2 -no-heap-arrays -no-prec-div -no-prec-sqrt -fno-common
+---
+> FCBASEOPTS_NO_G =       -ip -fp-model precise -w -ftz -align all -fno-alias $(FORMAT_FREE) $(BYTESWAPIO) -xHost -fp-model fast=2 -no-heap-arrays -no-prec-div -no-prec-sqrt -fno-common -xCORE-AVX2
+#+end_example
+
+** maria1km-WRFV4.0-intel18.0.1-mpt2.18-T3-N512
+#+begin_example
+rsl_lite error ("buf_for_proc.c":119) Bad P argument to buffer_for_proc.  P = 18088. Has RSL_MESH been called?
+#+end_example
 
 * Results
 ** Code Snippets                                                   :noexport:
@@ -104,9 +215,10 @@ def plot_scaling(cases, labels, title, shifts=None):
         except: print("unable to plot case", case, "with label", label)
     plt.xlabel("Total grid points / core")
     plt.ylabel("Time steps / s")
-    plt.legend(loc='upper center', bbox_to_anchor=(1.35, 0.8), ncol=1)
+    plt.legend(loc='upper center', bbox_to_anchor=(1.6, 1.0), ncol=1)
     #plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=2)
     plt.title(title)
+    plt.axis('scaled')
     plt.grid(False)
 
 def plot_bar(cases, nodes, labels, title):
@@ -129,38 +241,6 @@ def plot_bar(cases, nodes, labels, title):
     ax.set_xlabel('Time steps/s')
     ax.set_title(title)
 #+end_src
-# #+header: :var cases=new_conus12km-cases labels=new_conus12km-labels
-# #+header: :var title="Scaling results for NEW CONUS 12km with WRFV4.0"
-# #+begin_src ipython :session :ipyfile ./imgs/new_conus12km_bar.svg :exports results
-# 
-# secs_normal = []
-# secs_large = []
-# for case in cases:
-#     normal = getFromDict(data, case+[1])[2]
-#     large = getFromDict(data, case+[16])[2]
-#     secs_normal.append(normal if isinstance(normal, float) else 0.0)
-#     secs_large.append(large if isinstance(large, float) else 0.0)
-# 
-# secs_normal = np.array(secs_normal)
-# secs_large = np.array(secs_large)
-# 
-# labels = [l[0] for l in labels]
-# y_pos = np.arange(len(cases))
-# error = np.zeros(len(cases))
-# 
-# fig, ax = plt.subplots()
-# width = 0.4
-# 
-# ax.barh(y_pos, secs_normal, width, color='blue', label='normal')
-# ax.barh(y_pos+width, secs_large, width, color='red', label='large')
-# ax.set_yticks(y_pos)
-# ax.set_yticklabels(labels)
-# # ax.invert_yaxis()  # labels read top-to-bottom
-# ax.set_xlabel('Time steps/s')
-# ax.set_title('Performance for normal number of nodes')
-# ax.legend()
-# #+end_src
-
 
 #+begin_src ipython :session :var raw_data=data.org:data raw_gridpoints=data.org:gridpoints
 from collections import defaultdict
@@ -232,7 +312,7 @@ plot_scaling(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[32]:
+# Out[4]:
 [[file:./imgs/conus12km.svg]]
 :END:
 
@@ -262,7 +342,7 @@ plot_scaling(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[33]:
+# Out[5]:
 [[file:./imgs/new_conus12km_3.svg]]
 :END:
 
@@ -308,7 +388,7 @@ plot_scaling(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[34]:
+# Out[6]:
 [[file:./imgs/old_vs_new_conus12km_3.svg]]
 :END:
 
@@ -330,40 +410,42 @@ wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
 #+end_src
 
 #+name: new_conus12km-cases
-| case          | WRF version | compiler           | mpi            | trial |
-|---------------+-------------+--------------------+----------------+-------|
-| new_conus12km | WRFV4.0     | gnu6.3.0           | mpich3.2       |     1 |
-| new_conus12km | WRFV4.0     | gnu6.3.0           | mpt2.18        |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0           | mpt2.18        |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0           | mvapich2.2     |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0           | openmpi3.1.0   |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0_O3        | mvapich2.2     |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0_fma       | mvapich2.2     |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0_O3_fma    | mvapich2.2     |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0_O3_native | mpt2.18        |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0_Ofast     | mpt2.18        |     1 |
-| new_conus12km | WRFV4.0     | intel18.0.1        | mpt2.18        |     1 |
-| new_conus12km | WRFV4.0     | intel18.0.1        | openmpi3.1.0   |     1 |
-| new_conus12km | WRFV4.0     | intel18.0.1        | impi2018.1.163 |     1 |
-| new_conus12km | WRFV4.0     | intel18.0.1_host   | mpt2.18        |     1 |
+| case          | WRF version | compiler              | mpi            | trial |
+|---------------+-------------+-----------------------+----------------+-------|
+| new_conus12km | WRFV4.0     | gnu6.3.0              | mpich3.2       |     1 |
+| new_conus12km | WRFV4.0     | gnu6.3.0              | mpt2.18        |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0              | mpt2.18        |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0              | mvapich2.2     |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0              | openmpi3.1.0   |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_O3           | mvapich2.2     |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_fma          | mvapich2.2     |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_O3_fma       | mvapich2.2     |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_O3_native    | mpt2.18        |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_Ofast        | mpt2.18        |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_Ofast_native | mpt2.18        |     1 |
+| new_conus12km | WRFV4.0     | intel18.0.1           | mpt2.18        |     1 |
+| new_conus12km | WRFV4.0     | intel18.0.1           | openmpi3.1.0   |     1 |
+| new_conus12km | WRFV4.0     | intel18.0.1           | impi2018.1.163 |     1 |
+| new_conus12km | WRFV4.0     | intel18.0.1_host      | mpt2.18        |     1 |
 
 #+name: new_conus12km-labels
-| label                         |
-|-------------------------------|
-| gnu6.3.0 - mpich3.2           |
-| gnu6.3.0 - mpt2.18            |
-| gnu8.1.0 - mpt2.18            |
-| gnu8.1.0 - mvapich2.2         |
-| gnu8.1.0 - openmpi3.1.0       |
-| gnu8.1.0_O3 - mvapich2.2      |
-| gnu8.1.0_fma - mvapich2.2     |
-| gnu8.1.0_O3_fma - mvapich2.2  |
-| gnu8.1.0_O3_native - mpt2.18  |
-| gnu8.1.0_Ofast - mpt2.18      |
-| intel18.0.1 - mpt2.18         |
-| intel18.0.1  - openmpi3.1.0   |
-| intel18.0.1  - impi2018.1.163 |
-| intel18.0.1_host - mpt2.18    |
+| label                           |
+|---------------------------------|
+| gnu6.3.0 - mpich3.2             |
+| gnu6.3.0 - mpt2.18              |
+| gnu8.1.0 - mpt2.18              |
+| gnu8.1.0 - mvapich2.2           |
+| gnu8.1.0 - openmpi3.1.0         |
+| gnu8.1.0_O3 - mvapich2.2        |
+| gnu8.1.0_fma - mvapich2.2       |
+| gnu8.1.0_O3_fma - mvapich2.2    |
+| gnu8.1.0_O3_native - mpt2.18    |
+| gnu8.1.0_Ofast - mpt2.18        |
+| gnu8.1.0_Ofast_native - mpt2.18 |
+| intel18.0.1 - mpt2.18           |
+| intel18.0.1  - openmpi3.1.0     |
+| intel18.0.1  - impi2018.1.163   |
+| intel18.0.1_host - mpt2.18      |
 
 ** NEW CONUS 12km
 #+header: :var cases=new_conus12km-cases labels=new_conus12km-labels
@@ -374,7 +456,7 @@ plot_scaling(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[54]:
+# Out[7]:
 [[file:./imgs/new_conus12km.svg]]
 :END:
 
@@ -412,22 +494,40 @@ wrf_summarize_runs -r conus12km-WRFV3.8.1-gnu6.3.0-mpt2.18-T1-N* \
 #+end_src
 
 #+name: new_conus2.5km-cases
-| case          | WRF version | compiler        | mpi        | trial |
-|---------------+-------------+-----------------+------------+-------|
-| new_conus12km | WRFV4.0     | gnu6.3.0        | mvapich2.2 |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0        | mpt2.18    |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0        | mvapich2.2 |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0_O3_fma | mvapich2.2 |     1 |
-| new_conus12km | WRFV4.0     | intel18.0.1     | mpt2.18    |     1 |
+| case          | WRF version | compiler              | mpi            | trial |
+|---------------+-------------+-----------------------+----------------+-------|
+| new_conus12km | WRFV4.0     | gnu6.3.0              | mpich3.2       |     1 |
+| new_conus12km | WRFV4.0     | gnu6.3.0              | mvapich2.2     |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0              | mpt2.18        |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0              | mvapich2.2     |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0              | openmpi3.1.0   |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_O3           | mvapich2.2     |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_O3_fma       | mvapich2.2     |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_O3_native    | mpt2.18        |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_Ofast        | mpt2.18        |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_Ofast_native | mpt2.18        |     1 |
+| new_conus12km | WRFV4.0     | intel18.0.1           | mpt2.18        |     1 |
+| new_conus12km | WRFV4.0     | intel18.0.1           | openmpi3.1.0   |     1 |
+| new_conus12km | WRFV4.0     | intel18.0.1           | impi2018.1.163 |     1 |
+| new_conus12km | WRFV4.0     | intel18.0.1_host      | mpt2.18        |     1 |
 
 #+name: new_conus2.5km-labels
-| label                      |
-|----------------------------|
-| gnu6.3.0/mvapich2.2        |
-| gnu8.1.0/mpt2.18           |
-| gnu8.1.0/mvapich2.2        |
-| gnu8.1.0-O3-fma/mvapich2.2 |
-| intel18.0.1/mpt2.18        |
+| label                           |
+|---------------------------------|
+| gnu6.3.0 - mpich3.2             |
+| gnu6.3.0 - mvapich2.2           |
+| gnu8.1.0 - mpt2.18              |
+| gnu8.1.0 - mvapich2.2           |
+| gnu8.1.0 - openmpi3.1.0         |
+| gnu8.1.0_O3 - mvapich2.2        |
+| gnu8.1.0_O3_fma - mvapich2.2    |
+| gnu8.1.0_O3_native - mpt2.18    |
+| gnu8.1.0_Ofast - mpt2.18        |
+| gnu8.1.0_Ofast_native - mpt2.18 |
+| intel18.0.1 - mpt2.18           |
+| intel18.0.1  - openmpi3.1.0     |
+| intel18.0.1  - impi2018.1.163   |
+| intel18.0.1_host - mpt2.18      |
 
 ** NEW CONUS 2.5km
 #+header: :var cases=new_conus2.5km-cases labels=new_conus2.5km-labels
@@ -438,7 +538,7 @@ plot_scaling(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[42]:
+# Out[8]:
 [[file:./imgs/new_conus2-5km.svg]]
 :END:
 
@@ -471,7 +571,7 @@ plot_scaling(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[41]:
+# Out[9]:
 [[file:./imgs/maria3km.svg]]
 :END:
 
@@ -490,7 +590,7 @@ plot_scaling(cases, labels, title)
 | new_conus12km  |
 | new_conus2.5km |
 | maria3km       |
-| maria31m       |
+| maria1km       |
 
 ** Cases
 #+header: :var cases=cases-cases labels=cases-labels
@@ -502,7 +602,7 @@ plot_scaling(cases, labels, title)
 #+attr_latex: :width 1.0\linewidth
 #+RESULTS:
 :RESULTS:
-# Out[78]:
+# Out[10]:
 [[file:./imgs/cases.svg]]
 :END:
 
@@ -564,7 +664,7 @@ plot_scaling(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[59]:
+# Out[11]:
 [[file:./imgs/new_conus12km_mpi.svg]]
 :END:
 
@@ -576,7 +676,7 @@ plot_scaling(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[16]:
+# Out[12]:
 [[file:./imgs/new_conus2-5km_mpi.svg]]
 :END:
 
@@ -588,7 +688,7 @@ plot_bar(cases, 16, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[61]:
+# Out[13]:
 [[file:./imgs/new_conus12km_bar_normal.svg]]
 :END:
 
@@ -600,90 +700,96 @@ plot_bar(cases, 4, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[60]:
+# Out[14]:
 [[file:./imgs/new_conus12km_bar_large.svg]]
 :END:
 
 ** Compilers :noexport:
 #+name: new_conus12km-cases-compiler
-| case          | WRF version | compiler           | mpi            | trial |
-|---------------+-------------+--------------------+----------------+-------|
-| new_conus12km | WRFV4.0     | gnu8.1.0           | mpt2.18        |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0           | mvapich2.2     |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0_O3        | mvapich2.2     |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0_fma       | mvapich2.2     |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0_O3_fma    | mvapich2.2     |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0_O3_native | mpt2.18        |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0_Ofast     | mpt2.18        |     1 |
-| new_conus12km | WRFV4.0     | intel18.0.1        | mpt2.18        |     1 |
-| new_conus12km | WRFV4.0     | intel18.0.1_host   | mpt2.18        |     1 |
+| case          | WRF version | compiler              | mpi        | trial |
+|---------------+-------------+-----------------------+------------+-------|
+| new_conus12km | WRFV4.0     | gnu8.1.0              | mpt2.18    |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0              | mvapich2.2 |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_O3           | mvapich2.2 |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_fma          | mvapich2.2 |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_O3_fma       | mvapich2.2 |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_O3_native    | mpt2.18    |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_Ofast        | mpt2.18    |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_Ofast_native | mpt2.18    |     1 |
+| new_conus12km | WRFV4.0     | intel18.0.1           | mpt2.18    |     1 |
+| new_conus12km | WRFV4.0     | intel18.0.1_host      | mpt2.18    |     1 |
 
 #+name: new_conus12km-labels-compiler
-| label                         |
-|-------------------------------|
-| gnu8.1.0 - mpt2.18            |
-| gnu8.1.0 - mvapich2.2         |
-| gnu8.1.0_O3 - mvapich2.2      |
-| gnu8.1.0_fma - mvapich2.2     |
-| gnu8.1.0_O3_fma - mvapich2.2  |
-| gnu8.1.0_O3_native - mpt2.18  |
-| gnu8.1.0_Ofast - mpt2.18      |
-| intel18.0.1 - mpt2.18         |
-| intel18.0.1_host - mpt2.18    |
+| label                           |
+|---------------------------------|
+| gnu8.1.0 - mpt2.18              |
+| gnu8.1.0 - mvapich2.2           |
+| gnu8.1.0_O3 - mvapich2.2        |
+| gnu8.1.0_fma - mvapich2.2       |
+| gnu8.1.0_O3_fma - mvapich2.2    |
+| gnu8.1.0_O3_native - mpt2.18    |
+| gnu8.1.0_Ofast - mpt2.18        |
+| gnu8.1.0_Ofast_native - mpt2.18 |
+| intel18.0.1 - mpt2.18           |
+| intel18.0.1_host - mpt2.18      |
 
 #+name: new_conus2.5km-cases-compiler
-| case           | WRF version | compiler           | mpi        | trial |
-|----------------+-------------+--------------------+------------+-------|
-| new_conus2.5km | WRFV4.0     | gnu8.1.0           | mpt2.18    |     1 |
-| new_conus2.5km | WRFV4.0     | gnu8.1.0           | mvapich2.2 |     1 |
-| new_conus2.5km | WRFV4.0     | gnu8.1.0_O3        | mvapich2.2 |     1 |
-| new_conus2.5km | WRFV4.0     | gnu8.1.0_fma       | mvapich2.2 |     1 |
-| new_conus2.5km | WRFV4.0     | gnu8.1.0_O3_fma    | mvapich2.2 |     1 |
-| new_conus2.5km | WRFV4.0     | gnu8.1.0_O3_native | mpt2.18    |     1 |
-| new_conus2.5km | WRFV4.0     | gnu8.1.0_Ofast     | mpt2.18    |     1 |
-| new_conus2.5km | WRFV4.0     | intel18.0.1        | mpt2.18    |     1 |
-| new_conus2.5km | WRFV4.0     | intel18.0.1_host   | mpt2.18    |     1 |
+| case           | WRF version | compiler              | mpi        | trial |
+|----------------+-------------+-----------------------+------------+-------|
+| new_conus2.5km | WRFV4.0     | gnu8.1.0              | mpt2.18    |     1 |
+| new_conus2.5km | WRFV4.0     | gnu8.1.0              | mvapich2.2 |     1 |
+| new_conus2.5km | WRFV4.0     | gnu8.1.0_O3           | mvapich2.2 |     1 |
+| new_conus2.5km | WRFV4.0     | gnu8.1.0_fma          | mvapich2.2 |     1 |
+| new_conus2.5km | WRFV4.0     | gnu8.1.0_O3_fma       | mvapich2.2 |     1 |
+| new_conus2.5km | WRFV4.0     | gnu8.1.0_O3_native    | mpt2.18    |     1 |
+| new_conus2.5km | WRFV4.0     | gnu8.1.0_Ofast        | mpt2.18    |     1 |
+| new_conus2.5km | WRFV4.0     | gnu8.1.0_Ofast_native | mpt2.18    |     1 |
+| new_conus2.5km | WRFV4.0     | intel18.0.1           | mpt2.18    |     1 |
+| new_conus2.5km | WRFV4.0     | intel18.0.1_host      | mpt2.18    |     1 |
 
 #+name: new_conus2.5km-labels-compiler
-| label                         |
-|-------------------------------|
-| gnu8.1.0 - mpt2.18            |
-| gnu8.1.0 - mvapich2.2         |
-| gnu8.1.0_O3 - mvapich2.2      |
-| gnu8.1.0_fma - mvapich2.2     |
-| gnu8.1.0_O3_fma - mvapich2.2  |
-| gnu8.1.0_O3_native - mpt2.18  |
-| gnu8.1.0_Ofast - mpt2.18      |
-| intel18.0.1 - mpt2.18         |
-| intel18.0.1_host - mpt2.18    |
+| label                           |
+|---------------------------------|
+| gnu8.1.0 - mpt2.18              |
+| gnu8.1.0 - mvapich2.2           |
+| gnu8.1.0_O3 - mvapich2.2        |
+| gnu8.1.0_fma - mvapich2.2       |
+| gnu8.1.0_O3_fma - mvapich2.2    |
+| gnu8.1.0_O3_native - mpt2.18    |
+| gnu8.1.0_Ofast - mpt2.18        |
+| gnu8.1.0_Ofast_native - mpt2.18 |
+| intel18.0.1 - mpt2.18           |
+| intel18.0.1_host - mpt2.18      |
 
 #+name: new_conus12km-cases-gnu
-| case          | WRF version | compiler           | mpi            | trial |
-|---------------+-------------+--------------------+----------------+-------|
-| new_conus12km | WRFV4.0     | gnu6.3.0           | mpich3.2       |     1 |
-| new_conus12km | WRFV4.0     | gnu6.3.0           | mpt2.18        |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0           | mpt2.18        |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0           | mvapich2.2     |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0           | openmpi3.1.0   |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0_O3        | mvapich2.2     |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0_fma       | mvapich2.2     |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0_O3_fma    | mvapich2.2     |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0_O3_native | mpt2.18        |     1 |
-| new_conus12km | WRFV4.0     | gnu8.1.0_Ofast     | mpt2.18        |     1 |
+| case          | WRF version | compiler              | mpi          | trial |
+|---------------+-------------+-----------------------+--------------+-------|
+| new_conus12km | WRFV4.0     | gnu6.3.0              | mpich3.2     |     1 |
+| new_conus12km | WRFV4.0     | gnu6.3.0              | mpt2.18      |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0              | mpt2.18      |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0              | mvapich2.2   |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0              | openmpi3.1.0 |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_O3           | mvapich2.2   |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_fma          | mvapich2.2   |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_O3_fma       | mvapich2.2   |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_O3_native    | mpt2.18      |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_Ofast        | mpt2.18      |     1 |
+| new_conus12km | WRFV4.0     | gnu8.1.0_Ofast_native | mpt2.18      |     1 |
 
 #+name: new_conus12km-labels-gnu
-| label                         |
-|-------------------------------|
-| gnu6.3.0 - mpich3.2           |
-| gnu6.3.0 - mpt2.18            |
-| gnu8.1.0 - mpt2.18            |
-| gnu8.1.0 - mvapich2.2         |
-| gnu8.1.0 - openmpi3.1.0       |
-| gnu8.1.0_O3 - mvapich2.2      |
-| gnu8.1.0_fma - mvapich2.2     |
-| gnu8.1.0_O3_fma - mvapich2.2  |
-| gnu8.1.0_O3_native - mpt2.18  |
-| gnu8.1.0_Ofast - mpt2.18      |
+| label                           |
+|---------------------------------|
+| gnu6.3.0 - mpich3.2             |
+| gnu6.3.0 - mpt2.18              |
+| gnu8.1.0 - mpt2.18              |
+| gnu8.1.0 - mvapich2.2           |
+| gnu8.1.0 - openmpi3.1.0         |
+| gnu8.1.0_O3 - mvapich2.2        |
+| gnu8.1.0_fma - mvapich2.2       |
+| gnu8.1.0_O3_fma - mvapich2.2    |
+| gnu8.1.0_O3_native - mpt2.18    |
+| gnu8.1.0_Ofast - mpt2.18        |
+| gnu8.1.0_Ofast_native - mpt2.18 |
 
 #+name: new_conus12km-cases-intel
 | case          | WRF version | compiler           | mpi            | trial |
@@ -712,7 +818,7 @@ plot_scaling(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[64]:
+# Out[15]:
 [[file:./imgs/new_conus12km_compiler.svg]]
 :END:
 
@@ -724,7 +830,7 @@ plot_scaling(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[15]:
+# Out[16]:
 [[file:./imgs/new_conus2-5km_compiler.svg]]
 :END:
 
@@ -736,7 +842,7 @@ plot_scaling(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[65]:
+# Out[17]:
 [[file:./imgs/new_conus12km_gnu.svg]]
 :END:
 
@@ -748,39 +854,56 @@ plot_scaling(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[43]:
+# Out[18]:
 [[file:./imgs/new_conus12km_intel.svg]]
 :END:
 
 ** Hybrid :noexport:
 #+name: cases-omp
-| case           | WRF version | compiler    | mpi         | trial |
-|----------------+-------------+-------------+-------------+-------|
-| new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18     |     1 |
-| new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18_omp |     1 |
-| new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18     |     1 |
-| new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18_omp |     1 |
+| case           | WRF version | compiler    | mpi                | trial |
+|----------------+-------------+-------------+--------------------+-------|
+| new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18            |     1 |
+| new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18_omp        |     1 |
+| new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18_omp_m2_o18 |     1 |
+| new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18_omp_m3_o12 |     1 |
+| new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18_omp_m4_o9  |     1 |
+| new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18_omp_m6_o6  |     1 |
+| new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18            |     1 |
+| new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18_omp        |     1 |
+| new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18_omp_m2_o18 |     1 |
+| new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18_omp_m3_o12 |     1 |
+| new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18_omp_m4_o9  |     1 |
+| new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18_omp_m6_o6  |     1 |
 
 #+name: labels-omp
-| label                |
-|----------------------|
-| new_conus12km        |
-| new_conus12km - omp  |
-| new_conus2.5km       |
-| new_conus2.5km - omp |
+| label                               |
+|-------------------------------------|
+| new_conus12km                       |
+| new_conus12km - 2 MPI, 18 OMP - T1  |
+| new_conus12km - 2 MPI, 18 OMP - T2  |
+| new_conus12km - 3 MPI, 12 OMP       |
+| new_conus12km - 4 MPI, 9 OMP        |
+| new_conus12km - 6 MPI, 6 OMP        |
+| new_conus12km                       |
+| new_conus2.5km - 2 MPI, 18 OMP - T1 |
+| new_conus2.5km - 2 MPI, 18 OMP - T2 |
+| new_conus2.5km - 3 MPI, 12 OMP      |
+| new_conus2.5km - 4 MPI, 9 OMP       |
+| new_conus2.5km - 6 MPI, 6 OMP       |
 
 ** Hybrid
 #+header: :var cases=cases-omp labels=labels-omp
 #+header: :var title="Scaling results for Hybrid WRFV4.0"
 #+begin_src ipython :session :ipyfile ./imgs/hybrid.svg
-plot_scaling(cases, labels, title)#, shifts=[1, 18, 1, 18])
+plot_scaling(cases, labels, title, shifts=[1, 18, 18, 12, 9, 6,  1, 18, 18, 12, 9, 6])
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-# Out[14]:
+# Out[36]:
 [[file:./imgs/hybrid.svg]]
 :END:
+
 * WRF scaling and timing on Cheyenne[fn:: [[https://www2.cisl.ucar.edu/software/community-models/wrf-scaling-and-timing][A similar study for Yellowstone]]]
 - "Is it possible to solve a problem with such-and-such resolution in a timely
   manner?"
@@ -835,24 +958,56 @@ regime the speed benefits diminish, the time will be dominated by initialization
 and I/O (as well as wait in queue), and there will be larger core-hours charges
 for solving the same problem.
 
+** Run time code :noexport:
+#+begin_src ipython :session
+def plot_maria1km_time():
+    maria_case = ['maria1km', 'WRFV4.0', 'intel18.0.1', 'mpt2.18',  1 ]
+    runs = getFromDict(data, maria_case)
+    cpus = np.array([d[7] for _,d in runs.items() if d[0] != '--'])
+    comp = np.array([d[0] for _,d in runs.items() if d[0] != '--'])
+    io = np.array([d[3] for _,d in runs.items() if d[0] != '--'])
+    gridpoints = e_we[case[0]] * e_sn[case[0]]
+    plt.plot(cpus, comp, 'o', label='computation')
+    plt.plot(cpus, io, '+', label='io time')
+    plt.xlabel("cores")
+    plt.ylabel("wall clock time (seconds)")
+    plt.legend(loc='best')
+    #plt.title(title)
+    #plt.axis('scaled')
+    plt.grid(False)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[25]:
+:END:
+
 ** Run time results
 
-Figure 2 below shows the total run time for WRF jobs using increasing numbers of
-cores. Initialization time, computation time, and writing time also are shown
-for runs using up to 8,192 cores. Initialization and writing time rendered
-larger jobs impractical. Using a different output algorithm (CSG used the
-default) may yield better results for large jobs. Compare this to Figure 1,
-where only the computing time (represented in Figure 2 by the green triangles)
-has been taken into account to make the plot.
+Figure [[wrf_runtime]] below shows the total run time for WRF jobs using increasing
+numbers of cores. Initialization time, computation time, and writing time also
+are shown for runs using up to 8,192 cores. 
 
-These results are based on simulations of Hurricane Katrina (2005) at 1km
+These results are based on simulations of Hurricane Maria (2017) at 1km
 resolution.
 
 As illustrated, initialization and writing output times may be more expensive
-than computing time for larger core counts. Times shown are for a single restart
-and single output file of the Katrina 1km case, which used a domain of about 372
-million grid points. If you have more restarts and output files, your numbers
-will be different but the trend will be similar. Figure 2 - WRF timing Figure 2
+than computing time for larger core counts. Times shown are for a and single
+output file of the Maria 1km case, which used a domain of about 372 million grid
+points. If you have more restarts and output files, your numbers will be
+different but the trend will be similar.
+
+#+begin_src ipython :session :ipyfile ./imgs/maria1km_runtime.svg
+plot_maria1km_time()
+#+end_src
+
+#+name: wrf_runtime
+#+caption: WRF Run Timing
+#+RESULTS:
+:RESULTS:
+# Out[26]:
+[[file:./imgs/maria1km_runtime.svg]]
+:END:
 
 * Summary
 ** Conclusions?

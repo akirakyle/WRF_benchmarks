@@ -7,6 +7,10 @@
 #+export_file_name: index
 #+setupfile: theme-readtheorg-local.setup
 
+#+begin_warning
+This is still very much a work in progress!
+#+end_warning
+
 * Benchmarks for WRF
 This repo contains the benchmark cases and scripts used for assessing the
 scaling performance of WRF on NCAR's Cheyenne Supercomputer.
@@ -41,6 +45,9 @@ scaled across 1, 2, 4, 8 nodes on cheyenne. (cheyenne's 36 cores/node is
 hardcoded into ~wrf_run_pbs_jobs~)
 
 #+begin_src sh
+git clone https://github.com/akirakyle/WRF_benchmarks.git
+PATH=~/WRF_benchmarks/scripts:$PATH
+
 qsub WRF_benchmarks/WRFs/WRFV4.0-intel18.0.1-mpt2.18.pbs
 qstat # wait for job to finish...
 qsub WRF_benchmarks/WPSs/WPSV4.0-intel18.0.1.pbs
