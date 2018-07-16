@@ -1,0 +1,120 @@
+#!/bin/sh
+
+CASE_DIR=
+WRF_DIR=
+TRIAL=T1
+NODES=1
+RUN_DIR=~/scratch/run
+WALL_TIME='00:30:00'
+QUEUE=regular
+NCPUS=36
+MPIPROCS=36
+OMPTHREADS=
+MEM=
+
+help() {
+echo ""
+echo "Usage: ${0##*/} [OPTIONS]"
+echo ""
+echo "Creates WRF rundir and a PBS job script and submits job."
+echo ""
+echo "OPTIONS:"
+echo "    -c, --case CASE_DIR         Directory with case to run, containing a"
+echo "                                    namelist.input, wrfbdy, and wrfinput or wrfrst."
+echo "    -w, --wrf  WRF_DIR          Directory of the compiled WRF to use."
+echo "    -t, --trial STR             Trial string to make directory name unique [default $TRIAL]"
+echo "    -n, --nodes NUM_NODES       Number of nodes to use. [default $NODES]"
+echo "    -p, --ncpus NUM             Set ncpus=NUM in pbs job script. [default $NCPUS]"
+echo "    -m, --mpiprocs NUM          Set mpiprocs=NUM in pbs job script. [default $MPIPROCS]"
+echo "    -o, --ompthreads NUM        Set ompthreads=NUM in pbs job script. [default none]"
+echo "    -a, --walltime 'HH:MM:SS'   Walltime for all submitted jobs. [default $WALL_TIME]"
+echo "    -q, --queue QUEUE_NAME      Namee PBS queue to submit to. [default $QUEUE]"
+echo "    -e, --mem SIZE              Set mem=SIZE in pbs job script. [default none]"
+echo "    -r, --rundir RUN_DIR        Directory to which to place run output. [default $RUN_DIR]"
+echo "    -h, --help                  This help"
+echo ""
+exit 0
+}
+
+while test $# -gt 0
+do
+    case $1 in
+        -c|--case)
+            CASE_DIR=$2 ;;
+        -w|--wrf)
+            WRF_DIR=$2 ;;
+        -n|--nodes)
+            NODES=$2 ;;
+        -t|--trial)
+            TRIAL=$2 ;;
+        -r|--rundir)
+            RUN_DIR=$2 ;;
+        -a|--walltime)
+            WALL_TIME=$2 ;;
+        -p|--ncpus)
+            NCPUS=$2 ;;
+        -m|--mpiprocs)
+            MPIPROCS=$2 ;;
+        -o|--ompthreads)
+            OMPTHREADS=$2 ;;
+        -q|--queue)
+            QUEUE=$2 ;;
+        -e|--mem)
+            MEM=$2 ;;
+        -h|--help)
+            help ;;
+	      *)
+            help ;;
+    esac
+	  shift
+    shift
+done
+
+if [ -z $WRF_DIR ]; then
+    echo "WRF_DIR must be specified"; help
+fi
+if [ -z $CASE_DIR ]; then
+    echo "CASE_DIR must be specified"; help
+fi
+OMP_LABEL=
+if [ ! -z $OMPTHREADS ]; then
+    OMP_LABEL=_m${MPIPROCS}_o${OMPTHREADS}
+    OMPTHREADS=":ompthreads=$OMPTHREADS"
+fi
+if [ ! -z $MEM ]; then
+    MEM=":mem=$MEM"
+fi
+
+WRF_PATH=$(readlink -f $WRF_DIR)
+if [ -z $WRF_PATH ] || [ ! -d $WRF_PATH ]; then
+    echo "Invalid WRF_PATH: $WRF_DIR"
+    exit 1
+fi
+CASE_PATH=$(readlink -f $CASE_DIR)
+if [ -z $CASE_PATH ] || [ ! -d $WRF_PATH ]; then
+    echo "Invalid CASE_PATH: $CASE_PATH"
+    exit 1
+fi
+
+JOB_NAME=$(basename $CASE_DIR)-$(basename $WRF_DIR)$OMP_LABEL-$TRIAL-N$(printf "%03d" $NODES)
+mkdir -p $RUN_DIR/$JOB_NAME
+cd $RUN_DIR/$JOB_NAME
+
+ln -sf $WRF_PATH/run/* .
+ln -sf $CASE_PATH/* .  # must be second to overwrite default namelist.input
+
+TOT_MPI_TASKS=$(($NODES * $MPIPROCS))
+envsubst '${JOB_NAME},${QUEUE},${NODES},${NCPUS},${MPIPROCS},${OMPTHREADS},${TOT_MPI_TASKS},${WALL_TIME},${MEM}' > wrf_job.pbs << EOF
+#!/bin/bash
+#PBS -N ${JOB_NAME}
+#PBS -l walltime=${WALL_TIME}
+#PBS -q ${QUEUE}
+#PBS -j oe
+#PBS -l select=${NODES}:ncpus=${NCPUS}:mpiprocs=${MPIPROCS}${OMPTHREADS}${MEM}
+
+export TMPDIR=/glade/scratch/$USER/temp
+mkdir -p $TMPDIR
+
+./mpirun_wrf ${TOT_MPI_TASKS}
+EOF
+qsub wrf_job.pbs
