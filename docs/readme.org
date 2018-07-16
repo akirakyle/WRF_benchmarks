@@ -38,10 +38,10 @@ in the ~srcipts/~ directory do not hardcode paths (except ~wrf_run_pbs_job~ has
 a default run directory) but the scripts in the ~cases/~ directory do hardcode
 paths. All the job submission scripts in ~WRFs~ and ~WPSs~ also hardcode paths.
 
-The following will give you a table with timing results using the new_conus12km
-benchmark with WRFV4.0 compiled with intel18.0.1 and mpt2.18 scaled across 1, 2,
-4, 8 nodes on cheyenne. (cheyenne's 36 cores/node is the default in
-~wrf_run_pbs_job~)
+The following will give you a table with timing results using the
+~new_conus12km~ benchmark with WRFV4.0 compiled with intel18.0.1 and mpt2.18
+scaled across 1, 2, 4, 8 nodes on cheyenne. (cheyenne's 36 cores/node is the
+default in ~wrf_run_pbs_job~)
 
 #+begin_src sh
 export JASPERLIB=/glade/u/home/wrfhelp/UNGRIB_LIBRARIES/lib

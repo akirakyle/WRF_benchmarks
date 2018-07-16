@@ -10,10 +10,10 @@
 #+options: toc:t num:nil email:t author:t date:nil
 #+setupfile: theme-readtheorg-local.setup
 # #+html_head: <style type="text/css">body{ max-width:50em; margin-left:auto; margin-right:auto; }</style>
-#+latex_header: \author[shortname]{\vspace{-.4cm} Akira Kyle\inst{1}, Davide Del Vento \inst{2}, Brian Vanderwende \inst{2}, Negin Sobhani \inst{2}, Dixit Patel \inst{3}}
+#+latex_header: \author[Kyle]{\vspace{-.4cm} Akira Kyle\inst{1}, Davide Del Vento \inst{2}, Brian Vanderwende \inst{2}, Negin Sobhani \inst{2}, Dixit Patel \inst{3}}
 # #+latex_header: \institute[shortinst]{\inst{1} Carnegie Mellon University \and \inst{2} National Center for Atmospheric Research \and \inst{3} University of Colorado Boulder}
 #+latex_header: \titlegraphic{\begin{picture}(0,0) \put(315,-150){\makebox(0,0)[rt]{\includegraphics[width=0.25\linewidth]{Updated-SIParCS-logo.png} \includegraphics[width=0.25\linewidth]{NSF_4-Color_vector_Logo.pdf}}} \end{picture}}
-#+latex_header: \institute[shortinst]{\inst{1} \includegraphics[width=0.4\linewidth]{CMU_Logo_Horiz_Red.pdf} \vspace{-.1cm} \and \inst{2} \includegraphics[width=0.34\linewidth]{ncar-logo2.pdf} \vspace{-.2cm} \and \inst{3} \includegraphics[width=0.46\linewidth]{boulder-one-line.png}}
+#+latex_header: \institute[NCAR]{\inst{1} \includegraphics[width=0.4\linewidth]{CMU_Logo_Horiz_Red.pdf} \vspace{-.1cm} \and \inst{2} \includegraphics[width=0.34\linewidth]{ncar-logo2.pdf} \vspace{-.2cm} \and \inst{3} \includegraphics[width=0.46\linewidth]{boulder-one-line.png}}
 #+latex_header: \graphicspath{{./figs/}{./images/}{./obipy-resources/}}
 #+latex_class: beamer
 #+beamer_theme: metropolis
@@ -37,19 +37,14 @@ from tens of meters to thousands of kilometers, including the following."
 
 #+BEAMER: \pause
 – Meteorological studies
-
 #+BEAMER: \pause
 – Real-time NWP
-
 #+BEAMER: \pause
 – Idealized simulations
-
 #+BEAMER: \pause
 – Data assimilation
-
 #+BEAMER: \pause
 – Earth system model coupling
-
 #+BEAMER: \pause
 – Model training and educational support
 
@@ -60,46 +55,50 @@ from tens of meters to thousands of kilometers, including the following."
 * Intro
 ** Test cases
 - ~conus12km~ and ~conus2.5km~
-  - Official CONUS benchmarks - no longer maintained
-  - Only works on WRFV3.8.1 or later
+  - Official CONUS benchmarks from http://www2.mmm.ucar.edu/wrf/WG2/benchv3/
+  - Benchmarks no longer maintained
+  - Only works on WRFV3.8.1 or earlier
   - ~wrfbdy~ generated using WRFV2.2 and ~wrfrst~ generated using WRFV3.2beta
     provided
-- ~new_conus12km~
-  - 12km vertical and horizontal resolution
-  - CONUS Physics suite
-- ~new_conus2.5km~
-  - 2.5km vertical and horizontal resolution
-  - CONUS Physics suite with ~cu_physics~ disabled
-- ~katrina1km~
-- ~katrina3km~
-- ~maria1km~
-  - 1km vertical and horizontal resolution
-  - TROPICAL Physics suite with ~cu_physics~ disabled and ~sf_sfclay_physics = 1~
-- ~maria3km~
-  - 3km vertical and horizontal resolution
+- ~katrina1km~ ~katrina3km~
+  - cases based upon Katrina single domain case in WRF-ARW online tutorial
+    (http://www2.mmm.ucar.edu/wrf/OnLineTutorial/CASES/SingleDomain/index.html)
+  - Same domain and similar physics but higher resolution
+  - cfl errors encountered often, especially with ~1km~ resolution
+    - Mostly likely due to high vertical winds over mountain ranges in Mexico
+- ~new_conus12km~ and ~new_conus2.5km~
+  - Based on official CONUS benchmarks
+  - 12km and 2.5km vertical and horizontal resolution respectively
+  - Use CONUS Physics suite introduced in WRFV3.9 instead of physics used in
+    above official CONUS benchmarks
+  - ~cu_physics = 0~ for ~new_conus2.5~
+  - NCEP GFS 0.25 deg input data for 2018-06-17
+  - 6 hour run, model output at 0, 3, 6hrs, restart file at 6hrs
+- ~maria3km~ and ~maria1km~
+  - 3km and 1km vertical and horizontal resolution respectively
   - TROPICAL Physics suite with ~cu_physics~ disabled and ~sf_sfclay_physics = 1~
 
-| case            | e_we | e_sn | timestep |
-|-----------------+------+------+----------|
-| conus12km       |  425 |  300 |       72 |
-| new_conus12km_3 |  425 |  300 |       72 |
-| new_conus12km   |  425 |  300 |       72 |
-| new_conus2.5km  | 1901 | 1301 |       15 |
-| maria1km        | 3665 | 2894 |        3 |
-| maria3km        | 1396 | 1384 |        9 |
+| case           | e_we | e_sn | total gridpoints | timestep |
+|----------------+------+------+------------------+----------|
+| conus12km      |  425 |  300 | 127,500          |       72 |
+| conus2.5km     | 1901 | 1301 | 2,473,201        |       15 |
+| new_conus12km  |  425 |  300 | 127,500          |       72 |
+| new_conus2.5km | 1901 | 1301 | 2,473,201        |       15 |
+| maria1km       | 3665 | 2894 | 10,606,510       |        3 |
+| maria3km       | 1396 | 1384 | 1,932,064        |        9 |
 
 ** Compilers and MPI Libraries
 - GNU Compiler Collection (GCC) versions 6.3.0, 8.1.0
-  - WRF compiles with -O2 default
-    - Tried -O3 and -mfma (enables FMA instruction set)
-    - Use -ofast?
+  - WRF compiles with ~-O2~ by default
+  - Tried ~-O3~, ~-Ofast~, ~-mfma~ (enables FMA instruction set), ~-march=native~
 - Intel Compiler versions 17.0.1, 18.0.1
-- MPT, MVAPICH
-
-** Settings
-- MVAPICH
-
-http://mvapich.cse.ohio-state.edu/static/media/mvapich/mvapich2-2.3rc2-userguide.html#x1-19100011.15
+  - WRF compiles with ~-O3~ by default
+  - Tried ~-Xhost~ which is similar to GNU's ~-march=native~
+- MPT version 2.18
+- MVAPICH version 2.2
+- openMPI version 3.1.0
+- Intel MPI version 2018.1.163
+- MPICH version 3.2
 
 * Observations:
 ** Compilation issue with gnu > 6.3.0 and WRF < V4.0
@@ -112,7 +111,7 @@ module_cu_g3.f90:3132:41:
 Error: Size of ‘put’ argument of ‘random_seed’ intrinsic at (1) too small (12/33)
 #+end_example
 
-** new_conus12km on WRFV4.0 exceeds minimum patch size on >= 32 nodes (36 cpus per node)
+** ~new_conus12km~ on WRFV4.0 exceeds minimum patch size on >= 32 nodes (36 cpus per node)
 #+begin_example
 taskid: 0 hostname: r14i1n17
  module_io_quilt_old.F        2931 F
@@ -139,31 +138,26 @@ FATAL CALLED FROM FILE:  <stdin>  LINE:    1726
 NOTE:       1 namelist settings are wrong. Please check and reset these options
 -------------------------------------------
 #+end_example
+
+#+begin_note
+This is a change in WRFV4.0 from previous versions. From
+http://www2.mmm.ucar.edu/wrf/users/wrfv4.0/updates-4.0.html:
+-  "Determine the resultant x- and y-direction computational patch sizes based
+  on the full domain size and the number of MPI ranks used in each direction. If
+  the patch size < 10 grid cells in either direction, the model will stop."
+#+end_note
+
 ** Likely not enough memory for small node count on large cases
-For WRFV4.0 usually see jobs SIGKILLed at various points during startup for
+When run on cheyenne's 64 GB memory nodes
+(https://www2.cisl.ucar.edu/resources/computational-systems/cheyenne), WRFV4.0
+usually see jobs SIGKILLed at various points during startup for
 - new_conus2.5 on <= 2 nodes
-- maria3km on 1 nodes
+- maria3km on 1 node
 - maria1km on <= 8 nodes
 
 ** Intel takes ~2x as long to compile wrf then gnu
-** run issue with intel18 and intel17 + mvapich2.2
-#+begin_example
-===================================================================================
-=   BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES
-=   PID 32468 RUNNING AT r8i6n12.ib0.cheyenne.ucar.edu
-=   EXIT CODE: 174
-=   CLEANING UP REMAINING PROCESSES
-=   YOU CAN IGNORE THE BELOW CLEANUP MESSAGES
-===================================================================================
-[proxy:0:0@r8i6n9] HYD_pmcd_pmip_control_cmd_cb (pm/pmiserv/pmip_cb.c:909): assert (!closed) failed
-[proxy:0:0@r8i6n9] HYDT_dmxu_poll_wait_for_event (tools/demux/demux_poll.c:76): callback returned error status
-[proxy:0:0@r8i6n9] main (pm/pmiserv/pmip.c:206): demux engine error waiting for event
-[mpiexec@r8i6n9] HYDT_bscu_wait_for_completion (tools/bootstrap/utils/bscu_wait.c:76): one of the processes terminated badly; aborting
-[mpiexec@r8i6n9] HYDT_bsci_wait_for_completion (tools/bootstrap/src/bsci_wait.c:23): launcher returned error waiting for completion
-[mpiexec@r8i6n9] HYD_pmci_wait_for_completion (pm/pmiserv/pmiserv_pmci.c:218): launcher returned error waiting for completion
-[mpiexec@r8i6n9] main (ui/mpich/mpiexec.c:344): process manager error waiting for completion
-#+end_example
 ** WRF compilation option 66/67
+Relevant diff of ~configure.wrf~:
 #+begin_example
 5c5
 < # Compiler choice: 15
@@ -183,7 +177,10 @@ For WRFV4.0 usually see jobs SIGKILLed at various points during startup for
 > FCBASEOPTS_NO_G =       -ip -fp-model precise -w -ftz -align all -fno-alias $(FORMAT_FREE) $(BYTESWAPIO) -xHost -fp-model fast=2 -no-heap-arrays -no-prec-div -no-prec-sqrt -fno-common -xCORE-AVX2
 #+end_example
 
-** maria1km-WRFV4.0-intel18.0.1-mpt2.18-T3-N512
+** Jobs with over 10000 mpi tasks
+WRF produces ~rsl.out.XXXX~ and ~rsl.error.XXXX~ files for every mpi task, so to
+support > 10000 mpi tasks, one must patch WRF to have a longer rsl file number
+format otherwise one may encounter the following error:
 #+begin_example
 rsl_lite error ("buf_for_proc.c":119) Bad P argument to buffer_for_proc.  P = 18088. Has RSL_MESH been called?
 #+end_example
@@ -577,20 +574,20 @@ plot_scaling(cases, labels, title)
 
 ** Cases table :noexport:
 #+name: cases-cases
-| case           | WRF version | compiler    | mpi     | trial |
-|----------------+-------------+-------------+---------+-------|
-| new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18 |     1 |
-| new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18 |     1 |
-| maria3km       | WRFV4.0     | intel18.0.1 | mpt2.18 |     1 |
-| maria1km       | WRFV4.0     | intel18.0.1 | mpt2.18 |     1 |
+| case           | WRF version | compiler    | mpi         | trial |
+|----------------+-------------+-------------+-------------+-------|
+| new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18     |     1 |
+| new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18     |     1 |
+| maria3km       | WRFV4.0     | intel18.0.1 | mpt2.18     |     1 |
+| maria1km       | WRFV4.0     | intel18.0.1 | mpt2.18     |     1 |
 
 #+name: cases-labels
-| label          |
-|----------------|
-| new_conus12km  |
-| new_conus2.5km |
-| maria3km       |
-| maria1km       |
+| label            |
+|------------------|
+| new_conus12km    |
+| new_conus2.5km   |
+| maria3km         |
+| maria1km         |
 
 ** Cases
 #+header: :var cases=cases-cases labels=cases-labels
@@ -602,7 +599,7 @@ plot_scaling(cases, labels, title)
 #+attr_latex: :width 1.0\linewidth
 #+RESULTS:
 :RESULTS:
-# Out[10]:
+# Out[8]:
 [[file:./imgs/cases.svg]]
 :END:
 
@@ -863,45 +860,68 @@ plot_scaling(cases, labels, title)
 | case           | WRF version | compiler    | mpi                | trial |
 |----------------+-------------+-------------+--------------------+-------|
 | new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18            |     1 |
-| new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18_omp        |     1 |
 | new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18_omp_m2_o18 |     1 |
 | new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18_omp_m3_o12 |     1 |
 | new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18_omp_m4_o9  |     1 |
 | new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18_omp_m6_o6  |     1 |
 | new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18            |     1 |
-| new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18_omp        |     1 |
 | new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18_omp_m2_o18 |     1 |
 | new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18_omp_m3_o12 |     1 |
 | new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18_omp_m4_o9  |     1 |
 | new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18_omp_m6_o6  |     1 |
 
+
 #+name: labels-omp
-| label                               |
-|-------------------------------------|
-| new_conus12km                       |
-| new_conus12km - 2 MPI, 18 OMP - T1  |
-| new_conus12km - 2 MPI, 18 OMP - T2  |
-| new_conus12km - 3 MPI, 12 OMP       |
-| new_conus12km - 4 MPI, 9 OMP        |
-| new_conus12km - 6 MPI, 6 OMP        |
-| new_conus12km                       |
-| new_conus2.5km - 2 MPI, 18 OMP - T1 |
-| new_conus2.5km - 2 MPI, 18 OMP - T2 |
-| new_conus2.5km - 3 MPI, 12 OMP      |
-| new_conus2.5km - 4 MPI, 9 OMP       |
-| new_conus2.5km - 6 MPI, 6 OMP       |
+| label                          |
+|--------------------------------|
+| new_conus12km                  |
+| new_conus12km - 2 MPI, 18 OMP  |
+| new_conus12km - 3 MPI, 12 OMP  |
+| new_conus12km - 4 MPI, 9 OMP   |
+| new_conus12km - 6 MPI, 6 OMP   |
+| new_conus2.5km                 |
+| new_conus2.5km - 2 MPI, 18 OMP |
+| new_conus2.5km - 3 MPI, 12 OMP |
+| new_conus2.5km - 4 MPI, 9 OMP  |
+| new_conus2.5km - 6 MPI, 6 OMP  |
 
 ** Hybrid
 #+header: :var cases=cases-omp labels=labels-omp
 #+header: :var title="Scaling results for Hybrid WRFV4.0"
 #+begin_src ipython :session :ipyfile ./imgs/hybrid.svg
-plot_scaling(cases, labels, title, shifts=[1, 18, 18, 12, 9, 6,  1, 18, 18, 12, 9, 6])
+plot_scaling(cases, labels, title, shifts=[1, 18, 12, 9, 6,  1, 18, 12, 9, 6])
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-# Out[36]:
+# Out[14]:
 [[file:./imgs/hybrid.svg]]
+:END:
+
+#+header: :var cases=cases-omp labels=labels-omp
+#+header: :var title="Performance for normal number of nodes"
+#+begin_src ipython :session :ipyfile ./imgs/hybrid_bar_normal.svg
+cases=cases[:5]; labels=labels[:5]
+plot_bar(cases, 16, labels, title)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[21]:
+[[file:./imgs/hybrid_bar_normal.svg]]
+:END:
+
+#+header: :var cases=cases-omp labels=labels-omp
+#+header: :var title="Performance for large number of nodes"
+#+begin_src ipython :session :ipyfile ./imgs/hybrid_bar_large.svg
+cases=cases[5:]; labels=labels[5:]
+plot_bar(cases, 8, labels, title)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[19]:
+[[file:./imgs/hybrid_bar_large.svg]]
 :END:
 
 * WRF scaling and timing on Cheyenne[fn:: [[https://www2.cisl.ucar.edu/software/community-models/wrf-scaling-and-timing][A similar study for Yellowstone]]]
@@ -921,13 +941,11 @@ time-to-solution and in terms of your allocation.
 
 ** Scaling Results
 
-Figure [[wrf_scaling]] shows scaling results from the Katrina simulations at two
-different resolutions and also includes the official CONUS benchmarks from
-http://www2.mmm.ucar.edu/wrf/WG2/bench/ at 12km and 2.5km resolution. For
-comparison, a New Zealand case with different physics parametrization and a
-higher number of vertical levels is also included. When expressed this way, all
-the cases scale similarly. Note that both axes are logarithmic, so a small
-distance between points corresponds to a large difference in values. Figure 1 -
+Figure [[wrf_scaling]] shows scaling results from Hurricane Maria simulations at 3km
+and 1km resolutions along with CONUS simulations at 12km and 2.5km resolutions.
+When expressed this way, all the cases scale similarly. Note that both axes are
+logarithmic, so a small distance between points corresponds to a large
+difference in values.
 
 #+name: wrf_scaling
 #+caption: WRF scaling
@@ -935,12 +953,12 @@ distance between points corresponds to a large difference in values. Figure 1 -
 
 As you can see, there are three regimes:
 
-- large number of grid points per core - *Total grid points / core > 105* (small
-  core count)
-- intermediate number of grid points per core - *104 < Total grid points / core
-  < 105* (intermediate core count)
-- small number of grid points per core - *Total grid points / core < 104* (large
-  core count)
+- large number of grid points per core - *Total grid points / core > 10^5*
+  (small core count)
+- intermediate number of grid points per core - *10^4 < Total grid points / core
+  < 10^5* (intermediate core count)
+- small number of grid points per core - *Total grid points / core < 10^4*
+  (large core count)
 
 For a small number of cores, the WRF computation kernel is in a strong scaling
 regime. Increasing the core count will make the simulation go faster while it
@@ -1010,6 +1028,6 @@ plot_maria1km_time()
 :END:
 
 * Summary
-** Conclusions?
+** Conclusions
 - openMPI, MPT, and MVAPICH show similar runtime performance.
 - intel consistently faster than gnu
