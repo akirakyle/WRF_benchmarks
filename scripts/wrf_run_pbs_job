@@ -5,6 +5,7 @@ WRF_DIR=
 TRIAL=T1
 NODES=1
 RUN_DIR=~/scratch/run
+PBS_SCRIPT=wrf_job.pbs
 WALL_TIME='00:30:00'
 QUEUE=regular
 NCPUS=36
@@ -16,7 +17,7 @@ help() {
 echo ""
 echo "Usage: ${0##*/} [OPTIONS]"
 echo ""
-echo "Creates WRF rundir and a PBS job script and submits job."
+echo "Creates WRF rundir and a PBS job script."
 echo ""
 echo "OPTIONS:"
 echo "    -c, --case CASE_DIR         Directory with case to run, containing a"
@@ -104,7 +105,7 @@ ln -sf $WRF_PATH/run/* .
 ln -sf $CASE_PATH/* .  # must be second to overwrite default namelist.input
 
 TOT_MPI_TASKS=$(($NODES * $MPIPROCS))
-envsubst '${JOB_NAME},${QUEUE},${NODES},${NCPUS},${MPIPROCS},${OMPTHREADS},${TOT_MPI_TASKS},${WALL_TIME},${MEM}' > wrf_job.pbs << EOF
+envsubst '${JOB_NAME},${QUEUE},${NODES},${NCPUS},${MPIPROCS},${OMPTHREADS},${TOT_MPI_TASKS},${WALL_TIME},${MEM}' > $PBS_SCRIPT << EOF
 #!/bin/bash
 #PBS -N ${JOB_NAME}
 #PBS -l walltime=${WALL_TIME}
@@ -117,4 +118,4 @@ mkdir -p $TMPDIR
 
 ./mpirun_wrf ${TOT_MPI_TASKS}
 EOF
-qsub wrf_job.pbs
+echo $RUN_DIR/$JOB_NAME/$PBS_SCRIPT

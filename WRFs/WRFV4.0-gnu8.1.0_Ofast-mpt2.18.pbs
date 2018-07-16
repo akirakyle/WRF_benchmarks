@@ -11,7 +11,7 @@ wrf_compile \
     --source ~wrfhelp/SOURCE_CODE/WRFV4.0.TAR.gz \
     --wrfdir ~/work/WRFs/WRFV4.0-gnu8.1.0_Ofast-mpt2.18 \
     --tasks 4 \
-    --configure WRFV4.0-gnu8.1.0_Ofast-mpt2.18.configure.wrf \
+    --configure ~/WRF_benchmarks/WRFs/WRFV4.0-gnu8.1.0_Ofast-mpt2.18.configure.wrf \
     --mpiexec mpiexec_mpt \
     --modules \
     gnu/8.1.0 \

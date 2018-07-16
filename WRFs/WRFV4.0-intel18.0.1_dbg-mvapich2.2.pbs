@@ -9,13 +9,13 @@ mkdir -p $TMPDIR
 
 wrf_compile \
     --source ~wrfhelp/SOURCE_CODE/WRFV4.0.TAR.gz \
-    --wrfdir ~/work/WRFs/WRFV4.0-gnu8.1.0_fma-mpt2.18 \
+    --wrfdir ~/work/WRFs/WRFV4.0-intel18.0.1_dbg-mvapich2.2 \
     --tasks 4 \
-    --configure ~/WRF_benchmarks/WRFs/WRFV4.0-gnu8.1.0_fma-mpt2.18.configure.wrf \
-    --mpiexec mpiexec_mpt \
+    --configure ~/WRF_benchmarks/WRFs/WRFV4.0-intel18.0.1_dbg-mvapich2.2.configure.wrf \
+    --mpiexec mpirun \
     --modules \
-    gnu/8.1.0 \
-    mpt/2.18 \
+    intel/18.0.1 \
+    mvapich2/2.2 \
     netcdf/4.6.1 \
     ncarcompilers/0.4.1 \
     ncarenv/1.2
