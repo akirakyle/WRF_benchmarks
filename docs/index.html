@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2018-07-10 Tue 09:48 -->
+<!-- 2018-07-16 Mon 11:23 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Weather Research and Forecast (WRF) Scaling, Performance Assessment and Optimization</title>
@@ -243,18 +243,18 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgdaf188b">Benchmarks for WRF</a>
+<li><a href="#org62946e1">Benchmarks for WRF</a>
 <ul>
-<li><a href="#org1cc6ccd">git directories</a></li>
-<li><a href="#org0d05b39">Example of how to run the <code>new_conus12km</code> benchmark case</a></li>
-<li><a href="#org655040b">Data for the various benchmark cases</a>
+<li><a href="#org558c993">git directories</a></li>
+<li><a href="#orge79d4f6">Example of how to run the <code>new_conus12km</code> benchmark case</a></li>
+<li><a href="#org33586b1">Data for the various benchmark cases</a>
 <ul>
-<li><a href="#orgaf98309"><code>katrina</code> (1km, 3km, 30km)</a></li>
-<li><a href="#org876983d"><code>conus12km</code> and <code>conus2.5km</code></a></li>
-<li><a href="#org4b62840"><code>maria1km</code>, <code>maria3km</code>, and <code>new_conus12km</code> and <code>new_conus2.5km</code></a></li>
+<li><a href="#orgb35f5fc"><code>katrina</code> (1km, 3km, 30km)</a></li>
+<li><a href="#org09093dd"><code>conus12km</code> and <code>conus2.5km</code></a></li>
+<li><a href="#org519a84f"><code>maria1km</code>, <code>maria3km</code>, and <code>new_conus12km</code> and <code>new_conus2.5km</code></a></li>
 </ul>
 </li>
-<li><a href="#org7fc1664">Examples of pbs job scripts for cheyenne</a></li>
+<li><a href="#orgd7643a2">Examples of pbs job scripts for cheyenne</a></li>
 </ul>
 </li>
 </ul>
@@ -267,9 +267,9 @@ This is still very much a work in progress!
 
 </div>
 
-<div id="outline-container-orgdaf188b" class="outline-2">
-<h2 id="orgdaf188b">Benchmarks for WRF</h2>
-<div class="outline-text-2" id="text-orgdaf188b">
+<div id="outline-container-org62946e1" class="outline-2">
+<h2 id="org62946e1">Benchmarks for WRF</h2>
+<div class="outline-text-2" id="text-org62946e1">
 <p>
 This repo contains the benchmark cases and scripts used for assessing the
 scaling performance of WRF on NCAR&rsquo;s Cheyenne Supercomputer.
@@ -280,9 +280,9 @@ scaling performance of WRF on NCAR&rsquo;s Cheyenne Supercomputer.
 </p>
 </div>
 
-<div id="outline-container-org1cc6ccd" class="outline-3">
-<h3 id="org1cc6ccd">git directories</h3>
-<div class="outline-text-3" id="text-org1cc6ccd">
+<div id="outline-container-org558c993" class="outline-3">
+<h3 id="org558c993">git directories</h3>
+<div class="outline-text-3" id="text-org558c993">
 <ul class="org-ul">
 <li><code>cases/</code> contains the namelists for WPS and WRF for the various benchmark
 cases along with scripts for generating the <code>wrfbdy</code> and <code>wrfinput</code> files for
@@ -301,26 +301,29 @@ and associated analysis and plotting code used to generate the results.</li>
 </div>
 </div>
 
-<div id="outline-container-org0d05b39" class="outline-3">
-<h3 id="org0d05b39">Example of how to run the <code>new_conus12km</code> benchmark case</h3>
-<div class="outline-text-3" id="text-org0d05b39">
+<div id="outline-container-orge79d4f6" class="outline-3">
+<h3 id="orge79d4f6">Example of how to run the <code>new_conus12km</code> benchmark case</h3>
+<div class="outline-text-3" id="text-orge79d4f6">
 <p>
-Make sure the <code>WRF_benchmarks/scripts</code> is in your <code>$PATH</code>. As always, make sure
-to change the paths to your directory structure. All the scripts in the
-<code>srcipts/</code> directory do not hardcode paths (except <code>wrf_run_pbs_jobs</code> has a
-default run directory) but the scripts in the <code>cases/</code> directory do hardcode
-paths.
+As always, change the example paths to your directory structure. All the scripts
+in the <code>srcipts/</code> directory do not hardcode paths (except <code>wrf_run_pbs_job</code> has
+a default run directory) but the scripts in the <code>cases/</code> directory do hardcode
+paths. All the job submission scripts in <code>WRFs</code> and <code>WPSs</code> also hardcode paths.
 </p>
 
 <p>
-The following will give you a table with timing results on the new<sub>conus12km</sub>
-benchmark using WRFV4.0 compiled with gnu8.1.0 and mvapich2.2 for two trials
-scaled across 1, 2, 4, 8 nodes on cheyenne. (cheyenne&rsquo;s 36 cores/node is
-hardcoded into <code>wrf_run_pbs_jobs</code>)
+The following will give you a table with timing results using the new<sub>conus12km</sub>
+benchmark with WRFV4.0 compiled with intel18.0.1 and mpt2.18 scaled across 1, 2,
+4, 8 nodes on cheyenne. (cheyenne&rsquo;s 36 cores/node is the default in
+<code>wrf_run_pbs_job</code>)
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sh">git clone https://github.com/akirakyle/WRF_benchmarks.git
+<pre class="src src-sh"><span class="org-builtin">export</span> <span class="org-variable-name">JASPERLIB</span>=/glade/u/home/wrfhelp/UNGRIB_LIBRARIES/lib
+<span class="org-builtin">export</span> <span class="org-variable-name">JASPERINC</span>=/glade/u/home/wrfhelp/UNGRIB_LIBRARIES/include
+<span class="org-builtin">alias</span> <span class="org-variable-name">qsub</span>=<span class="org-string">'/opt/pbs/bin/qsub -A MY_ACCOUNT_CODE -m abe -M my_email_address'</span>
+
+git clone https://github.com/akirakyle/WRF_benchmarks.git
 <span class="org-variable-name">PATH</span>=~/WRF_benchmarks/scripts:$<span class="org-variable-name">PATH</span>
 
 qsub WRF_benchmarks/WRFs/WRFV4.0-intel18.0.1-mpt2.18.pbs
@@ -329,7 +332,10 @@ qsub WRF_benchmarks/WPSs/WPSV4.0-intel18.0.1.pbs
 qstat <span class="org-comment-delimiter"># </span><span class="org-comment">wait for job to finish...</span>
 ./WRF_benchmarks/cases/make_cases_new.sh
 qstat <span class="org-comment-delimiter"># </span><span class="org-comment">wait for job to finish...</span>
-wrf_run_pbs_jobs -w ~/work/WRFs/WRFV4.0-gnu8.1.0-mvapich2.2 -c ~/WRF_benchmarks/cases/new_conus12km -t <span class="org-highlight-numbers-number">1</span> <span class="org-highlight-numbers-number">2</span> -a <span class="org-string">'00:30:00'</span>-n <span class="org-highlight-numbers-number">1</span> <span class="org-highlight-numbers-number">2</span> <span class="org-highlight-numbers-number">4</span> <span class="org-highlight-numbers-number">8</span> -r ~/scratch/run
+wrf_run_pbs_job -c ~/WRF_benchmarks/cases/new_conus12km -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n <span class="org-highlight-numbers-number">1</span>
+wrf_run_pbs_job -c ~/WRF_benchmarks/cases/new_conus12km -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n <span class="org-highlight-numbers-number">2</span>
+wrf_run_pbs_job -c ~/WRF_benchmarks/cases/new_conus12km -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n <span class="org-highlight-numbers-number">4</span>
+wrf_run_pbs_job -c ~/WRF_benchmarks/cases/new_conus12km -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n <span class="org-highlight-numbers-number">8</span>
 qstat <span class="org-comment-delimiter"># </span><span class="org-comment">wait for jobs to finish...</span>
 <span class="org-builtin">cd</span> ~/scratch/run
 wrf_cpy_rsl -a ../archive -o ~/results -r *
@@ -340,13 +346,13 @@ wrf_stats *
 </div>
 </div>
 
-<div id="outline-container-org655040b" class="outline-3">
-<h3 id="org655040b">Data for the various benchmark cases</h3>
-<div class="outline-text-3" id="text-org655040b">
+<div id="outline-container-org33586b1" class="outline-3">
+<h3 id="org33586b1">Data for the various benchmark cases</h3>
+<div class="outline-text-3" id="text-org33586b1">
 </div>
-<div id="outline-container-orgaf98309" class="outline-4">
-<h4 id="orgaf98309"><code>katrina</code> (1km, 3km, 30km)</h4>
-<div class="outline-text-4" id="text-orgaf98309">
+<div id="outline-container-orgb35f5fc" class="outline-4">
+<h4 id="orgb35f5fc"><code>katrina</code> (1km, 3km, 30km)</h4>
+<div class="outline-text-4" id="text-orgb35f5fc">
 <p>
 Data for running the Hurricane Katrina cases can be downloaded from the WRF
 tutorial page
@@ -370,9 +376,9 @@ these cases
 </div>
 </div>
 
-<div id="outline-container-org876983d" class="outline-4">
-<h4 id="org876983d"><code>conus12km</code> and <code>conus2.5km</code></h4>
-<div class="outline-text-4" id="text-org876983d">
+<div id="outline-container-org09093dd" class="outline-4">
+<h4 id="org09093dd"><code>conus12km</code> and <code>conus2.5km</code></h4>
+<div class="outline-text-4" id="text-org09093dd">
 <p>
 The <code>wrfbdy_d01</code> and <code>wrfrst_d01</code> files for the official CONUS benchmarks at
 12km and 2.5km resolution can be found at:
@@ -381,9 +387,9 @@ The <code>wrfbdy_d01</code> and <code>wrfrst_d01</code> files for the official C
 </div>
 </div>
 
-<div id="outline-container-org4b62840" class="outline-4">
-<h4 id="org4b62840"><code>maria1km</code>, <code>maria3km</code>, and <code>new_conus12km</code> and <code>new_conus2.5km</code></h4>
-<div class="outline-text-4" id="text-org4b62840">
+<div id="outline-container-org519a84f" class="outline-4">
+<h4 id="org519a84f"><code>maria1km</code>, <code>maria3km</code>, and <code>new_conus12km</code> and <code>new_conus2.5km</code></h4>
+<div class="outline-text-4" id="text-org519a84f">
 <p>
 The data for these Hurricane Maria cases and CONUS cases comes from the NCEP GFS
 Model Runs which can be downloaded form <a href="https://rda.ucar.edu/datasets/ds084.1/">https://rda.ucar.edu/datasets/ds084.1/</a>.
@@ -399,15 +405,15 @@ these cases
 </div>
 </div>
 
-<div id="outline-container-org7fc1664" class="outline-3">
-<h3 id="org7fc1664">Examples of pbs job scripts for cheyenne</h3>
-<div class="outline-text-3" id="text-org7fc1664">
+<div id="outline-container-orgd7643a2" class="outline-3">
+<h3 id="orgd7643a2">Examples of pbs job scripts for cheyenne</h3>
+<div class="outline-text-3" id="text-orgd7643a2">
 <div class="org-src-container">
 <pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">!/bin/</span><span class="org-keyword">bash</span>
 <span class="org-comment-delimiter">### </span><span class="org-comment">Job Name</span>
 <span class="org-comment-delimiter">#</span><span class="org-comment">PBS -N cheyenne_wrf</span>
 <span class="org-comment-delimiter">### </span><span class="org-comment">Project code</span>
-<span class="org-comment-delimiter">#</span><span class="org-comment">PBS -A SCSG0002</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">PBS -A MY_PROJECT_CODE</span>
 <span class="org-comment-delimiter">#</span><span class="org-comment">PBS -l walltime=00:20:00</span>
 <span class="org-comment-delimiter">#</span><span class="org-comment">PBS -q regular</span>
 <span class="org-comment-delimiter">### </span><span class="org-comment">Merge output and error files</span>
@@ -417,7 +423,7 @@ these cases
 <span class="org-comment-delimiter">### </span><span class="org-comment">Send email on abort, begin and end</span>
 <span class="org-comment-delimiter">#</span><span class="org-comment">PBS -m abe</span>
 <span class="org-comment-delimiter">### </span><span class="org-comment">Specify mail recipient</span>
-<span class="org-comment-delimiter">#</span><span class="org-comment">PBS -M akirak@ucar.edu</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">PBS -M my_email_address</span>
 
 <span class="org-builtin">export</span> <span class="org-variable-name">TMPDIR</span>=/glade/scratch/$<span class="org-variable-name">USER</span>/temp
 mkdir -p $<span class="org-variable-name">TMPDIR</span>
@@ -469,7 +475,7 @@ mpirun_rsh -hostfile $<span class="org-variable-name">PBS_NODEFILE</span> -n <sp
 <div id="postamble" class="status">
 <p class="author">Author: Akira Kyle</p>
 <p class="email">Email: <a href="mailto:akyle@cmu.edu">akyle@cmu.edu</a></p>
-<p class="date">Created: 2018-07-10 Tue 09:48</p>
+<p class="date">Created: 2018-07-16 Mon 11:23</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

@@ -33,18 +33,21 @@ scaling performance of WRF on NCAR's Cheyenne Supercomputer.
   and associated analysis and plotting code used to generate the results.
 
 ** Example of how to run the ~new_conus12km~ benchmark case
-Make sure the ~WRF_benchmarks/scripts~ is in your ~$PATH~. As always, make sure
-to change the paths to your directory structure. All the scripts in the
-~srcipts/~ directory do not hardcode paths (except ~wrf_run_pbs_jobs~ has a
-default run directory) but the scripts in the ~cases/~ directory do hardcode
-paths.
+As always, change the example paths to your directory structure. All the scripts
+in the ~srcipts/~ directory do not hardcode paths (except ~wrf_run_pbs_job~ has
+a default run directory) but the scripts in the ~cases/~ directory do hardcode
+paths. All the job submission scripts in ~WRFs~ and ~WPSs~ also hardcode paths.
 
-The following will give you a table with timing results on the new_conus12km
-benchmark using WRFV4.0 compiled with gnu8.1.0 and mvapich2.2 for two trials
-scaled across 1, 2, 4, 8 nodes on cheyenne. (cheyenne's 36 cores/node is
-hardcoded into ~wrf_run_pbs_jobs~)
+The following will give you a table with timing results using the new_conus12km
+benchmark with WRFV4.0 compiled with intel18.0.1 and mpt2.18 scaled across 1, 2,
+4, 8 nodes on cheyenne. (cheyenne's 36 cores/node is the default in
+~wrf_run_pbs_job~)
 
 #+begin_src sh
+export JASPERLIB=/glade/u/home/wrfhelp/UNGRIB_LIBRARIES/lib
+export JASPERINC=/glade/u/home/wrfhelp/UNGRIB_LIBRARIES/include
+alias qsub='/opt/pbs/bin/qsub -A MY_ACCOUNT_CODE -m abe -M my_email_address'
+
 git clone https://github.com/akirakyle/WRF_benchmarks.git
 PATH=~/WRF_benchmarks/scripts:$PATH
 
@@ -54,7 +57,10 @@ qsub WRF_benchmarks/WPSs/WPSV4.0-intel18.0.1.pbs
 qstat # wait for job to finish...
 ./WRF_benchmarks/cases/make_cases_new.sh
 qstat # wait for job to finish...
-wrf_run_pbs_jobs -w ~/work/WRFs/WRFV4.0-gnu8.1.0-mvapich2.2 -c ~/WRF_benchmarks/cases/new_conus12km -t 1 2 -a '00:30:00'-n 1 2 4 8 -r ~/scratch/run
+wrf_run_pbs_job -c ~/WRF_benchmarks/cases/new_conus12km -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n 1
+wrf_run_pbs_job -c ~/WRF_benchmarks/cases/new_conus12km -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n 2
+wrf_run_pbs_job -c ~/WRF_benchmarks/cases/new_conus12km -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n 4
+wrf_run_pbs_job -c ~/WRF_benchmarks/cases/new_conus12km -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n 8
 qstat # wait for jobs to finish...
 cd ~/scratch/run
 wrf_cpy_rsl -a ../archive -o ~/results -r *
@@ -98,7 +104,7 @@ these cases
 ### Job Name
 #PBS -N cheyenne_wrf
 ### Project code
-#PBS -A SCSG0002
+#PBS -A MY_PROJECT_CODE
 #PBS -l walltime=00:20:00
 #PBS -q regular
 ### Merge output and error files
@@ -108,7 +114,7 @@ these cases
 ### Send email on abort, begin and end
 #PBS -m abe
 ### Specify mail recipient
-#PBS -M akirak@ucar.edu
+#PBS -M my_email_address
 
 export TMPDIR=/glade/scratch/$USER/temp
 mkdir -p $TMPDIR
