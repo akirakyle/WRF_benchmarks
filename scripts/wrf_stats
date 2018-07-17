@@ -1,70 +1,46 @@
-#!/bin/sh
+#!/usr/bin/env python3
 
-help() {
-    echo ""
-    echo "Usage: ${0##*/} [OPTIONS] RSL_OUT1 RSL_OUT2 ..."
-    echo "Analyzes timing output info for WRF runs. If no rsl output files are specified"
-    echo "then look for rsl.out.0000 in current directory"
-    echo ""
-    echo "OPTIONS:"
-    echo "    -a, --all                 Includes all timesteps, including those involving disk I/O"
-    echo "    -h, --help                This help"
-    echo ""
-    exit 0
-}
+import argparse, re
 
-filter=2
+def main(args):
+  files = args['files']
+  if len(files) == 0: files = ["rsl.out.0000"]
+  max_fname = max([len(f) for f in files]+[4])
 
-case $1 in
-    -a|--all)
-        filter=1 ; shift ;;
-    -h|--help)
-        help ;;
-esac
+  hdr_row1="File | Comp Steps |     Comp Total |       Comp Avg |     Init Total |       Init Avg |    Write Total |      Write Avg |  X  |  Y  |"
+  hdr_row2="-----+------------+----------------+----------------+----------------+----------------+----------------+----------------+-----+-----|"
+  row_fmt = "| {:"+str(max_fname)+"} | {:10d} | {:14.6f} | {:14.6f} | {:14.6f} | {:14.6f} | {:14.6f} | {:14.6f} | {:3d} | {:3d} |"
+  print("| ", " "*(max_fname-4), hdr_row1, sep="")
+  print("|-", "-"*(max_fname-4), hdr_row2, sep="")
 
-if [ $# -eq 0 ]; then
-    files=rsl.out.0000
-else
-    files=$@
-fi
+  cpu_regex = r'Ntasks in X\s*(\d+)\s*,\s*ntasks in Y\s*(\d+)'
+  main_regex = r'\s*Timing for main: time [0-9_:-]+ on domain'
+  write_regex = r'Timing for Writing [a-zA-Z0-9_:-]+ for domain'
+  secs_regex = r'\s*\d+:\s*(\d+\.\d+)\s*elapsed seconds'
 
-if [ ${width} -lt ${min_width} ]; then
-    width=${min_width}
-fi
+  for fname in files:
+    with open(fname, 'r') as f:
+      txt = f.read()
+      cpu_match = re.search(cpu_regex, txt)
+      X, Y = int(cpu_match.group(1)), int(cpu_match.group(2))
 
-max_flen=4
-for out in $files; do
-    out_len=$(echo "$out" | wc -m)
-    max_flen=$(( $max_flen > $out_len ? $max_flen : $out_len ))
-done
+      write = [float(t) for t in re.findall(write_regex+secs_regex, txt)]
 
-printf "| %*s | Comp: Total(s) | Steps |   Avg.(s/step) |  I/O: Total(s) |   Avg.(s/step) |   X |   Y |  CPUs |\n" $max_flen "File"
-printf "| %*s +                +       +                +                +                +     +     +       |\n" $max_flen " "|
-    tr " " "-"
+      init = []; comp = []
+      for m in re.finditer(r'('+main_regex+secs_regex+r')+', txt):
+        secs = [float(t) for t in re.findall(main_regex+secs_regex, m.group())]
+        init += [secs[0]]
+        comp += secs[1:]
 
-for out in $files; do
-    if [ ! -f $out ]; then
-        >&2 echo "$out is not a file"
-        continue
-    fi
+      print(row_fmt.format(
+        fname, len(comp), sum(comp), sum(comp)/len(comp), sum(init), sum
+        (init)/len(init), sum(write), sum(write)/len(write), X, Y))
 
-    offset=
-	  if [ -n "${filter}" ]; then
-		    offset=$( grep -A3 Writing $out 2>/dev/null | fgrep "Timing for main:" |
-                      awk 'BEGIN{i=0;t=0}{i=i+1;t=t+$9}END{printf("-v io=%d -v to=%f",i,t)}' )
-	  fi
 
-    printf "| %*s |" $max_flen "$out"
-    grep "Timing for main:.*domain  *1" $out 2>/dev/null | tail -n +$filter |
-			  awk ${offset} 'BEGIN{t=0;i=0;}{t=t+$9;i=i+1}END{t=t-to;i=i-io;\
-        if (i>0) {at=t/i;printf(" %14.6f | %5i | %14.8f |",t,i,at)}\
-				   else {printf("             -- |    -- |             -- |")}}'
-		grep Writing $out 2>/dev/null |
-			  awk 'BEGIN{t=0;i=0;}{t=t+$8;i=i+1;}\
-			END{if (i>0) {printf(" %14.6f | %14.8f |",t,t/i)}\
-				else {printf("             -- |             -- |")}}'
-		grep Ntasks $out 2>/dev/null | sed -e"s/,/ /g" |
-			  awk '{x=$4;y=$8;}END{if (NR>0) {printf(" %3i | %3i | %5i |\n",x,y,x*y)}\
-				else {printf("  -- |  -- |    -- |\n")}}'
+if __name__ == '__main__':
+  parser = argparse.ArgumentParser(
+    description="Analyzes timing output info for WRF runs. If no rsl output "
+    "files are specified then look for rsl.out.0000 in current directory")
+  parser.add_argument("files", nargs="*", help= "rsl.out.0000 file")
+  main(vars(parser.parse_args()))
 
-done
