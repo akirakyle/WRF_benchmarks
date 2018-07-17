@@ -4,6 +4,8 @@ help() {
     echo ""
     echo "Usage: ${0##*/} [-h] -o OUT_DIR -r RUN_DIR1 RUN_DIR2 ..."
     echo "Copies rsl outfiles iff they report a successful run."
+    echo "WARNING! this will overwrite results in OUT_DIR and ARCHIVE_DIR that have the same name as results in RUN_DIR!"
+    echo "I recommend passing non-existent directories for OUT_DIR and ARCHIVE_DIR and this script will create them and nothing will be overwritten. Then use mv -n to move results and archive to correct directories without moving anything that would cause something to be overwritten"
     echo ""
     echo "OPTIONS:"
     echo "    -a, --archive ARCHIVE_DIR    Move successfully completed wrf runs to this directory."
