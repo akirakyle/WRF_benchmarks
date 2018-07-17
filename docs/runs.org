@@ -303,6 +303,8 @@
 | new_conus12km   | WRFV4.0   | intel18.0.1_opt66     | mpt2.18        | T1        |   8 | 00:30:00 |    |    |    |
 | new_conus12km   | WRFV4.0   | intel18.0.1_opt66     | mpt2.18        | T1        |  16 | 00:30:00 |    |    |    |
 | maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm     |   1 | 04:00:00 |    |    |    |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm     |   1 | 08:00:00 |    |    |    |
+| maria1km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm     |   4 | 06:00:00 |    |    |    |
 
 
 #+name: failed
@@ -313,17 +315,20 @@
 #+name: pending
 | Case           | WRF     | Compiler    | MPI     | T         | N |     Wall |  P |  M | O |
 |----------------+---------+-------------+---------+-----------+---+----------+----+----+---|
-| new_conus2.5km | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm     | 1 | 08:00:00 |    |    |   |
-| maria1km       | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm     | 4 | 06:00:00 |    |    |   |
 | maria3km       | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p18 | 1 | 05:00:00 | 18 | 18 |   |
 | maria3km       | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p09 | 1 | 06:00:00 |  9 |  9 |   |
 | maria3km       | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p04 | 1 | 09:00:00 |  4 |  4 |   |
 | maria3km       | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p02 | 1 | 10:00:00 |  2 |  2 |   |
 | maria3km       | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p01 | 1 | 12:00:00 |  1 |  1 |   |
+| new_conus2.5km | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p18 | 1 |  8:00:00 | 18 | 18 |   |
+| new_conus2.5km | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p09 | 1 |  9:00:00 |  9 |  9 |   |
+| new_conus2.5km | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p04 | 1 | 10:00:00 |  4 |  4 |   |
+| new_conus2.5km | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p02 | 1 | 11:00:00 |  2 |  2 |   |
+| new_conus2.5km | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p01 | 1 | 12:00:00 |  1 |  1 |   |
 
 #+name: run
-| Case     | WRF     | Compiler    | MPI     | T         | N |     Wall |  P |  M | O |
-|----------+---------+-------------+---------+-----------+---+----------+----+----+---|
+| Case           | WRF     | Compiler    | MPI     | T         | N |     Wall |  P |  M | O |
+|----------------+---------+-------------+---------+-----------+---+----------+----+----+---|
 
 #+header: :var RUN=run[6]
 #+begin_src bash :dir /ssh:cheyenne:~/ :results raw drawer
@@ -342,7 +347,7 @@ wrf_make_run \
 
 #+RESULTS:
 :RESULTS:
-/glade/u/home/akirak/scratch/run/maria3km-WRFV4.0-intel18.0.1-mpt2.18-T1_hm_p01-N001/wrf_job.pbs
+/glade/u/home/akirak/scratch/run/new_conus2.5km-WRFV4.0-intel18.0.1-mpt2.18-T1_hm_p01-N001/wrf_job.pbs
 :END:
 
 

@@ -1,7 +1,7 @@
 # -*- org-html-htmlize-output-type: css; -*-
 #+title: Weather Research and Forecast (WRF) Scaling, Performance Assessment and Optimization
 # #+subtitle: Comparison of Compilers and MPI Libraries on Cheyenne \vspace{-.2cm}
-# #+subtitle: NCAR SIParCS Program
+#+subtitle: NCAR SIParCS Program
 #+date: August 3, 2018
 #+author: Akira Kyle
 #+email: akyle@cmu.edu
@@ -78,14 +78,14 @@ from tens of meters to thousands of kilometers, including the following."
   - 3km and 1km vertical and horizontal resolution respectively
   - TROPICAL Physics suite with ~cu_physics~ disabled and ~sf_sfclay_physics = 1~
 
-| case           | e_we | e_sn | total gridpoints | timestep | run hours |
-|----------------+------+------+------------------+----------+-----------|
-| conus12km      |  425 |  300 | 127,500          |       72 |         3 |
-| conus2.5km     | 1901 | 1301 | 2,473,201        |       15 |         6 |
-| new_conus12km  |  425 |  300 | 127,500          |       72 |         6 |
-| new_conus2.5km | 1901 | 1301 | 2,473,201        |       15 |         6 |
-| maria1km       | 3665 | 2894 | 10,606,510       |        3 |         1 |
-| maria3km       | 1396 | 1384 | 1,932,064        |        9 |         3 |
+| case             | e_we | e_sn | total gridpoints | timestep | run hours |
+|------------------+------+------+------------------+----------+-----------|
+| ~conus12km~      |  425 |  300 | 127,500          |       72 |         3 |
+| ~conus2.5km~     | 1901 | 1301 | 2,473,201        |       15 |         6 |
+| ~new_conus12km~  |  425 |  300 | 127,500          |       72 |         6 |
+| ~new_conus2.5km~ | 1901 | 1301 | 2,473,201        |       15 |         6 |
+| ~maria1km~       | 3665 | 2894 | 10,606,510       |        3 |         1 |
+| ~maria3km~       | 1396 | 1384 | 1,932,064        |        9 |         3 |
 
 ** Compilers and MPI Libraries
 - GNU Compiler Collection (GCC) versions 6.3.0, 8.1.0
@@ -100,7 +100,7 @@ from tens of meters to thousands of kilometers, including the following."
 - Intel MPI version 2018.1.163
 - MPICH version 3.2
 
-* Observations:
+* Observations
 ** Compilation issue with gnu > 6.3.0 and WRF < V4.0
  This likely require a source patch to fix, not an environment or compiler issue
 #+begin_example
@@ -147,13 +147,13 @@ http://www2.mmm.ucar.edu/wrf/users/wrfv4.0/updates-4.0.html:
   the patch size < 10 grid cells in either direction, the model will stop."
 #+end_note
 
-** Likely not enough memory for small node count on large cases
+** Not enough memory for small node count on large cases
 When run on cheyenne's 64 GB memory nodes
 (https://www2.cisl.ucar.edu/resources/computational-systems/cheyenne), WRFV4.0
 usually see jobs SIGKILLed at various points during startup for
-- new_conus2.5 on <= 2 nodes
-- maria3km on 1 node
-- maria1km on <= 8 nodes
+- ~new_conus2.5~ on <= 2 nodes
+- ~maria3km~ on 1 node
+- ~maria1km~ on <= 8 nodes
 
 ** Intel takes ~2x as long to compile wrf then gnu
 ** WRF compilation option 66/67
@@ -208,7 +208,7 @@ def plot_scaling(cases, labels, title, shifts=None):
         for trial in case[4].split(','):
             run = getFromDict(data, case[:4]+[trial]+case[5:])
             secs += [d[2] for _,d in run.items()]
-            cpus += [d[7] for _,d in run.items()]
+            cpus += [d[7]*d[8] for _,d in run.items()]
         secs = np.array(secs); cpus = np.array(cpus)
         p = secs.argsort()
         plt.loglog(gridpoints/(cpus[p]*shift), 1/secs[p], '+--', label=label[0])
@@ -252,8 +252,6 @@ tree = lambda: defaultdict(tree)
 data = tree()
 for run in raw_data:
     keys = run[0].split('-')
-    keys[0] = keys[0][2:]
-    keys[-1] = int(keys[-1][1:-4])
     d = getFromDict(data,keys[:-1])
     d[keys[-1]] = run[1:]
 
@@ -482,7 +480,7 @@ plot_scaling(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[61]:
+# Out[5]:
 [[file:./imgs/new_conus2-5km.svg]]
 :END:
 
@@ -521,12 +519,12 @@ plot_scaling(cases, labels, title)
 
 ** Cases table :noexport:
 #+name: cases-cases
-| case           | WRF version | compiler    | mpi     | trial                                 |
-|----------------+-------------+-------------+---------+---------------------------------------|
-| new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18 | T1,T1_p18,T1_p09,T1_p04,T1_p02,T1_p01 |
-| new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18 | T1,T1_hm                              |
-| maria3km       | WRFV4.0     | intel18.0.1 | mpt2.18 | T1,T1_hm                              |
-| maria1km       | WRFV4.0     | intel18.0.1 | mpt2.18 | T1                                    |
+| case           | WRF version | compiler    | mpi     | trial                                                      |
+|----------------+-------------+-------------+---------+------------------------------------------------------------|
+| new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18 | T1,T1_p18,T1_p09,T1_p04,T1_p02,T1_p01                      |
+| new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18 | T1,T1_hm,T1_hm_p18,T1_hm_p09                               |
+| maria3km       | WRFV4.0     | intel18.0.1 | mpt2.18 | T1,T1_hm,T1_hm_p18,T1_hm_p09,T1_hm_p04,T1_hm_p02,T1_hm_p01 |
+| maria1km       | WRFV4.0     | intel18.0.1 | mpt2.18 | T1,T1_hm                                                   |
 
 #+name: cases-labels
 | label          |
@@ -538,7 +536,7 @@ plot_scaling(cases, labels, title)
 
 ** Cases
 #+header: :var cases=cases-cases labels=cases-labels
-#+header: :var title="Scaling results for WRFV4.0/gnu8.1.0/mvapich2.2"
+#+header: :var title=""
 #+begin_src ipython :session :ipyfile ./imgs/cases.svg
 plot_scaling(cases, labels, title)
 #+end_src
@@ -546,7 +544,7 @@ plot_scaling(cases, labels, title)
 #+attr_latex: :width 1.0\linewidth
 #+RESULTS:
 :RESULTS:
-# Out[93]:
+# Out[24]:
 [[file:./imgs/cases.svg]]
 :END:
 
@@ -875,7 +873,7 @@ plot_bar(cases, 8, labels, title)
 [[file:./imgs/hybrid_bar_large.svg]]
 :END:
 
-* WRF scaling and timing on Cheyenne[fn:: [[https://www2.cisl.ucar.edu/software/community-models/wrf-scaling-and-timing][A similar study for Yellowstone]]]
+* WRF scaling and timing on Cheyenne[fn:: [[https://www2.cisl.ucar.edu/software/community-models/wrf-scaling-and-timing][On Yellowstone]]]
 - "Is it possible to solve a problem with such-and-such resolution in a timely
   manner?"
 - "If I use more cores I will have the results more quickly, but with this
@@ -890,18 +888,27 @@ time-to-solution and in terms of your allocation.
 
 --------------------------------------------------------------------------------
 
-** Scaling Results
+** TODO Scaling Results
 
 Figure [[wrf_scaling]] shows scaling results from Hurricane Maria simulations at 3km
-and 1km resolutions along with CONUS simulations at 12km and 2.5km resolutions.
-When expressed this way, all the cases scale similarly. Note that both axes are
-logarithmic, so a small distance between points corresponds to a large
-difference in values.
+and 1km resolutions along with CONUS simulations at 12km and 2.5km resolutions
+all run using WRFV4.0. When expressed this way, all the cases scale similarly.
+Note that both axes are logarithmic, so a small distance between points
+corresponds to a large difference in values.
 
 #+name: wrf_scaling
 #+caption: WRF scaling
 [[file:./imgs/cases.svg]]
 
+
+
+
+Beginning in WRFV4.0, the minimum patch size is 10 grid cells in either
+direction. This limits you to using at least 100 gridpoints/core. Thus WRF will
+prevent you from running on very large relative core counts where
+initialization, I/O, and communication dominate.
+
+*** old text
 As you can see, there are three regimes:
 
 - large number of grid points per core - *Total grid points / core > 10^5*
@@ -920,6 +927,7 @@ which may be larger for larger jobs.
 For an intermediate number of cores, WRF scaling increasingly departs from
 linear strong scaling. Running the same simulation on larger core counts will
 require more core-hours even though it will still run faster (again, ignoring
+
 time spent in initialization, I/O, and wait in queue).
 
 We do not recommend running WRF on extremely large core counts, because in this
@@ -927,56 +935,121 @@ regime the speed benefits diminish, the time will be dominated by initialization
 and I/O (as well as wait in queue), and there will be larger core-hours charges
 for solving the same problem.
 
-** Run time code :noexport:
-#+begin_src ipython :session
-def plot_maria1km_time():
-    maria_case = ['maria1km', 'WRFV4.0', 'intel18.0.1', 'mpt2.18',  1 ]
-    runs = getFromDict(data, maria_case)
-    cpus = np.array([d[7] for _,d in runs.items() if d[0] != '--'])
-    comp = np.array([d[0] for _,d in runs.items() if d[0] != '--'])
-    io = np.array([d[3] for _,d in runs.items() if d[0] != '--'])
-    gridpoints = e_we[case[0]] * e_sn[case[0]]
-    plt.plot(cpus, comp, 'o', label='computation')
-    plt.plot(cpus, io, '+', label='io time')
-    plt.xlabel("cores")
-    plt.ylabel("wall clock time (seconds)")
-    plt.legend(loc='best')
-    #plt.title(title)
-    #plt.axis('scaled')
-    plt.grid(False)
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-# Out[25]:
-:END:
-
-** Run time results
+** TODO Run time results
 
 Figure [[wrf_runtime]] below shows the total run time for WRF jobs using increasing
 numbers of cores. Initialization time, computation time, and writing time also
-are shown for runs using up to 8,192 cores. 
+are shown for runs using up to 9,216 cores.
 
 These results are based on simulations of Hurricane Maria (2017) at 1km
 resolution.
 
-As illustrated, initialization and writing output times may be more expensive
-than computing time for larger core counts. Times shown are for a and single
-output file of the Maria 1km case, which used a domain of about 372 million grid
-points. If you have more restarts and output files, your numbers will be
-different but the trend will be similar.
+As illustrated, initialization and writing output times remain relatively fixed,
+but increasing slightly as you move to larger core counts. Times shown are for a
+and single output file of the Maria 1km case, which used a domain of about 372
+million grid points. If you have more restarts and output files, your numbers
+will be different but the trend will be similar.
 
 #+begin_src ipython :session :ipyfile ./imgs/maria1km_runtime.svg
-plot_maria1km_time()
+maria_case = ['maria1km', 'WRFV4.0', 'intel18.0.1', 'mpt2.18',  'T1' ]
+runs = getFromDict(data, maria_case)
+cpus = np.array([d[7]*d[8] for _,d in runs.items()])
+comp = np.array([d[1] for _,d in runs.items()])/60.0
+init = np.array([d[3] for _,d in runs.items()])/60.0
+write = np.array([d[5] for _,d in runs.items()])/60.0
+tot = comp+init+write
+gridpoints = e_we[case[0]] * e_sn[case[0]]
+plt.figure(figsize=(5,5))
+plt.plot(cpus, tot, 'bo', label='total')
+plt.plot(cpus, init, 'rs', label='initialization')
+plt.plot(cpus, comp, 'gv', label='computing')
+plt.plot(cpus, write, 'b+', label='writing output')
+plt.xlabel("cores")
+plt.ylabel("wall clock time (minutes)")
+plt.legend(loc='best')
+# plt.title("Run time results")
+# plt.axis('equal')
+# plt.axes().set_aspect('equal', 'datalim')
+plt.grid(False)
 #+end_src
 
 #+name: wrf_runtime
 #+caption: WRF Run Timing
 #+RESULTS:
 :RESULTS:
-# Out[26]:
+# Out[19]:
 [[file:./imgs/maria1km_runtime.svg]]
 :END:
+
+* TODO Optimizing WRF performance[fn:: [[https://www2.cisl.ucar.edu/software/community-models/optimizing-wrf-performance][On Yellowstone]]]
+
+These recommendations for optimizing the performance of the Weather Research and
+Forecasting (WRF) modeling system are based on the results of numerous jobs run
+on the Cheyenne system by the CISL Consulting Services Group. The jobs
+included small runs and others, with different domain sizes and time steps.
+
+--------------------------------------------------------------------------------
+
+** Compiling and linking
+
+We recommend using the default *Intel compiler*. In our runs, the Intel compiler
+consistently outperformed the GNU compiler by ~1.5x.
+
+and the compiler's default
+settings as contained in the script for creating the *configure.wrf* file.
+
+The best results were achieved with a *Distributed-Memory Parallelism (DMPar)*
+build, which enables MPI. Depending on the individual case, advanced WRF users
+may find some improvement in performance with a hybrid build, using both DMPar
+and SMPar.
+
+We do not recommend SMPar alone or serial WRF builds.
+
+--------------------------------------------------------------------------------
+
+** TODO Runtime options
+
+We recommend using the following when running WRF jobs:
+
+1. Hyper-threading
+2. Processor binding
+
+Hyper-threading improved computing performance by 8% in a test MPI case using
+256 Yellowstone nodes. In other cases, hyper-threading had negligible impact.
+
+Tests of hybrid MPI/OpenMP jobs, both with and without hyper-threading, showed
+that hybrid parallelism can provide marginally higher performance than pure MPI
+parallelism, but run-to-run variability was high.
+
+Processor binding was enabled by default when running MPI jobs on Yellowstone.
+We used the default binding settings in test runs.
+
+--------------------------------------------------------------------------------
+
+**  Scaling and core count
+
+WRF is a highly scalable model, demonstrating both weak and strong scaling,
+within limits defined by the problem size. We do not recommend running WRF on
+extremely large core counts (relative to the number of grid points in the
+domain). This is because there will be increasingly less speed benefit as
+communication costs exceed the computational work per core. Extremely large core
+counts for WRF are defined as those for which *cores > total grid points/10^4*.
+
+*Weak scaling*: When increasing both problem size and core count, the time to
+solution remains constant provided that the core count is small enough that the
+time spent in I/O and initialization remains negligible. When you increase the
+size of the WRF domain, you can usually increase the core count to keep a
+constant time to solution—provided that the time spent in I/O and initialization
+remains negligible. You will need to run some tests with your own settings
+(especially input files and I/O frequency and format) to determine the upper
+limit for your core count.
+
+*Strong scaling*: When running WRF on relatively small numbers of cores (*namely
+cores < total grid points/10^5*), the time to solution decreases in inverse
+proportion to increases in core count if the problem size is unchanged. In such
+a strong scaling regime, increasing only the core count has no performance
+downside. We recommend making some runs to confirm that you are using the
+optimal core count for your problem size.
 
 * Summary
 ** Conclusions

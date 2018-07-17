@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2018-07-16 Mon 12:48 -->
+<!-- 2018-07-17 Tue 11:05 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Weather Research and Forecast (WRF) Scaling, Performance Assessment and Optimization</title>
@@ -243,18 +243,18 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org88067d0">Benchmarks for WRF</a>
+<li><a href="#orgd7e81b5">Benchmarks for WRF</a>
 <ul>
-<li><a href="#org1c50173">git directories</a></li>
-<li><a href="#orgc1abf00">Example of how to run the <code>new_conus12km</code> benchmark case</a></li>
-<li><a href="#org51b7d3d">Data for the various benchmark cases</a>
+<li><a href="#org39322a1">git directories</a></li>
+<li><a href="#org09b3b86">Example of how to run the <code>new_conus12km</code> benchmark case</a></li>
+<li><a href="#org304d8fa">Data for the various benchmark cases</a>
 <ul>
-<li><a href="#orgf62aeb9"><code>katrina</code> (1km, 3km, 30km)</a></li>
-<li><a href="#orgb83fcbb"><code>conus12km</code> and <code>conus2.5km</code></a></li>
-<li><a href="#orgfde742b"><code>maria1km</code>, <code>maria3km</code>, and <code>new_conus12km</code> and <code>new_conus2.5km</code></a></li>
+<li><a href="#orge0e90ab"><code>katrina</code> (1km, 3km, 30km)</a></li>
+<li><a href="#org93a11af"><code>conus12km</code> and <code>conus2.5km</code></a></li>
+<li><a href="#orgeb49deb"><code>maria1km</code>, <code>maria3km</code>, and <code>new_conus12km</code> and <code>new_conus2.5km</code></a></li>
 </ul>
 </li>
-<li><a href="#orgf09e17a">Examples of pbs job scripts for cheyenne</a></li>
+<li><a href="#orgc99198d">Examples of pbs job scripts for cheyenne</a></li>
 </ul>
 </li>
 </ul>
@@ -267,9 +267,9 @@ This is still very much a work in progress!
 
 </div>
 
-<div id="outline-container-org88067d0" class="outline-2">
-<h2 id="org88067d0">Benchmarks for WRF</h2>
-<div class="outline-text-2" id="text-org88067d0">
+<div id="outline-container-orgd7e81b5" class="outline-2">
+<h2 id="orgd7e81b5">Benchmarks for WRF</h2>
+<div class="outline-text-2" id="text-orgd7e81b5">
 <p>
 This repo contains the benchmark cases and scripts used for assessing the
 scaling performance of WRF on NCAR&rsquo;s Cheyenne Supercomputer.
@@ -280,9 +280,9 @@ scaling performance of WRF on NCAR&rsquo;s Cheyenne Supercomputer.
 </p>
 </div>
 
-<div id="outline-container-org1c50173" class="outline-3">
-<h3 id="org1c50173">git directories</h3>
-<div class="outline-text-3" id="text-org1c50173">
+<div id="outline-container-org39322a1" class="outline-3">
+<h3 id="org39322a1">git directories</h3>
+<div class="outline-text-3" id="text-org39322a1">
 <ul class="org-ul">
 <li><code>cases/</code> contains the namelists for WPS and WRF for the various benchmark
 cases along with scripts for generating the <code>wrfbdy</code> and <code>wrfinput</code> files for
@@ -301,9 +301,9 @@ and associated analysis and plotting code used to generate the results.</li>
 </div>
 </div>
 
-<div id="outline-container-orgc1abf00" class="outline-3">
-<h3 id="orgc1abf00">Example of how to run the <code>new_conus12km</code> benchmark case</h3>
-<div class="outline-text-3" id="text-orgc1abf00">
+<div id="outline-container-org09b3b86" class="outline-3">
+<h3 id="org09b3b86">Example of how to run the <code>new_conus12km</code> benchmark case</h3>
+<div class="outline-text-3" id="text-org09b3b86">
 <p>
 As always, change the example paths to your directory structure. All the scripts
 in the <code>srcipts/</code> directory do not hardcode paths (except <code>wrf_run_pbs_job</code> has
@@ -346,13 +346,13 @@ wrf_stats *
 </div>
 </div>
 
-<div id="outline-container-org51b7d3d" class="outline-3">
-<h3 id="org51b7d3d">Data for the various benchmark cases</h3>
-<div class="outline-text-3" id="text-org51b7d3d">
+<div id="outline-container-org304d8fa" class="outline-3">
+<h3 id="org304d8fa">Data for the various benchmark cases</h3>
+<div class="outline-text-3" id="text-org304d8fa">
 </div>
-<div id="outline-container-orgf62aeb9" class="outline-4">
-<h4 id="orgf62aeb9"><code>katrina</code> (1km, 3km, 30km)</h4>
-<div class="outline-text-4" id="text-orgf62aeb9">
+<div id="outline-container-orge0e90ab" class="outline-4">
+<h4 id="orge0e90ab"><code>katrina</code> (1km, 3km, 30km)</h4>
+<div class="outline-text-4" id="text-orge0e90ab">
 <p>
 Data for running the Hurricane Katrina cases can be downloaded from the WRF
 tutorial page
@@ -376,9 +376,9 @@ these cases
 </div>
 </div>
 
-<div id="outline-container-orgb83fcbb" class="outline-4">
-<h4 id="orgb83fcbb"><code>conus12km</code> and <code>conus2.5km</code></h4>
-<div class="outline-text-4" id="text-orgb83fcbb">
+<div id="outline-container-org93a11af" class="outline-4">
+<h4 id="org93a11af"><code>conus12km</code> and <code>conus2.5km</code></h4>
+<div class="outline-text-4" id="text-org93a11af">
 <p>
 The <code>wrfbdy_d01</code> and <code>wrfrst_d01</code> files for the official CONUS benchmarks at
 12km and 2.5km resolution can be found at:
@@ -387,9 +387,9 @@ The <code>wrfbdy_d01</code> and <code>wrfrst_d01</code> files for the official C
 </div>
 </div>
 
-<div id="outline-container-orgfde742b" class="outline-4">
-<h4 id="orgfde742b"><code>maria1km</code>, <code>maria3km</code>, and <code>new_conus12km</code> and <code>new_conus2.5km</code></h4>
-<div class="outline-text-4" id="text-orgfde742b">
+<div id="outline-container-orgeb49deb" class="outline-4">
+<h4 id="orgeb49deb"><code>maria1km</code>, <code>maria3km</code>, and <code>new_conus12km</code> and <code>new_conus2.5km</code></h4>
+<div class="outline-text-4" id="text-orgeb49deb">
 <p>
 The data for these Hurricane Maria cases and CONUS cases comes from the NCEP GFS
 Model Runs which can be downloaded form <a href="https://rda.ucar.edu/datasets/ds084.1/">https://rda.ucar.edu/datasets/ds084.1/</a>.
@@ -405,9 +405,9 @@ these cases
 </div>
 </div>
 
-<div id="outline-container-orgf09e17a" class="outline-3">
-<h3 id="orgf09e17a">Examples of pbs job scripts for cheyenne</h3>
-<div class="outline-text-3" id="text-orgf09e17a">
+<div id="outline-container-orgc99198d" class="outline-3">
+<h3 id="orgc99198d">Examples of pbs job scripts for cheyenne</h3>
+<div class="outline-text-3" id="text-orgc99198d">
 <div class="org-src-container">
 <pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">!/bin/</span><span class="org-keyword">bash</span>
 <span class="org-comment-delimiter">### </span><span class="org-comment">Job Name</span>
@@ -475,7 +475,7 @@ mpirun_rsh -hostfile $<span class="org-variable-name">PBS_NODEFILE</span> -n <sp
 <div id="postamble" class="status">
 <p class="author">Author: Akira Kyle</p>
 <p class="email">Email: <a href="mailto:akyle@cmu.edu">akyle@cmu.edu</a></p>
-<p class="date">Created: 2018-07-16 Mon 12:48</p>
+<p class="date">Created: 2018-07-17 Tue 11:05</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
