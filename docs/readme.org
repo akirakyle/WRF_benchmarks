@@ -11,13 +11,15 @@
 This is still very much a work in progress!
 #+end_warning
 
-* Benchmarks for WRF
 This repo contains the benchmark cases and scripts used for assessing the
 scaling performance of WRF on NCAR's Cheyenne Supercomputer.
 
 [[file:results.html][The results of this study can be found here.]]
 
-** git directories
+* git directories
+  :PROPERTIES:
+  :CUSTOM_ID: git_directories
+  :END:
 - ~cases/~ contains the namelists for WPS and WRF for the various benchmark
   cases along with scripts for generating the ~wrfbdy~ and ~wrfinput~ files for
   each case.
@@ -32,7 +34,10 @@ scaling performance of WRF on NCAR's Cheyenne Supercomputer.
 - ~docs/~ contains this documentation along with the timing and scaling results
   and associated analysis and plotting code used to generate the results.
 
-** Example of how to run the ~new_conus12km~ benchmark case
+* Example of how to run the ~new_conus12km~ benchmark case
+  :PROPERTIES:
+  :CUSTOM_ID: how_to_run_example
+  :END:
 As always, change the example paths to your directory structure. All the scripts
 in the ~srcipts/~ directory do not hardcode paths (except ~wrf_run_pbs_job~ has
 a default run directory) but the scripts in the ~cases/~ directory do hardcode
@@ -68,8 +73,14 @@ cd ~/results
 wrf_stats *
 #+end_src
 
-** Data for the various benchmark cases
-*** ~katrina~ (1km, 3km, 30km)
+* Data for the various benchmark cases
+  :PROPERTIES:
+  :CUSTOM_ID: benchmark_data
+  :END:
+** ~katrina~ (1km, 3km, 30km)
+   :PROPERTIES:
+   :CUSTOM_ID: katrina
+   :END:
 Data for running the Hurricane Katrina cases can be downloaded from the WRF
 tutorial page
 
@@ -84,12 +95,18 @@ The 30km case is the same namelist as shown in the WRF-ARW tutorial at
 WPS and ~real.exe~ must be run to generate ~wrfbdy_d01~ and ~wrfrst_d01~ for
 these cases
 
-*** ~conus12km~ and ~conus2.5km~
+** ~conus12km~ and ~conus2.5km~
+   :PROPERTIES:
+   :CUSTOM_ID: conus
+   :END:
 The ~wrfbdy_d01~ and ~wrfrst_d01~ files for the official CONUS benchmarks at
 12km and 2.5km resolution can be found at:
 [[http://www2.mmm.ucar.edu/wrf/WG2/benchv3/]]
 
-*** ~maria1km~, ~maria3km~, and ~new_conus12km~ and ~new_conus2.5km~
+** ~maria1km~, ~maria3km~, and ~new_conus12km~ and ~new_conus2.5km~
+   :PROPERTIES:
+   :CUSTOM_ID: maria_and_new_conus
+   :END:
 The data for these Hurricane Maria cases and CONUS cases comes from the NCEP GFS
 Model Runs which can be downloaded form [[https://rda.ucar.edu/datasets/ds084.1/]].
 However this data already resides on glade, so the WPS scripts just link in the
@@ -98,7 +115,10 @@ appropriate glade directories.
 WPS and ~real.exe~ must be run to generate ~wrfbdy_d01~ and ~wrfrst_d01~ for
 these cases
 
-** Examples of pbs job scripts for cheyenne
+* Examples of pbs job scripts for cheyenne
+  :PROPERTIES:
+  :CUSTOM_ID: example_cheyenne_job_scripts
+  :END:
 #+begin_src sh
 #!/bin/bash
 ### Job Name
@@ -144,5 +164,5 @@ perf-report -mpi -n 72 ./wrf.exe
 To use ~mvapich~ instead of ~mpt~
 #+begin_src sh
 module load mvapich2
-mpirun_rsh -hostfile $PBS_NODEFILE -n 72 ./wrf.exe
+mpirun -n 72 ./wrf.exe
 #+end_src

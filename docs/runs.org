@@ -305,12 +305,16 @@
 | maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm     |   1 | 04:00:00 |    |    |    |
 | new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm     |   1 | 08:00:00 |    |    |    |
 | maria1km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm     |   4 | 06:00:00 |    |    |    |
+| maria1km        | WRFV4.0.p | intel18.0.1           | mpt2.18        | T1        | 512 | 00:40:00 |    |    |    |
 
 
 #+name: failed
-| Case          | WRF     | Compiler        | MPI        | T  | N |     Wall | P | M | O |
-|---------------+---------+-----------------+------------+----+---+----------+---+---+---|
-| new_conus12km | WRFV4.0 | intel18.0.1_dbg | mvapich2.2 | T1 | 2 | 00:30:00 |   |   |   |
+| Case          | WRF       | Compiler        | MPI        | T     |   N |     Wall | P | M | O |
+|---------------+-----------+-----------------+------------+-------+-----+----------+---+---+---|
+| new_conus12km | WRFV4.0   | intel18.0.1     | mpt2.18    | T1    |   2 | 00:30:00 |   |   |   |
+| new_conus12km | WRFV4.0   | intel18.0.1_dbg | mvapich2.2 | T1    |   2 | 00:30:00 |   |   |   |
+| maria1km-test | WRFV4.0.p | intel18.0.1     | mpt2.18    | T1    | 512 | 00:10:00 |   |   |   |
+| new_conus12km | WRFV4.0   | intel18.0.1     | mvapich2.2 | T1_hm |   2 | 00:30:00 |   |   |   |
 
 #+name: pending
 | Case           | WRF     | Compiler    | MPI     | T         | N |     Wall |  P |  M | O |
@@ -326,11 +330,14 @@
 | new_conus2.5km | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p02 | 1 | 11:00:00 |  2 |  2 |   |
 | new_conus2.5km | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p01 | 1 | 12:00:00 |  1 |  1 |   |
 
-#+name: run
-| Case           | WRF     | Compiler    | MPI     | T         | N |     Wall |  P |  M | O |
-|----------------+---------+-------------+---------+-----------+---+----------+----+----+---|
 
-#+header: :var RUN=run[6]
+
+#+name: run
+| Case     | WRF       | Compiler    | MPI     | T  |    N |     Wall | P | M | O |
+|----------+-----------+-------------+---------+----+------+----------+---+---+---|
+| maria1km | WRFV4.0.p | intel18.0.1 | mpt2.18 | T1 | 1024 | 00:40:00 |   |   |   |
+
+#+header: :var RUN=run[2]
 #+begin_src bash :dir /ssh:cheyenne:~/ :results raw drawer
 wrf_make_run \
     -c ~/WRF_benchmarks/cases/${RUN[0]} \
@@ -338,16 +345,18 @@ wrf_make_run \
     -t ${RUN[4]} \
     -n ${RUN[5]} \
     -a ${RUN[6]} \
-    -p ${RUN[7]} \
-    -m ${RUN[8]} \
-    -e 109GB
+    -q economy
+#    -e 109GB
+#    -p ${RUN[7]} \
+#    -m ${RUN[8]} \
+#    -e 109GB
 #    -o ${RUN[9]} \
 #    -q share \
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-/glade/u/home/akirak/scratch/run/new_conus2.5km-WRFV4.0-intel18.0.1-mpt2.18-T1_hm_p01-N001/wrf_job.pbs
+/glade/u/home/akirak/scratch/run/maria1km-WRFV4.0.p-intel18.0.1-mpt2.18-T1-N1024/wrf_job.pbs
 :END:
 
 
