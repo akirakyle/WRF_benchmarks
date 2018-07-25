@@ -13,6 +13,7 @@ help() {
     echo "    -c, --compile NUM                   Select NUM option from the WRF ./configure compiler options list. Note this number is dependent on the WRF version."
     echo "    -n, --nest NUM                      Select NUM option for nesting from the ./configure nesting options list. Note this number is dependent on the WRF version"
     echo "    -w, --configure CONFIGURE.WRF       Instead of specifying -c and -n, pass the path to a configure.wrf file and skip the ./configure step."
+    echo "    -a, --patch PATCH_FILE              Apply a patch file before compiling (uses -p0)."
     echo "    -p, --mpiexec MPIEXEC_CMD           Command to launch an executable using mpi on nodes."
     echo "    -j, --tasks NUM                     Parallel compilation using NUM tasks (default 2)."
     echo "    -m, --modules MODULE1 MODULE2 ...   List of modules to be loaded into the environment for compilation and execution. Note: the order of matters here, prereqs must be loaded first."
@@ -40,6 +41,9 @@ do
             ;;
         -w|--configure)
             configure_wrf=$2
+            ;;
+        -a|--patch)
+            patch_file=$2
             ;;
         -j|--tasks)
             n_tasks=$2
@@ -85,6 +89,9 @@ gunzip *
 wrf_tar=$(ls)
 tar -xf $wrf_tar
 rm $wrf_tar
+if [ ! -z "$patch_file" ]; then
+    patch -p0 < $patch_file
+fi
 wrf_untar_name=$(ls)
 mv $wrf_untar_name/* .
 rm -r $wrf_untar_name

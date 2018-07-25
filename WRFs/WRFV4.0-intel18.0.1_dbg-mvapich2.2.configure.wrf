@@ -159,7 +159,7 @@ LD              =       $(FC)
 RWORDSIZE       =       $(NATIVE_RWORDSIZE)
 PROMOTION       =       -real-size `expr 8 \* $(RWORDSIZE)` -i4
 ARCH_LOCAL      =       -DNONSTANDARD_SYSTEM_FUNC  -DWRF_USE_CLM $(NETCDF4_IO_OPTS)
-CFLAGS_LOCAL    =       -w -O3 -ip #-xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -no-multibyte-chars
+CFLAGS_LOCAL    =       -g -w -O3 -ip #-xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -no-multibyte-chars
 LDFLAGS_LOCAL   =       -ip #-xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -align all -fno-alias -fno-common
 CPLUSPLUSLIB    =       
 ESMF_LDFLAG     =       $(CPLUSPLUSLIB)

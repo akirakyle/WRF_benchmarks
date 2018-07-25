@@ -1,5 +1,7 @@
 #!/bin/sh
 
+RSL_NAME=rsl.out.0000
+
 help() {
     echo ""
     echo "Usage: ${0##*/} [-h] -o OUT_DIR -r RUN_DIR1 RUN_DIR2 ..."
@@ -10,6 +12,7 @@ help() {
     echo "OPTIONS:"
     echo "    -a, --archive ARCHIVE_DIR    Move successfully completed wrf runs to this directory."
     echo "    -o, --outdir OUT_DIR         Directory in which to put summary files."
+    echo "    -n, --rslname RSL_NAME       Name of rsl output file [default: $RSL_NAME]."
     echo "    -r, --rundirs RUN_DIR LIST   Directories of completed wrf_runs"
     echo "    -h, --help                   This help"
     echo ""
@@ -30,6 +33,10 @@ do
         -a|--archive)
             reading_list=none
             ARCHIVE_DIR=$2
+            shift ;;
+        -n|--rslname)
+            reading_list=none
+            RSL_NAME=$2
             shift ;;
         -h|--help)
             help ;;
@@ -58,9 +65,9 @@ mkdir -p $OUT_DIR
 for DIR in "${RUN_DIRS[@]}"
 do
     DIR_NAME=$(echo $DIR | sed 's/\//-/g')
-    grep -q -s "SUCCESS COMPLETE WRF" $DIR/rsl.out.0000
+    grep -q -s "SUCCESS COMPLETE WRF" $DIR/$RSL_NAME
     if [[ $? -eq 0 ]]; then
-        cp $DIR/rsl.out.0000 $OUT_DIR/$DIR_NAME.rsl
+        cp $DIR/$RSL_NAME $OUT_DIR/$DIR_NAME.rsl
         if [ ! -z $ARCHIVE_DIR ]; then
             mv $DIR $ARCHIVE_DIR/
         fi

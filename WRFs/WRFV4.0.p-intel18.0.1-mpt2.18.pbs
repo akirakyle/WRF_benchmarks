@@ -1,0 +1,23 @@
+#!/bin/bash
+#PBS -l walltime=02:00:00
+#PBS -q share
+#PBS -j oe
+#PBS -l select=1:ncpus=4
+
+export TMPDIR=/glade/scratch/$USER/temp
+mkdir -p $TMPDIR
+
+wrf_compile \
+    --source ~wrfhelp/SOURCE_CODE/WRFV4.0.TAR.gz \
+    --wrfdir ~/work/WRFs/WRFV4.0.p-intel18.0.1-mpt2.18 \
+    --tasks 4 \
+    --compile 15 \
+    --nest 1 \
+    --patch ~/WRF_benchmarks/WRFs/WRFV4.0-rsl-8digit.patch \
+    --mpiexec mpiexec_mpt \
+    --modules \
+    intel/18.0.1 \
+    mpt/2.18 \
+    netcdf/4.6.1 \
+    ncarcompilers/0.4.1 \
+    ncarenv/1.2
