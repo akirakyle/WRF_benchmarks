@@ -14,7 +14,7 @@
 # #+latex_header: \institute[shortinst]{\inst{1} Carnegie Mellon University \and \inst{2} National Center for Atmospheric Research \and \inst{3} University of Colorado Boulder}
 #+latex_header: \titlegraphic{\begin{picture}(0,0) \put(315,-150){\makebox(0,0)[rt]{\includegraphics[width=0.25\linewidth]{Updated-SIParCS-logo.png} \includegraphics[width=0.25\linewidth]{NSF_4-Color_vector_Logo.pdf}}} \end{picture}}
 #+latex_header: \institute[NCAR]{\inst{1} \includegraphics[width=0.4\linewidth]{CMU_Logo_Horiz_Red.pdf} \vspace{-.1cm} \and \inst{2} \includegraphics[width=0.34\linewidth]{ncar-logo2.pdf} \vspace{-.2cm} \and \inst{3} \includegraphics[width=0.46\linewidth]{boulder-one-line.png}}
-#+latex_header: \graphicspath{{./figs/}{./images/}{./obipy-resources/}}
+#+latex_header: \graphicspath{{./figs/}{./imgs/}{./obipy-resources/}}
 #+latex_class: beamer
 #+beamer_theme: metropolis
 # #+startup: beamer
@@ -402,14 +402,14 @@ data = {**data, **dixit_data}
    :END:
 #+header: :var cases=conus12km-cases labels=conus12km-labels
 #+header: :var title="Scaling results for CONUS 12km with WRFV3.8.1"
-#+begin_src ipython :session :ipyfile ./imgs/conus12km.svg
+#+begin_src ipython :session :ipyfile ./figs/conus12km.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[54]:
-[[file:./imgs/conus12km.svg]]
+[[file:./figs/conus12km.svg]]
 :END:
 
 ** NEW CONUS 12km WRFV3.8.1 :noexport:
@@ -435,14 +435,14 @@ plot_scaling(cases, labels, title)
    :END:
 #+header: :var cases=new_conus12km_3-cases labels=new_conus12km_3-labels
 #+header: :var title="Scaling results for NEW CONUS 12km with WRFV3.8.1"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_3.svg
+#+begin_src ipython :session :ipyfile ./figs/new_conus12km_3.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[57]:
-[[file:./imgs/new_conus12km_3.svg]]
+[[file:./figs/new_conus12km_3.svg]]
 :END:
 
 ** OLD CONUS 12km vs NEW CONUS 12km WRFV3.8.1 :noexport:
@@ -484,14 +484,14 @@ plot_scaling(cases, labels, title)
    :END:
 #+header: :var cases=old-vs-new-conus12km-cases labels=old-vs-new-conus12km-labels
 #+header: :var title="Scaling results for OLD CONUS 12km vs NEW CONUS 12km with WRFV3.8.1"
-#+begin_src ipython :session :ipyfile ./imgs/old_vs_new_conus12km_3.svg
+#+begin_src ipython :session :ipyfile ./figs/old_vs_new_conus12km_3.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[58]:
-[[file:./imgs/old_vs_new_conus12km_3.svg]]
+[[file:./figs/old_vs_new_conus12km_3.svg]]
 :END:
 
 ** NEW CONUS 12km :noexport:
@@ -542,14 +542,14 @@ plot_scaling(cases, labels, title)
    :END:
 #+header: :var cases=new_conus12km-cases labels=new_conus12km-labels
 #+header: :var title="Scaling results for NEW CONUS 12km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km.svg
+#+begin_src ipython :session :ipyfile ./figs/new_conus12km.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[89]:
-[[file:./imgs/new_conus12km.svg]]
+[[file:./figs/new_conus12km.svg]]
 :END:
 
 ** NEW CONUS 2.5km :noexport:
@@ -595,14 +595,14 @@ plot_scaling(cases, labels, title)
    :END:
 #+header: :var cases=new_conus2.5km-cases labels=new_conus2.5km-labels
 #+header: :var title="Scaling results for NEW CONUS 2.5km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus2-5km.svg
+#+begin_src ipython :session :ipyfile ./figs/new_conus2-5km.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[5]:
-[[file:./imgs/new_conus2-5km.svg]]
+[[file:./figs/new_conus2-5km.svg]]
 :END:
 
 ** Maria 3km :noexport:
@@ -631,14 +631,14 @@ plot_scaling(cases, labels, title)
    :END:
 #+header: :var cases=maria3km-cases labels=maria3km-labels
 #+header: :var title="Scaling results for Maria 3km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/maria3km.svg
+#+begin_src ipython :session :ipyfile ./figs/maria3km.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[63]:
-[[file:./imgs/maria3km.svg]]
+[[file:./figs/maria3km.svg]]
 :END:
 
 ** Cases table :noexport:
@@ -664,7 +664,7 @@ plot_scaling(cases, labels, title)
    :END:
 #+header: :var cases=cases-cases labels=cases-labels
 #+header: :var title=""
-#+begin_src ipython :session :ipyfile ./imgs/cases.svg
+#+begin_src ipython :session :ipyfile ./figs/cases.svg
 plot_scaling(cases, labels, title, legend_outside=False)
 #+end_src
 
@@ -672,7 +672,7 @@ plot_scaling(cases, labels, title, legend_outside=False)
 #+RESULTS:
 :RESULTS:
 # Out[6]:
-[[file:./imgs/cases.svg]]
+[[file:./figs/cases.svg]]
 :END:
 
 ** MPIs :noexport:
@@ -730,50 +730,50 @@ plot_scaling(cases, labels, title, legend_outside=False)
    :END:
 #+header: :var cases=new_conus12km-cases-mpi labels=new_conus12km-labels-mpi
 #+header: :var title="Scaling results for NEW CONUS 12km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_mpi.svg
+#+begin_src ipython :session :ipyfile ./figs/new_conus12km_mpi.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[64]:
-[[file:./imgs/new_conus12km_mpi.svg]]
+[[file:./figs/new_conus12km_mpi.svg]]
 :END:
 
 #+header: :var cases=new_conus2.5km-cases-mpi labels=new_conus2.5km-labels-mpi
 #+header: :var title="Scaling results for NEW CONUS 2.5km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus2-5km_mpi.svg
+#+begin_src ipython :session :ipyfile ./figs/new_conus2-5km_mpi.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[65]:
-[[file:./imgs/new_conus2-5km_mpi.svg]]
+[[file:./figs/new_conus2-5km_mpi.svg]]
 :END:
 
 #+header: :var cases=new_conus12km-cases-mpi labels=new_conus12km-labels-mpi
 #+header: :var title="Performance for normal number of nodes"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_bar_normal.svg
+#+begin_src ipython :session :ipyfile ./figs/new_conus12km_bar_normal.svg
 plot_bar(cases, 16, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[53]:
-[[file:./imgs/new_conus12km_bar_normal.svg]]
+[[file:./figs/new_conus12km_bar_normal.svg]]
 :END:
 
 #+header: :var cases=new_conus2.5km-cases-mpi labels=new_conus2.5km-labels-mpi
 #+header: :var title="Performance for large number of nodes"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_bar_large.svg
+#+begin_src ipython :session :ipyfile ./figs/new_conus12km_bar_large.svg
 plot_bar(cases, 4, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[67]:
-[[file:./imgs/new_conus12km_bar_large.svg]]
+[[file:./figs/new_conus12km_bar_large.svg]]
 :END:
 
 ** Compilers :noexport:
@@ -891,50 +891,50 @@ plot_bar(cases, 4, labels, title)
    :END:
 #+header: :var cases=new_conus12km-cases-compiler labels=new_conus12km-labels-compiler
 #+header: :var title="Scaling results for NEW CONUS 12km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_compiler.svg
+#+begin_src ipython :session :ipyfile ./figs/new_conus12km_compiler.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[90]:
-[[file:./imgs/new_conus12km_compiler.svg]]
+[[file:./figs/new_conus12km_compiler.svg]]
 :END:
 
 #+header: :var cases=new_conus2.5km-cases-compiler labels=new_conus2.5km-labels-compiler
 #+header: :var title="Scaling results for NEW CONUS 2.5km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus2-5km_compiler.svg
+#+begin_src ipython :session :ipyfile ./figs/new_conus2-5km_compiler.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[83]:
-[[file:./imgs/new_conus2-5km_compiler.svg]]
+[[file:./figs/new_conus2-5km_compiler.svg]]
 :END:
 
 #+header: :var cases=new_conus12km-cases-gnu labels=new_conus12km-labels-gnu
 #+header: :var title="Scaling results for NEW CONUS 12km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_gnu.svg
+#+begin_src ipython :session :ipyfile ./figs/new_conus12km_gnu.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[84]:
-[[file:./imgs/new_conus12km_gnu.svg]]
+[[file:./figs/new_conus12km_gnu.svg]]
 :END:
 
 #+header: :var cases=new_conus12km-cases-intel labels=new_conus12km-labels-intel
 #+header: :var title="Scaling results for NEW CONUS 12km with WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_intel.svg
+#+begin_src ipython :session :ipyfile ./figs/new_conus12km_intel.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[91]:
-[[file:./imgs/new_conus12km_intel.svg]]
+[[file:./figs/new_conus12km_intel.svg]]
 :END:
 
 ** Hybrid :noexport:
@@ -973,19 +973,19 @@ plot_scaling(cases, labels, title)
    :END:
 #+header: :var cases=cases-omp labels=labels-omp
 #+header: :var title="Scaling results for Hybrid WRFV4.0"
-#+begin_src ipython :session :ipyfile ./imgs/hybrid.svg
+#+begin_src ipython :session :ipyfile ./figs/hybrid.svg
 plot_scaling(cases, labels, title, shifts=[1, 18, 12, 9, 6,  1, 18, 12, 9, 6])
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[75]:
-[[file:./imgs/hybrid.svg]]
+[[file:./figs/hybrid.svg]]
 :END:
 
 #+header: :var cases=cases-omp labels=labels-omp
 #+header: :var title="Performance for normal number of nodes"
-#+begin_src ipython :session :ipyfile ./imgs/hybrid_bar_normal.svg
+#+begin_src ipython :session :ipyfile ./figs/hybrid_bar_normal.svg
 cases=cases[:5]; labels=labels[:5]
 plot_bar(cases, 16, labels, title)
 #+end_src
@@ -993,12 +993,12 @@ plot_bar(cases, 16, labels, title)
 #+RESULTS:
 :RESULTS:
 # Out[76]:
-[[file:./imgs/hybrid_bar_normal.svg]]
+[[file:./figs/hybrid_bar_normal.svg]]
 :END:
 
 #+header: :var cases=cases-omp labels=labels-omp
 #+header: :var title="Performance for large number of nodes"
-#+begin_src ipython :session :ipyfile ./imgs/hybrid_bar_large.svg
+#+begin_src ipython :session :ipyfile ./figs/hybrid_bar_large.svg
 cases=cases[5:]; labels=labels[5:]
 plot_bar(cases, 8, labels, title)
 #+end_src
@@ -1006,7 +1006,7 @@ plot_bar(cases, 8, labels, title)
 #+RESULTS:
 :RESULTS:
 # Out[77]:
-[[file:./imgs/hybrid_bar_large.svg]]
+[[file:./figs/hybrid_bar_large.svg]]
 :END:
 
 ** Katrina :noexport:
@@ -1046,7 +1046,7 @@ plot_bar(cases, 8, labels, title)
    :END:
 #+header: :var cases=katrina3km-cases labels=katrina3km-labels
 #+header: :var title="Katrina WRFV3.9.1.1"
-#+begin_src ipython :session :ipyfile ./imgs/katrina.svg
+#+begin_src ipython :session :ipyfile ./figs/katrina.svg
 plot_scaling(cases, labels, title)
 #+end_src
 
@@ -1054,12 +1054,12 @@ plot_scaling(cases, labels, title)
 #+RESULTS:
 :RESULTS:
 # Out[41]:
-[[file:./imgs/katrina.svg]]
+[[file:./figs/katrina.svg]]
 :END:
 
 #+header: :var cases=katrina1km-cases labels=katrina1km-labels
 #+header: :var title="Katrina WRFV3.9.1.1"
-#+begin_src ipython :session :ipyfile ./imgs/katrina.svg
+#+begin_src ipython :session :ipyfile ./figs/katrina.svg
 plot_scaling(cases, labels, title, )
 #+end_src
 
@@ -1090,7 +1090,7 @@ plot_scaling(cases, labels, title, )
    :END:
 #+header: :var cases=casesplus-cases labels=casesplus-labels
 #+header: :var title=""
-#+begin_src ipython :session :ipyfile ./imgs/casesplus.svg
+#+begin_src ipython :session :ipyfile ./figs/casesplus.svg
 plot_scaling(cases, labels, title, legend_outside=False)
 #+end_src
 
@@ -1098,12 +1098,12 @@ plot_scaling(cases, labels, title, legend_outside=False)
 #+RESULTS:
 :RESULTS:
 # Out[8]:
-[[file:./imgs/casesplus.svg]]
+[[file:./figs/casesplus.svg]]
 :END:
 
 ** mvapich i/o
 
-#+begin_src ipython :session :ipyfile ./imgs/mvapich-io-new_conus12km.svg
+#+begin_src ipython :session :ipyfile ./figs/mvapich-io-new_conus12km.svg
 case, wrf, comp, trial = 'new_conus12km', 'WRFV4.0', 'gnu8.1.0', 'T1'
 for mpi,l in [('mvapich2.2', 'b'), ('mpt2.18', 'r')]:
     run = getFromDict(data, [case, wrf, comp, mpi , trial])
@@ -1122,10 +1122,10 @@ plt.grid(False)
 #+RESULTS:
 :RESULTS:
 # Out[59]:
-[[file:./imgs/mvapich-io-new_conus12km.svg]]
+[[file:./figs/mvapich-io-new_conus12km.svg]]
 :END:
 
-#+begin_src ipython :session :ipyfile ./imgs/mvapich-io-new_conus2.5km.svg
+#+begin_src ipython :session :ipyfile ./figs/mvapich-io-new_conus2.5km.svg
 case, wrf, comp, trial = 'new_conus2.5km', 'WRFV4.0', 'gnu8.1.0', 'T1'
 for mpi,l in [('mvapich2.2', 'b'), ('mpt2.18', 'r')]:
     run = getFromDict(data, [case, wrf, comp, mpi , trial])
@@ -1144,7 +1144,7 @@ plt.grid(False)
 #+RESULTS:
 :RESULTS:
 # Out[60]:
-[[file:./imgs/mvapich-io-new_conus2.5km.svg]]
+[[file:./figs/mvapich-io-new_conus2.5km.svg]]
 :END:
 
 ** figs :noexport:
@@ -1210,38 +1210,38 @@ plt.grid(False)
 ** figs
 #+header: :var cases=new_conus12km-cases-gnu-mpi labels=new_conus12km-labels-gnu-mpi
 #+header: :var title=""
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_gnu_mpi.svg
+#+begin_src ipython :session :ipyfile ./figs/new_conus12km_gnu_mpi.svg
 plot_scaling(cases, labels, title, legend_outside=False, fmts=['.--', 'o--', 'x--', '+--'])
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[4]:
-[[file:./imgs/new_conus12km_gnu_mpi.svg]]
+[[file:./figs/new_conus12km_gnu_mpi.svg]]
 :END:
 
 #+header: :var cases=new_conus12km-cases-intel-mpi labels=new_conus12km-labels-intel-mpi
 #+header: :var title=""
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_intel_mpi.svg
+#+begin_src ipython :session :ipyfile ./figs/new_conus12km_intel_mpi.svg
 plot_scaling(cases, labels, title, legend_outside=False, fmts=['o--', 'x--', '.--'])
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[5]:
-[[file:./imgs/new_conus12km_intel_mpi.svg]]
+[[file:./figs/new_conus12km_intel_mpi.svg]]
 :END:
 
 #+header: :var cases=new_conus12km-cases-compiler-fig labels=new_conus12km-labels-compiler-fig
 #+header: :var title=""
-#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_bar_compiler_fig.svg
+#+begin_src ipython :session :ipyfile ./figs/new_conus12km_bar_compiler_fig.svg
 plot_bar(cases, 'N016.rsl', labels, title)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
 # Out[65]:
-[[file:./imgs/new_conus12km_bar_compiler_fig.svg]]
+[[file:./figs/new_conus12km_bar_compiler_fig.svg]]
 :END:
 
 * Analysis
@@ -1262,7 +1262,7 @@ flags that make a significant difference in speed. Other flags tried such as
 #+name: wrf_scaling
 #+caption: Comparison of Intel 18.0.1 and Gnu 8.1.0 compilers and various compile flags
 #+attr_latex: :width 0.8\linewidth
-[[file:./imgs/new_conus12km_bar_compiler_fig.svg]]
+[[file:./figs/new_conus12km_bar_compiler_fig.svg]]
 
 ** MPI Libraries
   :PROPERTIES:
@@ -1280,12 +1280,12 @@ performance Intel MPI does not scale well to large node counts.
 #+caption: MPI comparison with Gnu 8.1.0
 #+name: gnu-mpi
 #+attr_latex: :width 0.8\linewidth
-[[file:./imgs/new_conus12km_gnu_mpi.svg]]
+[[file:./figs/new_conus12km_gnu_mpi.svg]]
 
 #+caption: MPI comparison with Intel 18.0.1
 #+name: intel-mpi
 #+attr_latex: :width 0.8\linewidth
-[[file:./imgs/new_conus12km_intel_mpi.svg]]
+[[file:./figs/new_conus12km_intel_mpi.svg]]
 
 ** Run Time Scaling Comparison
   :PROPERTIES:
@@ -1307,12 +1307,12 @@ in the MPI used in Cheyenne versus Yellowstone.
 #+caption: Run Time Scaling on *Yellowstone*
 #+name: yellowstone-runtime
 #+attr_latex: :width 0.8\linewidth
-[[file:./figs/timingdav.png]]
+[[file:./imgs/timingdav.png]]
 
 #+caption: Run Time Scaling on *Cheyenne*
 #+name: cheyenne-runtime
 #+attr_latex: :width 0.8\linewidth
-[[file:./imgs/maria1km_runtime.svg]]
+[[file:./figs/maria1km_runtime.svg]]
 
 ** Computation Time Scaling Results
   :PROPERTIES:
@@ -1334,12 +1334,12 @@ computation.
 #+caption: Computation Scaling on *Yellowstone*
 #+name: yellowstone-scaling
 #+attr_latex: :width 0.8\linewidth
-[[file:./figs/scalingideppresdav.png]]
+[[file:./imgs/scalingideppresdav.png]]
 
 #+caption: Computation Scaling on *Cheyenne*
 #+name: cheyenne-scaling
 #+attr_latex: :width 0.8\linewidth
-[[file:./imgs/cases.svg]]
+[[file:./figs/cases.svg]]
 
 
 Running WRF on Cheyenne versus Yellowstone differs in the the low relative
@@ -1417,7 +1417,7 @@ corresponds to a large difference in values.
 
 #+name: wrf_scaling
 #+caption: WRF scaling
-[[file:./imgs/cases.svg]]
+[[file:./figs/cases.svg]]
 
 
 Beginning in WRFV4.0, the minimum patch size is 10 grid cells in either
@@ -1443,7 +1443,7 @@ and single output file of the Maria 1km case, which used a domain of about 372
 million grid points. If you have more restarts and output files, your numbers
 will be different but the trend will be similar.
 
-#+begin_src ipython :session :ipyfile ./imgs/maria1km_runtime.svg
+#+begin_src ipython :session :ipyfile ./figs/maria1km_runtime.svg
 maria_case = ['maria1km', 'WRFV4.0', 'intel18.0.1', 'mpt2.18',  'T1' ]
 runs = getFromDict(data, maria_case)
 cpus = np.array([d[7]*d[8] for _,d in runs.items()])
@@ -1471,7 +1471,7 @@ plt.grid(False)
 #+RESULTS:
 :RESULTS:
 # Out[9]:
-[[file:./imgs/maria1km_runtime.svg]]
+[[file:./figs/maria1km_runtime.svg]]
 :END:
 
 * TODO Optimizing WRF performance

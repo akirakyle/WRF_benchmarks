@@ -10,7 +10,7 @@
 #+latex_header: \author[Kyle]{\vspace{-.4cm} Akira Kyle\inst{1}, Davide Del Vento \inst{2}, Dixit Patel \inst{3}, Brian Vanderwende \inst{2}, Negin Sobhani \inst{2}}
 #+latex_header: \institute[NCAR]{\inst{1} \raisebox{-.3\height}{\includegraphics[height=1.05cm]{CMU_Logo_Horiz_Red.pdf}} \inst{2} National Center For Atmospheric Research \inst{3} University of Colorado Boulder}
 # \includegraphics[height=2cm]{boulder-one-line.png}}
-#+latex_header: \graphicspath{{./figs/}{./images/}{./obipy-resources/}}
+#+latex_header: \graphicspath{{./figs/}{./imgs/}{./obipy-resources/}}
 #+latex_header: \usepackage[orientation=landscape,size=a1,scale=1.2]{beamerposter}
 #+latex_header: \usefonttheme[onlymath]{serif}
 #+latex_header: \boldmath
@@ -120,7 +120,7 @@ flags that make a significant difference in speed. Other flags tried such as
 #+name: wrf_scaling
 #+caption: \vspace{-5cm}Comparison of Intel 18.0.1 and Gnu 8.1.0 compilers and various compile flags
 #+attr_latex: :width 0.8\linewidth
-[[file:./imgs/new_conus12km_bar_compiler_fig.svg]]
+[[file:./figs/new_conus12km_bar_compiler_fig.svg]]
 
 *** Center column
     :PROPERTIES:
@@ -151,13 +151,13 @@ counts.
 #+begin_figure
 \begin{minipage}{.5\textwidth}
   \centering
-  \includesvg[width=.9\linewidth]{./imgs/new_conus12km_gnu_mpi}
+  \includesvg[width=.9\linewidth]{./figs/new_conus12km_gnu_mpi}
   \captionof{figure}{\vspace{-1cm}MPI comparison with Gnu 8.1.0}
   \label{fig:gnu-mpi}
 \end{minipage}%
 \begin{minipage}{.5\textwidth}
   \centering
-  \includesvg[width=.9\linewidth]{./imgs/new_conus12km_intel_mpi}
+  \includesvg[width=.9\linewidth]{./figs/new_conus12km_intel_mpi}
   \captionof{figure}{\vspace{-1cm}MPI comparison with Intel 18.0.1}
   \label{fig:intel-mpi}
 \end{minipage}
@@ -185,13 +185,13 @@ in the MPI used in Cheyenne versus Yellowstone.
 #+begin_figure
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[width=1\linewidth]{./figs/timingdav}
+  \includegraphics[width=1\linewidth]{./imgs/timingdav}
   \captionof{figure}{Run Time Scaling on \textbf{Yellowstone}}
   \label{fig:yellowstone-runtime}
 \end{minipage}%
 \begin{minipage}{.5\textwidth}
   \centering
-  \includesvg[width=1\linewidth]{./imgs/maria1km_runtime}
+  \includesvg[width=1\linewidth]{./figs/maria1km_runtime}
   \captionof{figure}{Run Time Scaling on \textbf{Cheyenne}}
   \label{fig:cheyenne-runtime}
 \end{minipage}
@@ -224,13 +224,13 @@ computation.
 #+begin_figure
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[width=1\linewidth]{./figs/scalingideppresdav}
+  \includegraphics[width=1\linewidth]{./imgs/scalingideppresdav}
   \captionof{figure}{Computation Scaling on \textbf{Yellowstone}}
   \label{fig:yellowstone-scaling}
 \end{minipage}%
 \begin{minipage}{.5\textwidth}
   \centering
-  \includesvg[width=1\linewidth]{./imgs/cases}
+  \includesvg[width=1\linewidth]{./figs/cases}
   \captionof{figure}{Computation Scaling on \textbf{Cheyenne}}
   \label{fig:cheyenne-scaling}
 \end{minipage}
