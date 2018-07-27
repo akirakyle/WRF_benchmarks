@@ -26,6 +26,29 @@
 This is still very much a work in progress!
 #+end_warning
 
+* Abstract
+  :PROPERTIES:
+  :CUSTOM_ID: abstract
+  :END:
+
+The Weather Research and Forecast (WRF) model is a parallel mesoscale numerical
+weather forecasting application used in both operational and research
+environments. The performance of WRF on NCAR's Cheyenne supercomputer was
+investigated, focusing primarily on run time and compile time settings. The
+latest Intel (18.0.1) and Gnu (8.1.0) compilers were compared with different
+compilation flags. We found the Intel compiler to be consistently faster than
+Gnu at various optimization levels. Various MPI libraries were tested, including
+MPT, MVAPICH, Intel MPI, MPICH. We found that openMPI, MPT, and MVAPICH show
+similar runtime performance while the performance of MPICH was poor and Intel
+MPI's performance scaled poorly to large node counts. Several benchmark cases
+were developed for the latest version of WRF (4.0) at different resolutions and
+utilizing the CONUS and tropical physics suites. The scaling results of these
+benchmark cases were used to give users of Cheyenne recommendations on how to
+run WRF in a timely and efficient manner. Additionally we compared the scaling
+of WRF's initialization time, I/O time, and computation time and found better
+scaling to very large node counts than with previous WRF versions on NCAR's
+previous supercomputer, Yellowstone.
+
 * Background
   :PROPERTIES:
   :CUSTOM_ID: background
@@ -35,31 +58,42 @@ This is still very much a work in progress!
    :CUSTOM_ID: weather_research_forcast_model
    :END:
 
-"WRF is a state-of-the-art atmospheric modeling system designed for both
-meteorological research and numerical weather prediction. It offers a host of
-options for atmospheric processes and can run on a variety of computing
-platforms. WRF excels in a broad range of applications across scales ranging
-from tens of meters to thousands of kilometers, including the following."
+The Weather Research and Forecast (WRF) model is a parallel mesoscale numerical
+weather forecasting application used in both operational and research
+environments. WRF is among the more commonly run codes by atmospheric scientists
+on NCAR's Cheyenne supercomputer. Hence it is very important for WRF's users to
+know how to obtain the best performance of WRF on Cheyenne, especially as users
+scale their runs to larger core counts.
 
-#+BEAMER: \pause
-– Meteorological studies
-#+BEAMER: \pause
-– Real-time NWP
-#+BEAMER: \pause
-– Idealized simulations
-#+BEAMER: \pause
-– Data assimilation
-#+BEAMER: \pause
-– Earth system model coupling
-#+BEAMER: \pause
-– Model training and educational support
-
-** WRF Flowchart
+** WRF System Flowchart
    :PROPERTIES:
    :CUSTOM_ID: wrf_flowchart
    :END:
 #+ATTR_LATEX: :width 0.9\linewidth
 [[./figs/WRF_flow_chart-ARW_v4.png]]
+
+** Cheyenne
+   :PROPERTIES:
+   :CUSTOM_ID: cheyenne_specs
+   :END:
+
+#+begin_note
+[[https://www2.cisl.ucar.edu/resources/computational-systems/cheyenne][More Details on the Cheyenne supercomputer can be found here]]
+#+end_note
+
+- 4,032 computation nodes
+ 	- Dual-socket nodes, 18 cores per socket
+    - 145,152 total processor cores
+  - 2.3-GHz Intel Xeon E5-2697V4 (Broadwell) processors
+    - 16 flops per clock
+  - 5.34 peak petaflops
+- 313 TB total system memory
+  - 64 GB/node on 3,168 nodes, DDR4-2400
+  - 128 GB/node on 864 nodes, DDR4-2400
+- Mellanox EDR InfiniBand high-speed interconnect
+  - Partial 9D Enhanced Hypercube single-plane interconnect topology
+  - Bandwidth: 25 GBps bidirectional per link
+  - Latency: MPI ping-pong < 1 µs; hardware link 130 ns
 
 * Intro
   :PROPERTIES:
@@ -102,19 +136,32 @@ from tens of meters to thousands of kilometers, including the following."
 | ~maria1km~       | 3665 | 2894 | 10,606,510       |        3 |         1 |
 | ~maria3km~       | 1396 | 1384 | 1,932,064        |        9 |         3 |
 
-** Compilers and MPI Libraries
+** Compilers
    :PROPERTIES:
-   :CUSTOM_ID: compilers_and_mpi_libraries
+   :CUSTOM_ID: compilers
    :END:
+
 - GNU Compiler Collection (GCC) versions 6.3.0, 8.1.0
   - WRF compiles with ~-O2~ by default
-  - Tried ~-O3~, ~-Ofast~, ~-mfma~ (enables FMA instruction set), ~-march=native~
+  - ~-O3~ : enables all ~-O2~ optimization along with optimizations such as
+    function inlining and loop vectorization
+  - ~-Ofast~ : enables all ~-O3~ optimizations along with disregarding strict
+    standards compliance (such is for floating point operations)
+  - ~-mfma~ : enables Fused Multiply-Add instruction set
+  - ~-march=native~ : enables target instruction set to be everything
+    supported by the compiling machine
 - Intel Compiler versions 17.0.1, 18.0.1
   - WRF compiles with ~-O3~ by default
-  - Tried ~-Xhost~ which is similar to GNU's ~-march=native~
-- MPT version 2.18
-- MVAPICH version 2.2
-- openMPI version 3.1.0
+  - ~-Xhost~ : similar to GNU's ~-march=native~
+  - ~-fp-model fast=2~ : similar to GNU's ~-Ofast~ optimization
+
+** Message Passing Interface Libraries
+   :PROPERTIES:
+   :CUSTOM_ID: mpi_libraries
+   :END:
+- SGI's MPT version 2.18 (Default MPI for Cheyenne)
+- Ohio State University's MVAPICH version 2.2
+- OpenMPI version 3.1.0
 - Intel MPI version 2018.1.163
 - MPICH version 3.2
 
@@ -224,6 +271,8 @@ format otherwise one may encounter the following error:
 rsl_lite error ("buf_for_proc.c":119) Bad P argument to buffer_for_proc.  P = 18088. Has RSL_MESH been called?
 #+end_example
 
+A patch for WRFV4.0 can be found at ~WRFs/WRFV4.0-rsl-8digit.patch~
+
 * Results
   :PROPERTIES:
   :CUSTOM_ID: results
@@ -247,9 +296,10 @@ import matplotlib.pyplot as plt
 #+end_src
 
 #+begin_src ipython :session
-def plot_scaling(cases, labels, title, shifts=None, legend_outside=True):
+def plot_scaling(cases, labels, title, shifts=None, legend_outside=True, fmts=None):
     if not shifts: shifts = [1] * len(cases)
-    for case,label,shift in zip(cases,labels,shifts):
+    if not fmts: fmts = ['o--'] * len(cases)
+    for case,label,shift,fmt in zip(cases,labels,shifts,fmts):
         gridpoints = e_we[case[0]] * e_sn[case[0]]
         secs = []; cpus = []
         for trial in case[4].split(','):
@@ -258,7 +308,7 @@ def plot_scaling(cases, labels, title, shifts=None, legend_outside=True):
             cpus += [d[7]*d[8] for _,d in run.items()]
         secs = np.array(secs); cpus = np.array(cpus)
         p = secs.argsort()
-        plt.loglog(gridpoints/(cpus[p]*shift), 1/secs[p], '+--', label=label[0])
+        plt.loglog(gridpoints/(cpus[p]*shift), 1/secs[p], fmt, label=label[0])
     plt.xlabel("Total grid points / core")
     plt.ylabel("Time steps / s")
     if legend_outside: plt.legend(loc='upper center', bbox_to_anchor=(1.6, 1.0), ncol=1)
@@ -596,17 +646,17 @@ plot_scaling(cases, labels, title)
 | case           | WRF version | compiler    | mpi     | trial                                                      |
 |----------------+-------------+-------------+---------+------------------------------------------------------------|
 | new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18 | T1,T1_p18,T1_p09,T1_p04,T1_p02,T1_p01                      |
-| new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18 | T1,T1_hm,T1_hm_p18,T1_hm_p09                               |
+| new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18 | T1,T1_hm,T1_hm_p18,T1_hm_p09,T1_hm_p04,T1_hm_p02,T1_hm_p01 |
 | maria3km       | WRFV4.0     | intel18.0.1 | mpt2.18 | T1,T1_hm,T1_hm_p18,T1_hm_p09,T1_hm_p04,T1_hm_p02,T1_hm_p01 |
 | maria1km       | WRFV4.0     | intel18.0.1 | mpt2.18 | T1,T1_hm                                                   |
 
 #+name: cases-labels
-| label          |
-|----------------|
-| new_conus12km  |
-| new_conus2.5km |
-| maria3km       |
-| maria1km       |
+| label       |
+|-------------|
+| CONUS 12km  |
+| CONUS 2.5km |
+| Maria 3km   |
+| Maria 1km   |
 
 ** Cases
    :PROPERTIES:
@@ -621,7 +671,7 @@ plot_scaling(cases, labels, title, legend_outside=False)
 #+attr_latex: :width 1.0\linewidth
 #+RESULTS:
 :RESULTS:
-# Out[8]:
+# Out[6]:
 [[file:./imgs/cases.svg]]
 :END:
 
@@ -710,7 +760,7 @@ plot_bar(cases, 16, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[66]:
+# Out[53]:
 [[file:./imgs/new_conus12km_bar_normal.svg]]
 :END:
 
@@ -1047,15 +1097,299 @@ plot_scaling(cases, labels, title, legend_outside=False)
 #+attr_latex: :width 1.0\linewidth
 #+RESULTS:
 :RESULTS:
-# Out[46]:
+# Out[8]:
 [[file:./imgs/casesplus.svg]]
 :END:
 
+** mvapich i/o
 
-* WRF scaling and timing on Cheyenne[fn:: [[https://www2.cisl.ucar.edu/software/community-models/wrf-scaling-and-timing][On Yellowstone]]]
+#+begin_src ipython :session :ipyfile ./imgs/mvapich-io-new_conus12km.svg
+case, wrf, comp, trial = 'new_conus12km', 'WRFV4.0', 'gnu8.1.0', 'T1'
+for mpi,l in [('mvapich2.2', 'b'), ('mpt2.18', 'r')]:
+    run = getFromDict(data, [case, wrf, comp, mpi , trial])
+    plt.plot([d[7]*d[8] for _,d in run.items()], [d[4] for _,d in run.items()], 
+             l+'+--', label='init '+mpi)
+    plt.plot([d[7]*d[8] for _,d in run.items()], [d[6] for _,d in run.items()], 
+             l+'o--', label='write '+mpi)
+
+plt.xlabel("Cores")
+plt.ylabel("Time")
+plt.legend(loc='best')
+plt.title("Scaling I/O for new_conus12km")
+plt.grid(False)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[59]:
+[[file:./imgs/mvapich-io-new_conus12km.svg]]
+:END:
+
+#+begin_src ipython :session :ipyfile ./imgs/mvapich-io-new_conus2.5km.svg
+case, wrf, comp, trial = 'new_conus2.5km', 'WRFV4.0', 'gnu8.1.0', 'T1'
+for mpi,l in [('mvapich2.2', 'b'), ('mpt2.18', 'r')]:
+    run = getFromDict(data, [case, wrf, comp, mpi , trial])
+    plt.plot([d[7]*d[8] for _,d in run.items()], [d[4] for _,d in run.items()], 
+             l+'+--', label='init '+mpi)
+    plt.plot([d[7]*d[8] for _,d in run.items()], [d[6] for _,d in run.items()], 
+             l+'o--', label='write '+mpi)
+
+plt.xlabel("Cores")
+plt.ylabel("Time")
+plt.legend(loc='best')
+plt.title("Scaling of write time for new_conus2.5km")
+plt.grid(False)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[60]:
+[[file:./imgs/mvapich-io-new_conus2.5km.svg]]
+:END:
+
+** figs :noexport:
+
+#+name: new_conus12km-cases-gnu-mpi
+| case          | WRF version | compiler    | mpi            | trial |
+|---------------+-------------+-------------+----------------+-------|
+| new_conus12km | WRFV4.0     | gnu6.3.0    | mpich3.2       | T1    |
+| new_conus12km | WRFV4.0     | gnu8.1.0    | mpt2.18        | T1    |
+| new_conus12km | WRFV4.0     | gnu8.1.0    | mvapich2.2     | T1    |
+| new_conus12km | WRFV4.0     | gnu8.1.0    | openmpi3.1.0   | T1    |
+
+#+name: new_conus12km-cases-intel-mpi
+| case          | WRF version | compiler    | mpi            | trial |
+|---------------+-------------+-------------+----------------+-------|
+| new_conus12km | WRFV4.0     | intel18.0.1 | mpt2.18        | T1    |
+| new_conus12km | WRFV4.0     | intel18.0.1 | openmpi3.1.0   | T1    |
+| new_conus12km | WRFV4.0     | intel18.0.1 | impi2018.1.163 | T1    |
+
+#+name: new_conus12km-labels-gnu-mpi
+| label   |
+|---------|
+| MPICH   |
+| MPT     |
+| MVAPICH |
+| OpenMPI |
+
+#+name: new_conus12km-labels-intel-mpi
+| label     |
+|-----------|
+| MPT       |
+| OpenMPI   |
+| Intel MPI |
+
+#+name: new_conus12km-cases-compiler-fig
+| case          | WRF version | compiler              | mpi        | trial |
+|---------------+-------------+-----------------------+------------+-------|
+| new_conus12km | WRFV4.0     | gnu8.1.0              | mpt2.18    | T1    |
+| new_conus12km | WRFV4.0     | gnu8.1.0_O3           | mvapich2.2 | T1    |
+| new_conus12km | WRFV4.0     | gnu8.1.0_fma          | mvapich2.2 | T1    |
+| new_conus12km | WRFV4.0     | gnu8.1.0_O3_fma       | mvapich2.2 | T1    |
+| new_conus12km | WRFV4.0     | gnu8.1.0_O3_native    | mpt2.18    | T1    |
+| new_conus12km | WRFV4.0     | gnu8.1.0_Ofast        | mpt2.18    | T1    |
+| new_conus12km | WRFV4.0     | gnu8.1.0_Ofast_native | mpt2.18    | T1    |
+| new_conus12km | WRFV4.0     | intel18.0.1           | mpt2.18    | T1    |
+| new_conus12km | WRFV4.0     | intel18.0.1_host      | mpt2.18    | T1    |
+| new_conus12km | WRFV4.0     | intel18.0.1_opt66     | mpt2.18    | T1    |
+
+#+name: new_conus12km-labels-compiler-fig
+| label                                |
+|--------------------------------------|
+| gnu -O2                              |
+| gnu -O3                              |
+| gnu -mfma                            |
+| gnu -O3 -mfma                        |
+| gnu -O3 -march=native                |
+| gnu -Ofast                           |
+| gnu -Ofast -march=native             |
+| intel18.0.1 -O3                      |
+| intel18.0.1 -Xhost                   |
+| intel18.0.1  -xHost -fp-model fast=2 |
+
+** figs
+#+header: :var cases=new_conus12km-cases-gnu-mpi labels=new_conus12km-labels-gnu-mpi
+#+header: :var title=""
+#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_gnu_mpi.svg
+plot_scaling(cases, labels, title, legend_outside=False, fmts=['.--', 'o--', 'x--', '+--'])
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[4]:
+[[file:./imgs/new_conus12km_gnu_mpi.svg]]
+:END:
+
+#+header: :var cases=new_conus12km-cases-intel-mpi labels=new_conus12km-labels-intel-mpi
+#+header: :var title=""
+#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_intel_mpi.svg
+plot_scaling(cases, labels, title, legend_outside=False, fmts=['o--', 'x--', '.--'])
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[5]:
+[[file:./imgs/new_conus12km_intel_mpi.svg]]
+:END:
+
+#+header: :var cases=new_conus12km-cases-compiler-fig labels=new_conus12km-labels-compiler-fig
+#+header: :var title=""
+#+begin_src ipython :session :ipyfile ./imgs/new_conus12km_bar_compiler_fig.svg
+plot_bar(cases, 'N016.rsl', labels, title)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[65]:
+[[file:./imgs/new_conus12km_bar_compiler_fig.svg]]
+:END:
+
+* Analysis
+  :PROPERTIES:
+  :CUSTOM_ID: analysis
+  :END:
+** Compilers
+  :PROPERTIES:
+  :CUSTOM_ID: analysis-compilers
+  :END:
+
+We see from Figure [[wrf_scaling]] that the Intel compiler is consistently faster
+than the Gnu compiler across all flags tried. We also see that for both Intel
+and Gnu, the ~-Ofast~ (for Gnu) or ~-fp-model fast=2~ (for Intel) are the only
+flags that make a significant difference in speed. Other flags tried such as
+~-mfma~ or ~-march=native~ ~-Xhost~ made little to no difference in WRF's speed.
+
+#+name: wrf_scaling
+#+caption: Comparison of Intel 18.0.1 and Gnu 8.1.0 compilers and various compile flags
+#+attr_latex: :width 0.8\linewidth
+[[file:./imgs/new_conus12km_bar_compiler_fig.svg]]
+
+** MPI Libraries
+  :PROPERTIES:
+  :CUSTOM_ID: analysis-mpi
+  :END:
+
+We also tested the scaling performance of several MPI implementations. Note that
+Cheyenne uses a Mellanox EDR InfiniBand high-speed interconnect with a Partial
+9D Enhanced Hypercube single-plane interconnect topology.
+
+We see from Figures [[gnu-mpi]] and [[intel-mpi]] that MPT, MVAPICH and OpenMPI all have
+similar performance, while MPICH has overall poor performance and the
+performance Intel MPI does not scale well to large node counts.
+
+#+caption: MPI comparison with Gnu 8.1.0
+#+name: gnu-mpi
+#+attr_latex: :width 0.8\linewidth
+[[file:./imgs/new_conus12km_gnu_mpi.svg]]
+
+#+caption: MPI comparison with Intel 18.0.1
+#+name: intel-mpi
+#+attr_latex: :width 0.8\linewidth
+[[file:./imgs/new_conus12km_intel_mpi.svg]]
+
+** Run Time Scaling Comparison
+  :PROPERTIES:
+  :CUSTOM_ID: run_time_scaling_comparison
+  :END:
+
+Figures [[yellowstone-runtime]] and [[cheyenne-runtime]] show the
+total run time for WRF using increasing numbers of cores with the total run time
+broken down into the initialization time, computation time, and writing time.
+These results use the 1 km Hurricane Maria Benchmark case. We see that on
+Cheyenne the initialization and writing output times remain relatively fixed,
+only increasing slightly as you move to larger core counts. However on
+Yellowstone, the initialization time scaled much poorer at large node counts,
+eventually leading to unfeasible long jobs. This improvement in the scaling of
+the initialization time is likely due to the improvements made to WRF's
+initialization code with how the MPI calls are performed along with improvements
+in the MPI used in Cheyenne versus Yellowstone.
+
+#+caption: Run Time Scaling on *Yellowstone*
+#+name: yellowstone-runtime
+#+attr_latex: :width 0.8\linewidth
+[[file:./figs/timingdav.png]]
+
+#+caption: Run Time Scaling on *Cheyenne*
+#+name: cheyenne-runtime
+#+attr_latex: :width 0.8\linewidth
+[[file:./imgs/maria1km_runtime.svg]]
+
+** Computation Time Scaling Results
+  :PROPERTIES:
+  :CUSTOM_ID: comp_time_scaling_comparison
+  :END:
+
+When expressing the scaling as a function of WRF gridpoints per core, we see
+that all the cases scale similarly in both Figure [[cheyenne-scaling]] on
+Cheyenne and Figure [[yellowstone-scaling]] on Yellowstone. Note that both
+axes are logarithmic, so a small distance between points corresponds to a large
+difference in values. On both Cheyenne and Yellowstone, in the high relative
+gridpoints per core region, we see that WRF has linear *strong scaling*. This
+means that WRF is making effective use of the parallel computational resources
+available to it. So increasing the number of cores a run uses, will
+proportionately decrease WRF's computation time (however initialization and I/O
+time may increase) while about same number of total core-hours will be used for
+computation.
+
+#+caption: Computation Scaling on *Yellowstone*
+#+name: yellowstone-scaling
+#+attr_latex: :width 0.8\linewidth
+[[file:./figs/scalingideppresdav.png]]
+
+#+caption: Computation Scaling on *Cheyenne*
+#+name: cheyenne-scaling
+#+attr_latex: :width 0.8\linewidth
+[[file:./imgs/cases.svg]]
+
+
+Running WRF on Cheyenne versus Yellowstone differs in the the low relative
+gridpoints per core region. On Yellowstone we see WRF depart from the linear
+strong scaling relationship. User's running WRF in this low gridpoints per core
+region on Yellowstone would effectively be using more core-hours to run the same
+simulation than if they had run it on fewer cores. In this low gridpoints per
+core region, MPI communication starts to dominate the actual time spent in
+computation. However on Cheyenne, we see that WRF does not significantly depart
+from this linear strong scaling at any amount of gridpoints per core. Likely
+this is due to improvements in the WRF's MPI code along with a better network
+interconnect on Cheyenne than Yellowstone along with a MPI library. Furthermore
+WRFV4.0 will refuse to run if there is a minimum patch size of less than 10 grid
+points in either direction. This limits users from running with fewer than 100
+gridpoints per core, which would likely be a very MPI communication bound region
+where WRF would depart from its linear strong scaling.
+
+The interesting feature in Figure [[cheyenne-scaling]] in the high
+gridpoints per core region where the time steps per second seem to jump slightly
+is an artifact of the memory constraints on Cheyenne. The normal nodes on
+Cheyenne have only 64 GB of memory, which is less than on Yellowstone. WRF runs
+with too many gridpoints per node will run out of memory and be killed. The
+maximum number of gridpoints per node that will fit into the 64 GB of memory of
+that node depends on the physics parameterizations, however, we observed that
+typically the maximum is between 10^5 and 10^6 total gridpoints. Thus to obtain
+the results in the very large gridpoints per core region, we utilized Cheyenne's
+128 GB memory nodes for an additional point or two, then we undersubscribed the
+cores on each node. This undersubscription of cores is likely responsible for
+the small bump in speed observed. However we do not recommend that users
+undersubscribe cores as core-hours are charged for all cores on the node so
+undersubscription of cores will be an inefficient use of a user's core-hour
+allocation.
+
+Finally it's worth noting that the vertical axis between Figures
+[[yellowstone-scaling]] and [[cheyenne-scaling]] is shifted due to
+the difference in clock speeds between the processors used in Yellowstone versus
+those used in Cheyenne.
+
+* TODO WRF scaling and timing on Cheyenne
   :PROPERTIES:
   :CUSTOM_ID: wrf_scaling_and_timing_on_cheyenne
   :END:
+
+#+begin_note
+[[https://www2.cisl.ucar.edu/software/community-models/wrf-scaling-and-timing][The previous recommendations for users of WRF on Yellowstone]]
+
+To see how WRFs performance differs on Cheyenne compared to yellowstone, see the
+discussion [[#run_time_scaling_comparison][here]]
+#+end_note
+
 - "Is it possible to solve a problem with such-and-such resolution in a timely
   manner?"
 - "If I use more cores I will have the results more quickly, but with this
@@ -1086,39 +1420,10 @@ corresponds to a large difference in values.
 [[file:./imgs/cases.svg]]
 
 
-
-
 Beginning in WRFV4.0, the minimum patch size is 10 grid cells in either
 direction. This limits you to using at least 100 gridpoints/core. Thus WRF will
 prevent you from running on very large relative core counts where
 initialization, I/O, and communication dominate.
-
-*** old text
-As you can see, there are three regimes:
-
-- large number of grid points per core - *Total grid points / core > 10^5*
-  (small core count)
-- intermediate number of grid points per core - *10^4 < Total grid points / core
-  < 10^5* (intermediate core count)
-- small number of grid points per core - *Total grid points / core < 10^4*
-  (large core count)
-
-For a small number of cores, the WRF computation kernel is in a strong scaling
-regime. Increasing the core count will make the simulation go faster while it
-consumes approximately the same amount of core-hours (ignoring time spent in
-initialization and I/O). Time-to-solution will also depend on the wait in queue,
-which may be larger for larger jobs.
-
-For an intermediate number of cores, WRF scaling increasingly departs from
-linear strong scaling. Running the same simulation on larger core counts will
-require more core-hours even though it will still run faster (again, ignoring
-
-time spent in initialization, I/O, and wait in queue).
-
-We do not recommend running WRF on extremely large core counts, because in this
-regime the speed benefits diminish, the time will be dominated by initialization
-and I/O (as well as wait in queue), and there will be larger core-hours charges
-for solving the same problem.
 
 ** TODO Run time results
    :PROPERTIES:
@@ -1147,13 +1452,13 @@ init = np.array([d[3] for _,d in runs.items()])/60.0
 write = np.array([d[5] for _,d in runs.items()])/60.0
 tot = comp+init+write
 gridpoints = e_we[case[0]] * e_sn[case[0]]
-plt.figure(figsize=(5,5))
-plt.plot(cpus, tot, 'bo', label='total')
-plt.plot(cpus, init, 'rs', label='initialization')
-plt.plot(cpus, comp, 'gv', label='computing')
-plt.plot(cpus, write, 'b+', label='writing output')
-plt.xlabel("cores")
-plt.ylabel("wall clock time (minutes)")
+plt.figure(figsize=(4,4))
+plt.plot(cpus, tot, 'bo', label='Total')
+plt.plot(cpus, init, 'rs', label='Initialization')
+plt.plot(cpus, comp, 'gv', label='Computing')
+plt.plot(cpus, write, 'b+', label='Writing output')
+plt.xlabel("Cores")
+plt.ylabel("Wall-clock time (minutes)")
 plt.legend(loc='best')
 # plt.title("Run time results")
 # plt.axis('equal')
@@ -1169,10 +1474,13 @@ plt.grid(False)
 [[file:./imgs/maria1km_runtime.svg]]
 :END:
 
-* TODO Optimizing WRF performance[fn:: [[https://www2.cisl.ucar.edu/software/community-models/optimizing-wrf-performance][On Yellowstone]]]
+* TODO Optimizing WRF performance
   :PROPERTIES:
   :CUSTOM_ID: optimizing_wrf_performance
   :END:
+#+begin_note
+[[https://www2.cisl.ucar.edu/software/community-models/optimizing-wrf-performance][The previous recommendations for users of WRF on Yellowstone]]
+#+end_note
 
 These recommendations for optimizing the performance of the Weather Research and
 Forecasting (WRF) modeling system are based on the results of numerous jobs run
@@ -1181,7 +1489,7 @@ included small runs and others, with different domain sizes and time steps.
 
 --------------------------------------------------------------------------------
 
-** Compiling and linking
+** TODO Compiling and linking
    :PROPERTIES:
    :CUSTOM_ID: compiling_and_linking
    :END:
@@ -1223,7 +1531,7 @@ We used the default binding settings in test runs.
 
 --------------------------------------------------------------------------------
 
-**  Scaling and core count
+** TODO Scaling and core count
    :PROPERTIES:
    :CUSTOM_ID: scaling_and_core_count
    :END:
@@ -1255,9 +1563,5 @@ optimal core count for your problem size.
   :PROPERTIES:
   :CUSTOM_ID: summary
   :END:
-** Conclusions
-   :PROPERTIES:
-   :CUSTOM_ID: conclusions
-   :END:
 - openMPI, MPT, and MVAPICH show similar runtime performance.
 - intel consistently faster than gnu
