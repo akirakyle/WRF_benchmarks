@@ -1102,14 +1102,17 @@ plot_scaling(cases, labels, title, legend_outside=False)
 :END:
 
 ** mvapich i/o
+   :PROPERTIES:
+   :CUSTOM_ID: mvapich_io
+   :END:
 
 #+begin_src ipython :session :ipyfile ./figs/mvapich-io-new_conus12km.svg
 case, wrf, comp, trial = 'new_conus12km', 'WRFV4.0', 'gnu8.1.0', 'T1'
 for mpi,l in [('mvapich2.2', 'b'), ('mpt2.18', 'r')]:
     run = getFromDict(data, [case, wrf, comp, mpi , trial])
-    plt.plot([d[7]*d[8] for _,d in run.items()], [d[4] for _,d in run.items()], 
+    plt.plot([d[7]*d[8] for _,d in run.items()], [d[4] for _,d in run.items()],
              l+'+--', label='init '+mpi)
-    plt.plot([d[7]*d[8] for _,d in run.items()], [d[6] for _,d in run.items()], 
+    plt.plot([d[7]*d[8] for _,d in run.items()], [d[6] for _,d in run.items()],
              l+'o--', label='write '+mpi)
 
 plt.xlabel("Cores")
@@ -1129,22 +1132,44 @@ plt.grid(False)
 case, wrf, comp, trial = 'new_conus2.5km', 'WRFV4.0', 'gnu8.1.0', 'T1'
 for mpi,l in [('mvapich2.2', 'b'), ('mpt2.18', 'r')]:
     run = getFromDict(data, [case, wrf, comp, mpi , trial])
-    plt.plot([d[7]*d[8] for _,d in run.items()], [d[4] for _,d in run.items()], 
+    plt.plot([d[7]*d[8] for _,d in run.items()], [d[4] for _,d in run.items()],
              l+'+--', label='init '+mpi)
-    plt.plot([d[7]*d[8] for _,d in run.items()], [d[6] for _,d in run.items()], 
+    plt.plot([d[7]*d[8] for _,d in run.items()], [d[6] for _,d in run.items()],
              l+'o--', label='write '+mpi)
 
 plt.xlabel("Cores")
 plt.ylabel("Time")
 plt.legend(loc='best')
-plt.title("Scaling of write time for new_conus2.5km")
+plt.title("Scaling of I/O for new_conus2.5km")
 plt.grid(False)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-# Out[60]:
+# Out[17]:
 [[file:./figs/mvapich-io-new_conus2.5km.svg]]
+:END:
+
+#+begin_src ipython :session :ipyfile ./figs/mvapich-io-maria3km.svg
+case, wrf, comp, trial = 'maria3km', 'WRFV4.0', 'gnu8.1.0', 'T1'
+for mpi,l in [('mvapich2.2', 'b'), ('mpt2.18', 'r')]:
+    run = getFromDict(data, [case, wrf, comp, mpi , trial])
+    plt.plot([d[7]*d[8] for _,d in run.items()], [d[4] for _,d in run.items()],
+             l+'+--', label='init '+mpi)
+    plt.plot([d[7]*d[8] for _,d in run.items()], [d[6] for _,d in run.items()],
+             l+'o--', label='write '+mpi)
+
+plt.xlabel("Cores")
+plt.ylabel("Time")
+plt.legend(loc='best')
+plt.title("Scaling of I/O for maria3km")
+plt.grid(False)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[18]:
+[[file:./figs/mvapich-io-maria3km.svg]]
 :END:
 
 ** figs :noexport:
