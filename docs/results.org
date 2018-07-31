@@ -1140,12 +1140,13 @@ plot_scaling(cases, labels, title, legend_outside=False)
    :CUSTOM_ID: mvapich_io
    :END:
 
-#+begin_src ipython :session
-case, wrf, comp = 
-for mpi,trial,l in [('mvapich2.2', 'T1', 'b'), ('mpt2.18', 'T1', 'r'), 
-                    ('mvapich2.3', 'E0', 'g'), ('mvapich2.3', 'E1', 'y')]:
-getFromDict(data, ['new_conus12km', 'WRFV4.0', 'gnu8.1.0'case, wrf, comp, mpi , trial])
-#+end_src
+#+begin_note
+mvapich2.3E0 corresponds to setting the environment variables:
+~MV2_CPU_BINDING_POLICY=hybrid MV2_HYBRID_BINDING_POLICY=bunch~
+
+mvapich2.3E1 corresponds to setting the environment variables:
+~MV2_CPU_BINDING_POLICY=hybrid MV2_HYBRID_BINDING_POLICY=bunch MV2_USE_MCAST=1 MV2_ENABLE_SHARP=1~
+#+end_note
 
 #+begin_src ipython :session :ipyfile ./figs/mvapich-io-new_conus12km.svg
 case, wrf, comp = 'new_conus12km', 'WRFV4.0', 'gnu8.1.0'
