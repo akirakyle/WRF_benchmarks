@@ -1,0 +1,119 @@
+#!/bin/sh
+
+TRIAL=T1
+RUN_DIR=~/scratch/run
+WALL_TIME='00:30:00'
+PBS_OPTS=
+PBS_SCRIPT=wrf_job.pbs
+
+help() {
+echo ""
+echo "Usage: ${0##*/} [OPTIONS]"
+echo ""
+echo "Creates and submits a series of PBS jobs scripts for all combinations of parameters"
+echo ""
+echo "OPTIONS:"
+echo "    -c, --cases CASE_DIR LIST    Directories with cases to run, each containing a"
+echo "                                    namelist.input, wrfbdy, and wrfinput or wrfrst."
+echo "    -w, --wrfs  WRF_DIR LIST     Directories of compiled WRF versions to use."
+echo "    -n, --nodes NUM_NODES LIST   Number of nodes to use."
+echo "    -t, --trial TRIAL            Trial string to avoids overwriting previous runs. [default $TRIAL]"
+echo "    -r, --rundir RUN_DIR         Directory to which to place run output. [default $RUN_DIR]"
+echo "    -a, --walltime 'HH:MM:SS'    Walltime for all submitted jobs. [default $WALL_TIME]"
+echo "    -p, --pbs PBS_OPTS           Options to pass to qsub."
+echo "    -h, --help                   This help"
+echo ""
+exit 0
+}
+
+reading_list=none
+while test $# -gt 0
+do
+    case $1 in
+        -c|--cases)
+            reading_list=cases ;;
+        -w|--wrfs)
+            reading_list=wrfs ;;
+        -n|--nodes)
+            reading_list=nodes ;;
+        -t|--trial)
+            reading_list=none
+            TRIAL=$2
+            shift ;;
+        -r|--rundir)
+            reading_list=none
+            RUN_DIR=$2
+            shift ;;
+        -a|--walltime)
+            reading_list=none
+            WALL_TIME=$2
+            shift ;;
+        -p|--pbs)
+            reading_list=none
+            PBS_OPTS=$2
+            shift ;;
+        -h|--help)
+            help ;;
+	      *)
+            if   [ "$reading_list" = cases   ] ; then CASES+=("$1")
+            elif [ "$reading_list" = wrfs    ] ; then WRFs+=("$1")
+            elif [ "$reading_list" = nodes   ] ; then NODES+=($1)
+            else
+                help
+            fi
+	          ;;
+    esac
+	  shift
+done
+
+if [ -z $CASES ]; then
+    echo "at least one CASE_DIR must be specified"; help
+fi
+if [ -z $WRFs ]; then
+    echo "at least one WRF_DIR must be specified"; help
+fi
+if [ -z $NODES ]; then
+    echo "at least one NUM_NODES must be specified"; help
+fi
+
+PWD=$(pwd)
+
+for CASE_DIR in "${CASES[@]}"; do
+    for WRF_DIR in "${WRFs[@]}"; do
+        for N in "${NODES[@]}"; do
+            cd $PWD
+            WRF_PATH=$(readlink -f $WRF_DIR)
+            if [ -z $WRF_PATH ] || [ ! -d $WRF_PATH ]; then
+                echo "Invalid WRF_PATH: $WRF_DIR"
+                exit 1
+            fi
+            CASE_PATH=$(readlink -f $CASE_DIR)
+            if [ -z $CASE_PATH ] || [ ! -d $WRF_PATH ]; then
+                echo "Invalid CASE_PATH: $CASE_PATH"
+                exit 1
+            fi
+
+            JOB_NAME=$(basename $CASE_DIR)-$(basename $WRF_DIR)-$TRIAL-N$(printf "%03d" $N)
+            mkdir -p $RUN_DIR/$JOB_NAME
+            cd $RUN_DIR/$JOB_NAME
+
+            ln -sf $WRF_PATH/run/* .
+            ln -sf $CASE_PATH/* .  # must be second to overwrite default namelist.input
+
+            envsubst '${JOB_NAME},${N},${WALL_TIME}' > $PBS_SCRIPT << EOF
+#!/bin/bash
+#PBS -N ${JOB_NAME}
+#PBS -l walltime=${WALL_TIME}
+#PBS -q regular
+#PBS -j oe
+#PBS -l select=${N}:ncpus=36:mpiprocs=36
+
+export TMPDIR=/glade/scratch/$USER/temp
+mkdir -p $TMPDIR
+
+./mpirun_wrf $((${N} * 36))
+EOF
+            qsub $PBS_OPTS $PBS_SCRIPT
+        done
+    done
+done
