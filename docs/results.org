@@ -641,6 +641,40 @@ plot_scaling(cases, labels, title)
 [[file:./figs/maria3km.svg]]
 :END:
 
+** Maria 1km
+   :PROPERTIES:
+   :CUSTOM_ID: maria1km
+   :END:
+
+#+begin_src ipython :session :ipyfile ./figs/maria1km_runtime.svg
+maria_case = ['maria1km', 'WRFV4.0', 'intel18.0.1', 'mpt2.18',  'T1' ]
+runs = getFromDict(data, maria_case)
+cpus = np.array([d[7]*d[8] for _,d in runs.items()])
+comp = np.array([d[1] for _,d in runs.items()])/60.0
+init = np.array([d[3] for _,d in runs.items()])/60.0
+write = np.array([d[5] for _,d in runs.items()])/60.0
+tot = comp+init+write
+gridpoints = e_we[case[0]] * e_sn[case[0]]
+plt.figure(figsize=(4,4))
+plt.plot(cpus, tot, 'bo', label='Total')
+plt.plot(cpus, init, 'rs', label='Initialization')
+plt.plot(cpus, comp, 'gv', label='Computing')
+plt.plot(cpus, write, 'b+', label='Writing output')
+plt.xlabel("Cores")
+plt.ylabel("Wall-clock time (minutes)")
+plt.legend(loc='best')
+# plt.title("Run time results")
+# plt.axis('equal')
+# plt.axes().set_aspect('equal', 'datalim')
+plt.grid(False)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[9]:
+[[file:./figs/maria1km_runtime.svg]]
+:END:
+
 ** Cases table :noexport:
 #+name: cases-cases
 | case           | WRF version | compiler    | mpi     | trial                                                      |
@@ -1106,25 +1140,34 @@ plot_scaling(cases, labels, title, legend_outside=False)
    :CUSTOM_ID: mvapich_io
    :END:
 
+#+begin_src ipython :session
+case, wrf, comp = 
+for mpi,trial,l in [('mvapich2.2', 'T1', 'b'), ('mpt2.18', 'T1', 'r'), 
+                    ('mvapich2.3', 'E0', 'g'), ('mvapich2.3', 'E1', 'y')]:
+getFromDict(data, ['new_conus12km', 'WRFV4.0', 'gnu8.1.0'case, wrf, comp, mpi , trial])
+#+end_src
+
 #+begin_src ipython :session :ipyfile ./figs/mvapich-io-new_conus12km.svg
-case, wrf, comp, trial = 'new_conus12km', 'WRFV4.0', 'gnu8.1.0', 'T1'
-for mpi,l in [('mvapich2.2', 'b'), ('mpt2.18', 'r')]:
+case, wrf, comp = 'new_conus12km', 'WRFV4.0', 'gnu8.1.0'
+for mpi,trial,l in [('mvapich2.2', 'T1', 'b'), ('mpt2.18', 'T1', 'r'), 
+                    ('mvapich2.3', 'E0_T1', 'g'), ('mvapich2.3', 'E1_T1', 'y')]:
     run = getFromDict(data, [case, wrf, comp, mpi , trial])
     plt.plot([d[7]*d[8] for _,d in run.items()], [d[4] for _,d in run.items()],
-             l+'+--', label='init '+mpi)
+             l+'+--', label='init '+mpi+''+trial[:-3])
     plt.plot([d[7]*d[8] for _,d in run.items()], [d[6] for _,d in run.items()],
-             l+'o--', label='write '+mpi)
+             l+'o--', label='write '+mpi+''+trial[:-3])
 
 plt.xlabel("Cores")
 plt.ylabel("Time")
-plt.legend(loc='best')
+#plt.legend(loc='best')
+plt.legend(loc='upper center', bbox_to_anchor=(1.22, 1.0), ncol=1)
 plt.title("Scaling I/O for new_conus12km")
 plt.grid(False)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-# Out[59]:
+# Out[44]:
 [[file:./figs/mvapich-io-new_conus12km.svg]]
 :END:
 
@@ -1468,36 +1511,9 @@ and single output file of the Maria 1km case, which used a domain of about 372
 million grid points. If you have more restarts and output files, your numbers
 will be different but the trend will be similar.
 
-#+begin_src ipython :session :ipyfile ./figs/maria1km_runtime.svg
-maria_case = ['maria1km', 'WRFV4.0', 'intel18.0.1', 'mpt2.18',  'T1' ]
-runs = getFromDict(data, maria_case)
-cpus = np.array([d[7]*d[8] for _,d in runs.items()])
-comp = np.array([d[1] for _,d in runs.items()])/60.0
-init = np.array([d[3] for _,d in runs.items()])/60.0
-write = np.array([d[5] for _,d in runs.items()])/60.0
-tot = comp+init+write
-gridpoints = e_we[case[0]] * e_sn[case[0]]
-plt.figure(figsize=(4,4))
-plt.plot(cpus, tot, 'bo', label='Total')
-plt.plot(cpus, init, 'rs', label='Initialization')
-plt.plot(cpus, comp, 'gv', label='Computing')
-plt.plot(cpus, write, 'b+', label='Writing output')
-plt.xlabel("Cores")
-plt.ylabel("Wall-clock time (minutes)")
-plt.legend(loc='best')
-# plt.title("Run time results")
-# plt.axis('equal')
-# plt.axes().set_aspect('equal', 'datalim')
-plt.grid(False)
-#+end_src
-
 #+name: wrf_runtime
 #+caption: WRF Run Timing
-#+RESULTS:
-:RESULTS:
-# Out[9]:
 [[file:./figs/maria1km_runtime.svg]]
-:END:
 
 * TODO Optimizing WRF performance
   :PROPERTIES:
