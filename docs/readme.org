@@ -39,22 +39,20 @@ scaling performance of WRF on NCAR's Cheyenne Supercomputer.
   :CUSTOM_ID: how_to_run_example
   :END:
 As always, change the example paths to your directory structure. All the scripts
-in the ~srcipts/~ directory do not hardcode paths (except ~wrf_run_pbs_job~ has
+in the ~srcipts/~ directory do not hardcode paths (except ~wrf_run_pbs_jobs~ has
 a default run directory) but the scripts in the ~cases/~ directory do hardcode
 paths. All the job submission scripts in ~WRFs~ and ~WPSs~ also hardcode paths.
 
 The following will give you a table with timing results using the
 ~new_conus12km~ benchmark with WRFV4.0 compiled with intel18.0.1 and mpt2.18
 scaled across 1, 2, 4, 8 nodes on cheyenne. (cheyenne's 36 cores/node is the
-default in ~wrf_run_pbs_job~)
+default in ~wrf_run_pbs_jobs~)
 
 #+begin_src sh
 export JASPERLIB=/glade/u/home/wrfhelp/UNGRIB_LIBRARIES/lib
 export JASPERINC=/glade/u/home/wrfhelp/UNGRIB_LIBRARIES/include
-alias qsub='/opt/pbs/bin/qsub -A MY_ACCOUNT_CODE -m abe -M my_email_address'
 
 git clone https://github.com/akirakyle/WRF_benchmarks.git
-PATH=~/WRF_benchmarks/scripts:$PATH
 
 qsub WRF_benchmarks/WRFs/WRFV4.0-intel18.0.1-mpt2.18.pbs
 qstat # wait for job to finish...
@@ -62,18 +60,36 @@ qsub WRF_benchmarks/WPSs/WPSV4.0-intel18.0.1.pbs
 qstat # wait for job to finish...
 ./WRF_benchmarks/cases/make_cases_new.sh
 qstat # wait for job to finish...
-wrf_run_pbs_job -c ~/WRF_benchmarks/cases/new_conus12km -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n 1
-wrf_run_pbs_job -c ~/WRF_benchmarks/cases/new_conus12km -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n 2
-wrf_run_pbs_job -c ~/WRF_benchmarks/cases/new_conus12km -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n 4
-wrf_run_pbs_job -c ~/WRF_benchmarks/cases/new_conus12km -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n 8
+./WRF_benchmarks/wrf_run_pbs_jobs -c ~/WRF_benchmarks/cases/new_conus12km \
+                                  -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 \
+                                  -n 1 2 4 8 -r ./run \
+                                  -p '-A MY_ACCOUNT_CODE -m abe -M my_email_address'
 qstat # wait for jobs to finish...
-cd ~/scratch/run
-wrf_cpy_rsl -a ../archive -o ~/results -r *
-cd ~/results
-wrf_stats *
+cd run
+./WRF_benchmarks/wrf_cpy_rsl -a ../archive -o ../results -r *
+cd ../results
+./WRF_benchmarks/wrf_stats *
 #+end_src
 
-* Data for the various benchmark cases
+#+begin_note
+I made heavy use of [[https://orgmode.org/][emacs org mode]] for automating the above workflow of creating
+runs, submitting them, and plotting their output. In particular I made use of
+the [[https://orgmode.org/worg/org-contrib/babel/intro.html][babel feature in org mode]] and its integration with [[https://www.gnu.org/software/tramp/][TRAMP mode]]. I eventually
+needed a more flexible solution than provided by the ~wrf_run_pbs_job~ script to
+manage all the pbs job submission scripts so I created the bash source block in
+in ~docs/runs.org~ file to run, manage, and document all the jobs I was
+submitting to Cheyenne. The ~wrf_stats~ script outputs an org mode compatible
+table, so I can use the ~docs/data.org~ file to save all the wrf timing results.
+I can then reference this table of data in the analysis code blocks in
+~docs/results.org~.
+
+Of course this document itself is also written in org mode and exported to html.
+Be wary of the fact that github does render org mode documents as if it was
+markdown, however this often leaves out valuable information present in the raw
+org mode text.
+#+end_note
+
+* Data Sources for the various benchmark cases
   :PROPERTIES:
   :CUSTOM_ID: benchmark_data
   :END:
@@ -114,55 +130,3 @@ appropriate glade directories.
 
 WPS and ~real.exe~ must be run to generate ~wrfbdy_d01~ and ~wrfrst_d01~ for
 these cases
-
-* Examples of pbs job scripts for cheyenne
-  :PROPERTIES:
-  :CUSTOM_ID: example_cheyenne_job_scripts
-  :END:
-#+begin_src sh
-#!/bin/bash
-### Job Name
-#PBS -N cheyenne_wrf
-### Project code
-#PBS -A MY_PROJECT_CODE
-#PBS -l walltime=00:20:00
-#PBS -q regular
-### Merge output and error files
-#PBS -j oe
-### Select 2 nodes with 36 CPUs each for a total of 72 MPI processes
-#PBS -l select=2:ncpus=36:mpiprocs=36
-### Send email on abort, begin and end
-#PBS -m abe
-### Specify mail recipient
-#PBS -M my_email_address
-
-export TMPDIR=/glade/scratch/$USER/temp
-mkdir -p $TMPDIR
-
-### Run the executable
-mpiexec_mpt ./wrf.exe
-#+end_src
-
-~real.exe~ must also be run with mpi
-#+begin_src sh
-mpiexec_mpt ./real.exe
-#+end_src
-
-To profile with ~arm-map~
-#+begin_src sh
-module load arm-forge/18.1.2
-# map --connect ./wrf.exe # for live, interactive profiling
-map --profile ./wrf.exe # for generating profile file to be loaded later
-#+end_src
-
-To profile with ~arm-reports~
-#+begin_src sh
-module load arm-reports/18.1.2
-perf-report -mpi -n 72 ./wrf.exe
-#+end_src
-
-To use ~mvapich~ instead of ~mpt~
-#+begin_src sh
-module load mvapich2
-mpirun -n 72 ./wrf.exe
-#+end_src

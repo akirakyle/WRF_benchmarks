@@ -3,360 +3,430 @@
 #+AUTHOR: Akira Kyle
 #+EMAIL: akyle@cmu.edu
 
-#+name: completed
-| Case            | WRF       | Compiler              | MPI            | T         |   N |     Wall |  P |  M |  O |
-|-----------------+-----------+-----------------------+----------------+-----------+-----+----------+----+----+----|
-| maria1km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |  16 | 04:00:00 |    |    |    |
-| maria1km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |  32 | 04:00:00 |    |    |    |
-| maria1km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |  64 | 04:00:00 |    |    |    |
-| maria1km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        | 128 | 04:00:00 |    |    |    |
-| maria1km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        | 256 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |   2 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |   4 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |   8 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |  16 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |  32 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |  64 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |   2 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |   8 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |  16 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |  32 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |  64 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |   2 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |   8 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |  16 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |  32 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |   2 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |   4 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |   8 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |  16 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |  32 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   2 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   4 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   8 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |  16 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |  32 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |  64 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        | 128 | 04:00:00 |    |    |    |
-| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        | 256 | 04:00:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mpt2.18        | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mpt2.18        | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mpt2.18        | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mpt2.18        | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mpt2.18        | T1        |  16 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mpt2.18        | T1        |  32 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mpt2.18        | T1        |  64 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mpt2.18        | T1        | 128 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mpt2.18        | T1        | 256 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mvapich2.2     | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mvapich2.2     | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mvapich2.2     | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mvapich2.2     | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mvapich2.2     | T1        |  16 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mvapich2.2     | T1        |  32 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mvapich2.2     | T1        |  64 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | intel18.0.1           | mpt2.18        | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | intel18.0.1           | mpt2.18        | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | intel18.0.1           | mpt2.18        | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | intel18.0.1           | mpt2.18        | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | intel18.0.1           | mpt2.18        | T1        |  16 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | intel18.0.1           | mpt2.18        | T1        |  32 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | intel18.0.1           | mpt2.18        | T1        |  64 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | intel18.0.1           | mpt2.18        | T1        | 128 | 00:30:00 |    |    |    |
-| new_conus12km_3 | WRFV3.8.1 | intel18.0.1           | mpt2.18        | T1        | 256 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |  16 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpt2.18        | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpt2.18        | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpt2.18        | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpt2.18        | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpt2.18        | T1        |  16 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_fma          | mvapich2.2     | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_fma          | mvapich2.2     | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_fma          | mvapich2.2     | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_fma          | mvapich2.2     | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_fma          | mvapich2.2     | T1        |  16 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |  16 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |  16 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |  16 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_O3           | mvapich2.2     | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_O3           | mvapich2.2     | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_O3           | mvapich2.2     | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_O3           | mvapich2.2     | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_O3           | mvapich2.2     | T1        |  16 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |  16 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |  16 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |  16 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |  16 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel17.0.1           | mvapich2.2     | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |  16 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |  16 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |   1 | 08:00:00 |    |  2 | 18 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |   2 | 08:00:00 |    |  2 | 18 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |   4 | 08:00:00 |    |  2 | 18 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |   8 | 08:00:00 |    |  2 | 18 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |  16 | 08:00:00 |    |  2 | 18 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |  32 | 08:00:00 |    |  2 | 18 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |  64 | 08:00:00 |    |  2 | 18 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 | 128 | 08:00:00 |    |  2 | 18 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |   1 | 08:00:00 |    |  3 | 12 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |   2 | 08:00:00 |    |  3 | 12 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |   4 | 08:00:00 |    |  3 | 12 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |   8 | 08:00:00 |    |  3 | 12 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |  16 | 08:00:00 |    |  3 | 12 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |  32 | 08:00:00 |    |  3 | 12 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |  64 | 08:00:00 |    |  3 | 12 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 | 128 | 08:00:00 |    |  3 | 12 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |   1 | 08:00:00 |    |  4 |  9 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |   2 | 08:00:00 |    |  4 |  9 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |   4 | 08:00:00 |    |  4 |  9 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |   8 | 08:00:00 |    |  4 |  9 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |  16 | 08:00:00 |    |  4 |  9 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |  32 | 08:00:00 |    |  4 |  9 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |  64 | 08:00:00 |    |  4 |  9 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |   1 | 08:00:00 |    |  6 |  6 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |   2 | 08:00:00 |    |  6 |  6 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |   4 | 08:00:00 |    |  6 |  6 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |   8 | 08:00:00 |    |  6 |  6 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |  16 | 08:00:00 |    |  6 |  6 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |  32 | 08:00:00 |    |  6 |  6 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |  64 | 08:00:00 |    |  6 |  6 |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |  16 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |   2 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |   4 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |   8 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |  16 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mvapich2.2     | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |  16 | 00:30:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |   4 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |   8 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |  16 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |  32 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |  64 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        | 128 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |   4 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |   8 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |  16 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |  32 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |  64 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |   4 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |   8 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |  16 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |  32 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |  64 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        | 128 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        | 256 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |   4 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |   8 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |  16 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |  32 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |  64 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |   4 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |   8 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |  16 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |  32 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |  64 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |   4 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |   8 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |  16 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |  32 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |  64 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        | 128 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        | 256 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |   4 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |   8 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |  16 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |  32 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |  64 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        | 128 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        | 256 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |   4 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |   8 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |  16 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |  32 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |  64 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        | 128 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        | 256 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |   4 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |   8 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |  16 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |  32 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |  64 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |   4 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |   8 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |  16 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |  32 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |  64 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        | 128 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        | 256 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |   4 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |   8 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |  16 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |  32 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |  64 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |   8 | 08:00:00 |    |  2 | 18 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |  16 | 08:00:00 |    |  2 | 18 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |  32 | 08:00:00 |    |  2 | 18 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |  64 | 08:00:00 |    |  2 | 18 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 | 128 | 08:00:00 |    |  2 | 18 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 | 256 | 08:00:00 |    |  2 | 18 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 | 512 | 08:00:00 |    |  2 | 18 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |   8 | 08:00:00 |    |  3 | 12 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |  16 | 08:00:00 |    |  3 | 12 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |  32 | 08:00:00 |    |  3 | 12 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |  64 | 08:00:00 |    |  3 | 12 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 | 128 | 08:00:00 |    |  3 | 12 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 | 256 | 08:00:00 |    |  3 | 12 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 | 512 | 08:00:00 |    |  3 | 12 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |   4 | 08:00:00 |    |  4 |  9 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |   8 | 08:00:00 |    |  4 |  9 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |  16 | 08:00:00 |    |  4 |  9 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |  32 | 08:00:00 |    |  4 |  9 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |  64 | 08:00:00 |    |  4 |  9 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  | 128 | 08:00:00 |    |  4 |  9 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  | 256 | 08:00:00 |    |  4 |  9 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  | 512 | 08:00:00 |    |  4 |  9 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |   4 | 08:00:00 |    |  6 |  6 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |   8 | 08:00:00 |    |  6 |  6 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |  16 | 08:00:00 |    |  6 |  6 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |  32 | 08:00:00 |    |  6 |  6 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |  64 | 08:00:00 |    |  6 |  6 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  | 128 | 08:00:00 |    |  6 |  6 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  | 256 | 08:00:00 |    |  6 |  6 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  | 512 | 08:00:00 |    |  6 |  6 |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   4 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   8 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |  16 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |  32 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |  64 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        | 128 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        | 256 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |   4 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |   8 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |  16 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |  32 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |  64 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        | 128 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        | 256 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |   4 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |   8 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |  16 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |  32 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |  64 | 04:00:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_p18    |   1 | 00:30:00 | 18 | 18 |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_p09    |   1 | 01:00:00 |  9 |  9 |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_p04    |   1 | 01:00:00 |  4 |  4 |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_p02    |   1 | 02:00:00 |  2 |  2 |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_p01    |   1 | 03:00:00 |  1 |  1 |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm     |   2 | 04:00:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1_opt66     | mpt2.18        | T1        |   1 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1_opt66     | mpt2.18        | T1        |   2 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1_opt66     | mpt2.18        | T1        |   4 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1_opt66     | mpt2.18        | T1        |   8 | 00:30:00 |    |    |    |
-| new_conus12km   | WRFV4.0   | intel18.0.1_opt66     | mpt2.18        | T1        |  16 | 00:30:00 |    |    |    |
-| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm     |   1 | 04:00:00 |    |    |    |
-| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm     |   1 | 08:00:00 |    |    |    |
-| maria1km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm     |   4 | 06:00:00 |    |    |    |
-| maria1km        | WRFV4.0.p | intel18.0.1           | mpt2.18        | T1        | 512 | 00:40:00 |    |    |    |
+#+name: archived
+| Case            | WRF       | Compiler              | MPI            | T         |    N |     Wall |  P |  M |       O | Queue | Mem | Env |
+|-----------------+-----------+-----------------------+----------------+-----------+------+----------+----+----+---------+-------+-----+-----|
+| maria1km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| maria1km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| maria1km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   64 | 04:00:00 |    |    |         |       |     |     |
+| maria1km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |  128 | 04:00:00 |    |    |         |       |     |     |
+| maria1km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |  256 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |    2 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |    4 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |    8 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |   64 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |    2 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |    8 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |   64 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |    2 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |    8 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |    2 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |    4 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |    8 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |    2 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |    4 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |    8 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   64 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |  128 | 04:00:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |  256 | 04:00:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mpt2.18        | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mpt2.18        | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mpt2.18        | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mpt2.18        | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mpt2.18        | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mpt2.18        | T1        |   32 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mpt2.18        | T1        |   64 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mpt2.18        | T1        |  128 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mpt2.18        | T1        |  256 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mvapich2.2     | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mvapich2.2     | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mvapich2.2     | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mvapich2.2     | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mvapich2.2     | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mvapich2.2     | T1        |   32 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | gnu6.3.0              | mvapich2.2     | T1        |   64 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | intel18.0.1           | mpt2.18        | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | intel18.0.1           | mpt2.18        | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | intel18.0.1           | mpt2.18        | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | intel18.0.1           | mpt2.18        | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | intel18.0.1           | mpt2.18        | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | intel18.0.1           | mpt2.18        | T1        |   32 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | intel18.0.1           | mpt2.18        | T1        |   64 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | intel18.0.1           | mpt2.18        | T1        |  128 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km_3 | WRFV3.8.1 | intel18.0.1           | mpt2.18        | T1        |  256 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpt2.18        | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpt2.18        | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpt2.18        | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpt2.18        | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu6.3.0              | mpt2.18        | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_fma          | mvapich2.2     | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_fma          | mvapich2.2     | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_fma          | mvapich2.2     | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_fma          | mvapich2.2     | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_fma          | mvapich2.2     | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_O3           | mvapich2.2     | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_O3           | mvapich2.2     | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_O3           | mvapich2.2     | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_O3           | mvapich2.2     | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_O3           | mvapich2.2     | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel17.0.1           | mvapich2.2     | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |    1 | 08:00:00 |    |  2 |      18 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |    2 | 08:00:00 |    |  2 |      18 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |    4 | 08:00:00 |    |  2 |      18 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |    8 | 08:00:00 |    |  2 |      18 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |   16 | 08:00:00 |    |  2 |      18 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |   32 | 08:00:00 |    |  2 |      18 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |   64 | 08:00:00 |    |  2 |      18 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |  128 | 08:00:00 |    |  2 |      18 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |    1 | 08:00:00 |    |  3 |      12 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |    2 | 08:00:00 |    |  3 |      12 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |    4 | 08:00:00 |    |  3 |      12 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |    8 | 08:00:00 |    |  3 |      12 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |   16 | 08:00:00 |    |  3 |      12 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |   32 | 08:00:00 |    |  3 |      12 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |   64 | 08:00:00 |    |  3 |      12 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |  128 | 08:00:00 |    |  3 |      12 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |    1 | 08:00:00 |    |  4 |       9 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |    2 | 08:00:00 |    |  4 |       9 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |    4 | 08:00:00 |    |  4 |       9 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |    8 | 08:00:00 |    |  4 |       9 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |   16 | 08:00:00 |    |  4 |       9 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |   32 | 08:00:00 |    |  4 |       9 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |   64 | 08:00:00 |    |  4 |       9 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |    1 | 08:00:00 |    |  6 |       6 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |    2 | 08:00:00 |    |  6 |       6 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |    4 | 08:00:00 |    |  6 |       6 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |    8 | 08:00:00 |    |  6 |       6 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |   16 | 08:00:00 |    |  6 |       6 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |   32 | 08:00:00 |    |  6 |       6 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |   64 | 08:00:00 |    |  6 |       6 |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mvapich2.2     | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |    4 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |    8 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |   64 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mpich3.2       | T1        |  128 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |    4 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |    8 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu6.3.0              | mvapich2.2     | T1        |   64 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |    4 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |    8 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |   64 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |  128 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mpt2.18        | T1        |  256 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |    4 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |    8 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |   64 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |    4 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |    8 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_fma       | mvapich2.2     | T1        |   64 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |    4 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |    8 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |   64 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |  128 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_O3_native    | mpt2.18        | T1        |  256 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |    4 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |    8 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |   64 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |  128 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast        | mpt2.18        | T1        |  256 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |    4 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |    8 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |   64 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |  128 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0_Ofast_native | mpt2.18        | T1        |  256 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |    4 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |    8 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | gnu8.1.0              | openmpi3.1.0   | T1        |   64 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |    4 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |    8 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |   64 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |  128 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1_host      | mpt2.18        | T1        |  256 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |    4 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |    8 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | impi2018.1.163 | T1        |   64 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |    8 | 08:00:00 |    |  2 |      18 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |   16 | 08:00:00 |    |  2 |      18 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |   32 | 08:00:00 |    |  2 |      18 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |   64 | 08:00:00 |    |  2 |      18 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |  128 | 08:00:00 |    |  2 |      18 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |  256 | 08:00:00 |    |  2 |      18 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m2_o18 |  512 | 08:00:00 |    |  2 |      18 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |    8 | 08:00:00 |    |  3 |      12 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |   16 | 08:00:00 |    |  3 |      12 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |   32 | 08:00:00 |    |  3 |      12 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |   64 | 08:00:00 |    |  3 |      12 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |  128 | 08:00:00 |    |  3 |      12 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |  256 | 08:00:00 |    |  3 |      12 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m3_o12 |  512 | 08:00:00 |    |  3 |      12 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |    4 | 08:00:00 |    |  4 |       9 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |    8 | 08:00:00 |    |  4 |       9 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |   16 | 08:00:00 |    |  4 |       9 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |   32 | 08:00:00 |    |  4 |       9 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |   64 | 08:00:00 |    |  4 |       9 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |  128 | 08:00:00 |    |  4 |       9 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |  256 | 08:00:00 |    |  4 |       9 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m4_o9  |  512 | 08:00:00 |    |  4 |       9 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |    4 | 08:00:00 |    |  6 |       6 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |    8 | 08:00:00 |    |  6 |       6 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |   16 | 08:00:00 |    |  6 |       6 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |   32 | 08:00:00 |    |  6 |       6 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |   64 | 08:00:00 |    |  6 |       6 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |  128 | 08:00:00 |    |  6 |       6 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |  256 | 08:00:00 |    |  6 |       6 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18_omp    | T1_m6_o6  |  512 | 08:00:00 |    |  6 |       6 |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |    4 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |    8 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |   64 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |  128 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1        |  256 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |    4 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |    8 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |   16 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |   32 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |   64 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |  128 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T2        |  256 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |    4 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |    8 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |   16 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |   32 | 04:00:00 |    |    |         |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | openmpi3.1.0   | T1        |   64 | 04:00:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_p18    |    1 | 00:30:00 | 18 | 18 |   share |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_p09    |    1 | 01:00:00 |  9 |  9 |   share |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_p04    |    1 | 01:00:00 |  4 |  4 |   share |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_p02    |    1 | 02:00:00 |  2 |  2 |   share |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_p01    |    1 | 03:00:00 |  1 |  1 |   share |       |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm     |    2 | 04:00:00 |    |    |         | 109GB |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1_opt66     | mpt2.18        | T1        |    1 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1_opt66     | mpt2.18        | T1        |    2 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1_opt66     | mpt2.18        | T1        |    4 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1_opt66     | mpt2.18        | T1        |    8 | 00:30:00 |    |    |         |       |     |     |
+| new_conus12km   | WRFV4.0   | intel18.0.1_opt66     | mpt2.18        | T1        |   16 | 00:30:00 |    |    |         |       |     |     |
+| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm     |    1 | 04:00:00 |    |    |         | 109GB |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm     |    1 | 08:00:00 |    |    |         | 109GB |     |     |
+| maria1km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm     |    4 | 06:00:00 |    |    |         | 109GB |     |     |
+| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm_p18 |    1 | 05:00:00 | 18 | 18 |         | 109GB |     |     |
+| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm_p09 |    1 | 06:00:00 |  9 |  9 |         | 109GB |     |     |
+| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm_p04 |    1 | 09:00:00 |  4 |  4 |         | 109GB |     |     |
+| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm_p02 |    1 | 10:00:00 |  2 |  2 |         | 109GB |     |     |
+| maria3km        | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm_p01 |    1 | 12:00:00 |  1 |  1 |         | 109GB |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm_p18 |    1 |  8:00:00 | 18 | 18 |         | 109GB |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm_p09 |    1 |  9:00:00 |  9 |  9 |         | 109GB |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm_p04 |    1 | 10:00:00 |  4 |  4 |         | 109GB |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm_p02 |    1 | 11:00:00 |  2 |  2 |         | 109GB |     |     |
+| new_conus2.5km  | WRFV4.0   | intel18.0.1           | mpt2.18        | T1_hm_p01 |    1 | 12:00:00 |  1 |  1 |         | 109GB |     |     |
+| maria1km        | WRFV4.0.p | intel18.0.1           | mpt2.18        | T1        |  512 | 00:40:00 |    |    | economy |       |     |     |
+| maria1km        | WRFV4.0.p | intel18.0.1           | mpt2.18        | T1        | 1024 | 00:40:00 |    |    | economy |       |     |     |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.2     | T1        |   64 | 04:00:00 |    |    |         |       |     |     |
 
-
-#+name: failed
-| Case          | WRF       | Compiler        | MPI        | T     |   N |     Wall | P | M | O |
-|---------------+-----------+-----------------+------------+-------+-----+----------+---+---+---|
-| new_conus12km | WRFV4.0   | intel18.0.1     | mpt2.18    | T1    |   2 | 00:30:00 |   |   |   |
-| new_conus12km | WRFV4.0   | intel18.0.1_dbg | mvapich2.2 | T1    |   2 | 00:30:00 |   |   |   |
-| maria1km-test | WRFV4.0.p | intel18.0.1     | mpt2.18    | T1    | 512 | 00:10:00 |   |   |   |
-| new_conus12km | WRFV4.0   | intel18.0.1     | mvapich2.2 | T1_hm |   2 | 00:30:00 |   |   |   |
+#+name: env_vars
+| MV2_CPU_BINDING_POLICY=hybrid MV2_HYBRID_BINDING_POLICY=bunch MV2_USE_THREAD_WARNING=0                                    |
+| MV2_CPU_BINDING_POLICY=hybrid MV2_HYBRID_BINDING_POLICY=bunch MV2_USE_THREAD_WARNING=0 MV2_USE_MCAST=1 MV2_ENABLE_SHARP=1 |
 
 #+name: pending
-| Case           | WRF     | Compiler    | MPI     | T         | N |     Wall |  P |  M | O |
-|----------------+---------+-------------+---------+-----------+---+----------+----+----+---|
-| maria3km       | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p18 | 1 | 05:00:00 | 18 | 18 |   |
-| maria3km       | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p09 | 1 | 06:00:00 |  9 |  9 |   |
-| maria3km       | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p04 | 1 | 09:00:00 |  4 |  4 |   |
-| maria3km       | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p02 | 1 | 10:00:00 |  2 |  2 |   |
-| maria3km       | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p01 | 1 | 12:00:00 |  1 |  1 |   |
-| new_conus2.5km | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p18 | 1 |  8:00:00 | 18 | 18 |   |
-| new_conus2.5km | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p09 | 1 |  9:00:00 |  9 |  9 |   |
-| new_conus2.5km | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p04 | 1 | 10:00:00 |  4 |  4 |   |
-| new_conus2.5km | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p02 | 1 | 11:00:00 |  2 |  2 |   |
-| new_conus2.5km | WRFV4.0 | intel18.0.1 | mpt2.18 | T1_hm_p01 | 1 | 12:00:00 |  1 |  1 |   |
-
-
+| Case          | WRF     | Compiler | MPI        | T     |  N | W | P | M | O | Q | M | Env |
+|---------------+---------+----------+------------+-------+----+---+---+---+---+---+---+-----|
+| new_conus12km | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 |  1 |   |   |   |   |   |   |   0 |
+| new_conus12km | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 |  2 |   |   |   |   |   |   |   0 |
+| new_conus12km | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 |  4 |   |   |   |   |   |   |   0 |
+| new_conus12km | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 |  8 |   |   |   |   |   |   |   0 |
+| new_conus12km | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 | 16 |   |   |   |   |   |   |   0 |
+| new_conus12km | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E1_T1 |  1 |   |   |   |   |   |   |   1 |
+| new_conus12km | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E1_T1 |  2 |   |   |   |   |   |   |   1 |
+| new_conus12km | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E1_T1 |  4 |   |   |   |   |   |   |   1 |
+| new_conus12km | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E1_T1 |  8 |   |   |   |   |   |   |   1 |
+| new_conus12km | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E1_T1 | 16 |   |   |   |   |   |   |   1 |
 
 #+name: run
-| Case     | WRF       | Compiler    | MPI     | T  |    N |     Wall | P | M | O |
-|----------+-----------+-------------+---------+----+------+----------+---+---+---|
-| maria1km | WRFV4.0.p | intel18.0.1 | mpt2.18 | T1 | 1024 | 00:40:00 |   |   |   |
+| Case          | WRF     | Compiler | MPI        | T    | N | W | P | M | O | Q | M | Env |
+|---------------+---------+----------+------------+------+---+---+---+---+---+---+---+-----|
 
-#+header: :var RUN=run[2]
+#+header: :var ENV_VARS=env_vars RUN=run[2]
 #+begin_src bash :dir /ssh:cheyenne:~/ :results raw drawer
-wrf_make_run \
-    -c ~/WRF_benchmarks/cases/${RUN[0]} \
-    -w ~/work/WRFs/${RUN[1]}-${RUN[2]}-${RUN[3]} \
-    -t ${RUN[4]} \
-    -n ${RUN[5]} \
-    -a ${RUN[6]} \
-    -q economy
-#    -e 109GB
-#    -p ${RUN[7]} \
-#    -m ${RUN[8]} \
-#    -e 109GB
-#    -o ${RUN[9]} \
-#    -q share \
+#set -x
+CASE=${RUN[0]}
+WRF=${RUN[1]}
+COMPILER=${RUN[2]}
+MPI=${RUN[3]}
+TRIAL=${RUN[4]}
+NODES=${RUN[5]}
+WALL=${RUN[6]}
+NCPUS=${RUN[7]}
+MPIPROCS=${RUN[8]}
+OMPTHREADS=${RUN[9]}
+QUEUE=${RUN[10]}
+MEM=${RUN[11]}
+ENV=${RUN[12]}
+
+RUN_DIR=~/scratch/run
+PBS_SCRIPT=wrf_job.pbs
+
+CASE_DIR=~/WRF_benchmarks/cases/$CASE
+WRF_DIR=~/work/WRFs/$WRF-$COMPILER-$MPI
+
+WRF_PATH=$(readlink -f $WRF_DIR)
+if [ -z $WRF_PATH ] || [ ! -d $WRF_PATH ]; then
+    echo "Invalid WRF_PATH: $WRF_DIR"; exit 1
+fi
+CASE_PATH=$(readlink -f $CASE_DIR)
+if [ -z $CASE_PATH ] || [ ! -d $WRF_PATH ]; then
+    echo "Invalid CASE_PATH: $CASE_PATH"; exit 1
+fi
+
+if [ -z $TRIAL ]; then TRIAL=T1; fi
+if [ -z $NODES ]; then echo "Must specify nodes"; exit 1; fi
+if [ -z $WALL ]; then WALL='00:30:00'; fi
+if [ -z $NCPUS ]; then NCPUS=36; fi
+if [ -z $MPIPROCS ]; then MPIPROCS=36; fi
+if [ -z $QUEUE ]; then QUEUE=regular; fi
+if [ ! -z $MEM ]; then MEM=":mem=$MEM"; fi
+if [ ! -z $ENV ]; then ENV_STR=$(printf "\nexport %s" "${ENV_VARS[$ENV]}"); fi
+
+OMP_LABEL=
+if [ ! -z $OMPTHREADS ]; then
+    OMP_LABEL=_m${MPIPROCS}_o${OMPTHREADS}
+    OMPTHREADS=":ompthreads=$OMPTHREADS"
+fi
+
+JOB_NAME=$(basename $CASE_DIR)-$(basename $WRF_DIR)$OMP_LABEL-$TRIAL-N$(printf "%03d" $NODES)
+mkdir -p $RUN_DIR/$JOB_NAME
+cd $RUN_DIR/$JOB_NAME
+
+ln -sf $WRF_PATH/run/* .
+ln -sf $CASE_PATH/* .  # must be second to overwrite default namelist.input
+
+TOT_MPI_TASKS=$(($NODES * $MPIPROCS))
+envsubst '${JOB_NAME},${QUEUE},${NODES},${NCPUS},${MPIPROCS},${OMPTHREADS},${TOT_MPI_TASKS},${WALL},${MEM},${ENV_STR}' > $PBS_SCRIPT << EOF
+#!/bin/bash
+#PBS -N ${JOB_NAME}
+#PBS -l walltime=${WALL}
+#PBS -q ${QUEUE}
+#PBS -j oe
+#PBS -l select=${NODES}:ncpus=${NCPUS}:mpiprocs=${MPIPROCS}${OMPTHREADS}${MEM}
+
+export TMPDIR=/glade/scratch/$USER/temp
+mkdir -p $TMPDIR
+${ENV_STR}
+./mpirun_wrf ${TOT_MPI_TASKS}
+EOF
+
+cat $PBS_SCRIPT
+qsub -A SCSG0002 -m abe -M akirak@ucar.edu $PBS_SCRIPT
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-/glade/u/home/akirak/scratch/run/maria1km-WRFV4.0.p-intel18.0.1-mpt2.18-T1-N1024/wrf_job.pbs
+#!/bin/bash
+#PBS -N new_conus12km-WRFV4.0-gnu8.1.0-mvapich2.3-ENV1-N008
+#PBS -l walltime=00:30:00
+#PBS -q regular
+#PBS -j oe
+#PBS -l select=8:ncpus=36:mpiprocs=36
+
+export TMPDIR=/glade/scratch/akirak/temp
+mkdir -p /glade/scratch/akirak
+
+export MV2_CPU_BINDING_POLICY=hybrid MV2_HYBRID_BINDING_POLICY=bunch MV2_USE_THREAD_WARNING=0
+./mpirun_wrf 288
+1362248.chadmin1
 :END:
-
-

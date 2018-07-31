@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2018-07-25 Wed 13:29 -->
+<!-- 2018-07-30 Mon 23:51 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Weather Research and Forecast (WRF) Scaling, Performance Assessment and Optimization</title>
@@ -245,14 +245,13 @@ for the JavaScript code in this tag.
 <ul>
 <li><a href="#git_directories">git directories</a></li>
 <li><a href="#how_to_run_example">Example of how to run the <code>new_conus12km</code> benchmark case</a></li>
-<li><a href="#benchmark_data">Data for the various benchmark cases</a>
+<li><a href="#benchmark_data">Data Sources for the various benchmark cases</a>
 <ul>
 <li><a href="#katrina"><code>katrina</code> (1km, 3km, 30km)</a></li>
 <li><a href="#conus"><code>conus12km</code> and <code>conus2.5km</code></a></li>
 <li><a href="#maria_and_new_conus"><code>maria1km</code>, <code>maria3km</code>, and <code>new_conus12km</code> and <code>new_conus2.5km</code></a></li>
 </ul>
 </li>
-<li><a href="#example_cheyenne_job_scripts">Examples of pbs job scripts for cheyenne</a></li>
 </ul>
 </div>
 </div>
@@ -272,8 +271,8 @@ scaling performance of WRF on NCAR&rsquo;s Cheyenne Supercomputer.
 <a href="results.html">The results of this study can be found here.</a>
 </p>
 
-<div id="outline-container-org35969dc" class="outline-2">
-<h2 id="git_directories"><a id="org35969dc"></a>git directories</h2>
+<div id="outline-container-org8b64a53" class="outline-2">
+<h2 id="git_directories"><a id="org8b64a53"></a>git directories</h2>
 <div class="outline-text-2" id="text-git_directories">
 <ul class="org-ul">
 <li><code>cases/</code> contains the namelists for WPS and WRF for the various benchmark
@@ -293,12 +292,12 @@ and associated analysis and plotting code used to generate the results.</li>
 </div>
 </div>
 
-<div id="outline-container-orgb73f802" class="outline-2">
-<h2 id="how_to_run_example"><a id="orgb73f802"></a>Example of how to run the <code>new_conus12km</code> benchmark case</h2>
+<div id="outline-container-orgcc50afe" class="outline-2">
+<h2 id="how_to_run_example"><a id="orgcc50afe"></a>Example of how to run the <code>new_conus12km</code> benchmark case</h2>
 <div class="outline-text-2" id="text-how_to_run_example">
 <p>
 As always, change the example paths to your directory structure. All the scripts
-in the <code>srcipts/</code> directory do not hardcode paths (except <code>wrf_run_pbs_job</code> has
+in the <code>srcipts/</code> directory do not hardcode paths (except <code>wrf_run_pbs_jobs</code> has
 a default run directory) but the scripts in the <code>cases/</code> directory do hardcode
 paths. All the job submission scripts in <code>WRFs</code> and <code>WPSs</code> also hardcode paths.
 </p>
@@ -307,16 +306,14 @@ paths. All the job submission scripts in <code>WRFs</code> and <code>WPSs</code>
 The following will give you a table with timing results using the
 <code>new_conus12km</code> benchmark with WRFV4.0 compiled with intel18.0.1 and mpt2.18
 scaled across 1, 2, 4, 8 nodes on cheyenne. (cheyenne&rsquo;s 36 cores/node is the
-default in <code>wrf_run_pbs_job</code>)
+default in <code>wrf_run_pbs_jobs</code>)
 </p>
 
 <div class="org-src-container">
 <pre class="src src-sh"><span class="org-builtin">export</span> <span class="org-variable-name">JASPERLIB</span>=/glade/u/home/wrfhelp/UNGRIB_LIBRARIES/lib
 <span class="org-builtin">export</span> <span class="org-variable-name">JASPERINC</span>=/glade/u/home/wrfhelp/UNGRIB_LIBRARIES/include
-<span class="org-builtin">alias</span> <span class="org-variable-name">qsub</span>=<span class="org-string">'/opt/pbs/bin/qsub -A MY_ACCOUNT_CODE -m abe -M my_email_address'</span>
 
 git clone https://github.com/akirakyle/WRF_benchmarks.git
-<span class="org-variable-name">PATH</span>=~/WRF_benchmarks/scripts:$<span class="org-variable-name">PATH</span>
 
 qsub WRF_benchmarks/WRFs/WRFV4.0-intel18.0.1-mpt2.18.pbs
 qstat <span class="org-comment-delimiter"># </span><span class="org-comment">wait for job to finish...</span>
@@ -324,26 +321,49 @@ qsub WRF_benchmarks/WPSs/WPSV4.0-intel18.0.1.pbs
 qstat <span class="org-comment-delimiter"># </span><span class="org-comment">wait for job to finish...</span>
 ./WRF_benchmarks/cases/make_cases_new.sh
 qstat <span class="org-comment-delimiter"># </span><span class="org-comment">wait for job to finish...</span>
-wrf_run_pbs_job -c ~/WRF_benchmarks/cases/new_conus12km -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n <span class="org-highlight-numbers-number">1</span>
-wrf_run_pbs_job -c ~/WRF_benchmarks/cases/new_conus12km -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n <span class="org-highlight-numbers-number">2</span>
-wrf_run_pbs_job -c ~/WRF_benchmarks/cases/new_conus12km -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n <span class="org-highlight-numbers-number">4</span>
-wrf_run_pbs_job -c ~/WRF_benchmarks/cases/new_conus12km -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 -n <span class="org-highlight-numbers-number">8</span>
+./WRF_benchmarks/wrf_run_pbs_jobs -c ~/WRF_benchmarks/cases/new_conus12km <span class="org-sh-escaped-newline">\</span>
+                                  -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 <span class="org-sh-escaped-newline">\</span>
+                                  -n <span class="org-highlight-numbers-number">1</span> <span class="org-highlight-numbers-number">2</span> <span class="org-highlight-numbers-number">4</span> <span class="org-highlight-numbers-number">8</span> -r ./run <span class="org-sh-escaped-newline">\</span>
+                                  -p <span class="org-string">'-A MY_ACCOUNT_CODE -m abe -M my_email_address'</span>
 qstat <span class="org-comment-delimiter"># </span><span class="org-comment">wait for jobs to finish...</span>
-<span class="org-builtin">cd</span> ~/scratch/run
-wrf_cpy_rsl -a ../archive -o ~/results -r *
-<span class="org-builtin">cd</span> ~/results
-wrf_stats *
+<span class="org-builtin">cd</span> run
+./WRF_benchmarks/wrf_cpy_rsl -a ../archive -o ../results -r *
+<span class="org-builtin">cd</span> ../results
+./WRF_benchmarks/wrf_stats *
 </pre>
+</div>
+
+<div class="note">
+<p>
+I made heavy use of <a href="https://orgmode.org/">emacs org mode</a> for automating the above workflow of creating
+runs, submitting them, and plotting their output. In particular I made use of
+the <a href="https://orgmode.org/worg/org-contrib/babel/intro.html">babel feature in org mode</a> and its integration with <a href="https://www.gnu.org/software/tramp/">TRAMP mode</a>. I eventually
+needed a more flexible solution than provided by the <code>wrf_run_pbs_job</code> script to
+manage all the pbs job submission scripts so I created the bash source block in
+in <code>docs/runs.org</code> file to run, manage, and document all the jobs I was
+submitting to Cheyenne. The <code>wrf_stats</code> script outputs an org mode compatible
+table, so I can use the <code>docs/data.org</code> file to save all the wrf timing results.
+I can then reference this table of data in the analysis code blocks in
+<code>docs/results.org</code>.
+</p>
+
+<p>
+Of course this document itself is also written in org mode and exported to html.
+Be wary of the fact that github does render org mode documents as if it was
+markdown, however this often leaves out valuable information present in the raw
+org mode text.
+</p>
+
 </div>
 </div>
 </div>
 
-<div id="outline-container-org97b37f9" class="outline-2">
-<h2 id="benchmark_data"><a id="org97b37f9"></a>Data for the various benchmark cases</h2>
+<div id="outline-container-org6ec702c" class="outline-2">
+<h2 id="benchmark_data"><a id="org6ec702c"></a>Data Sources for the various benchmark cases</h2>
 <div class="outline-text-2" id="text-benchmark_data">
 </div>
-<div id="outline-container-orgc7f0fc9" class="outline-3">
-<h3 id="katrina"><a id="orgc7f0fc9"></a><code>katrina</code> (1km, 3km, 30km)</h3>
+<div id="outline-container-org6247a20" class="outline-3">
+<h3 id="katrina"><a id="org6247a20"></a><code>katrina</code> (1km, 3km, 30km)</h3>
 <div class="outline-text-3" id="text-katrina">
 <p>
 Data for running the Hurricane Katrina cases can be downloaded from the WRF
@@ -368,8 +388,8 @@ these cases
 </div>
 </div>
 
-<div id="outline-container-org4c44205" class="outline-3">
-<h3 id="conus"><a id="org4c44205"></a><code>conus12km</code> and <code>conus2.5km</code></h3>
+<div id="outline-container-org0566da0" class="outline-3">
+<h3 id="conus"><a id="org0566da0"></a><code>conus12km</code> and <code>conus2.5km</code></h3>
 <div class="outline-text-3" id="text-conus">
 <p>
 The <code>wrfbdy_d01</code> and <code>wrfrst_d01</code> files for the official CONUS benchmarks at
@@ -379,8 +399,8 @@ The <code>wrfbdy_d01</code> and <code>wrfrst_d01</code> files for the official C
 </div>
 </div>
 
-<div id="outline-container-org3f71abc" class="outline-3">
-<h3 id="maria_and_new_conus"><a id="org3f71abc"></a><code>maria1km</code>, <code>maria3km</code>, and <code>new_conus12km</code> and <code>new_conus2.5km</code></h3>
+<div id="outline-container-org340d294" class="outline-3">
+<h3 id="maria_and_new_conus"><a id="org340d294"></a><code>maria1km</code>, <code>maria3km</code>, and <code>new_conus12km</code> and <code>new_conus2.5km</code></h3>
 <div class="outline-text-3" id="text-maria_and_new_conus">
 <p>
 The data for these Hurricane Maria cases and CONUS cases comes from the NCEP GFS
@@ -396,77 +416,11 @@ these cases
 </div>
 </div>
 </div>
-
-<div id="outline-container-orgd3eb0ef" class="outline-2">
-<h2 id="example_cheyenne_job_scripts"><a id="orgd3eb0ef"></a>Examples of pbs job scripts for cheyenne</h2>
-<div class="outline-text-2" id="text-example_cheyenne_job_scripts">
-<div class="org-src-container">
-<pre class="src src-sh"><span class="org-comment-delimiter">#</span><span class="org-comment">!/bin/</span><span class="org-keyword">bash</span>
-<span class="org-comment-delimiter">### </span><span class="org-comment">Job Name</span>
-<span class="org-comment-delimiter">#</span><span class="org-comment">PBS -N cheyenne_wrf</span>
-<span class="org-comment-delimiter">### </span><span class="org-comment">Project code</span>
-<span class="org-comment-delimiter">#</span><span class="org-comment">PBS -A MY_PROJECT_CODE</span>
-<span class="org-comment-delimiter">#</span><span class="org-comment">PBS -l walltime=00:20:00</span>
-<span class="org-comment-delimiter">#</span><span class="org-comment">PBS -q regular</span>
-<span class="org-comment-delimiter">### </span><span class="org-comment">Merge output and error files</span>
-<span class="org-comment-delimiter">#</span><span class="org-comment">PBS -j oe</span>
-<span class="org-comment-delimiter">### </span><span class="org-comment">Select 2 nodes with 36 CPUs each for a total of 72 MPI processes</span>
-<span class="org-comment-delimiter">#</span><span class="org-comment">PBS -l select=2:ncpus=36:mpiprocs=36</span>
-<span class="org-comment-delimiter">### </span><span class="org-comment">Send email on abort, begin and end</span>
-<span class="org-comment-delimiter">#</span><span class="org-comment">PBS -m abe</span>
-<span class="org-comment-delimiter">### </span><span class="org-comment">Specify mail recipient</span>
-<span class="org-comment-delimiter">#</span><span class="org-comment">PBS -M my_email_address</span>
-
-<span class="org-builtin">export</span> <span class="org-variable-name">TMPDIR</span>=/glade/scratch/$<span class="org-variable-name">USER</span>/temp
-mkdir -p $<span class="org-variable-name">TMPDIR</span>
-
-<span class="org-comment-delimiter">### </span><span class="org-comment">Run the executable</span>
-mpiexec_mpt ./wrf.exe
-</pre>
-</div>
-
-<p>
-<code>real.exe</code> must also be run with mpi
-</p>
-<div class="org-src-container">
-<pre class="src src-sh">mpiexec_mpt ./real.exe
-</pre>
-</div>
-
-<p>
-To profile with <code>arm-map</code>
-</p>
-<div class="org-src-container">
-<pre class="src src-sh">module load arm-forge/18.1.2
-<span class="org-comment-delimiter"># </span><span class="org-comment">map --connect ./wrf.exe # for live, interactive profiling</span>
-map --profile ./wrf.exe <span class="org-comment-delimiter"># </span><span class="org-comment">for generating profile file to be loaded later</span>
-</pre>
-</div>
-
-<p>
-To profile with <code>arm-reports</code>
-</p>
-<div class="org-src-container">
-<pre class="src src-sh">module load arm-reports/18.1.2
-perf-report -mpi -n <span class="org-highlight-numbers-number">72</span> ./wrf.exe
-</pre>
-</div>
-
-<p>
-To use <code>mvapich</code> instead of <code>mpt</code>
-</p>
-<div class="org-src-container">
-<pre class="src src-sh">module load mvapich2
-mpirun -n <span class="org-highlight-numbers-number">72</span> ./wrf.exe
-</pre>
-</div>
-</div>
-</div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Akira Kyle</p>
 <p class="email">Email: <a href="mailto:akyle@cmu.edu">akyle@cmu.edu</a></p>
-<p class="date">Created: 2018-07-25 Wed 13:29</p>
+<p class="date">Created: 2018-07-30 Mon 23:51</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
