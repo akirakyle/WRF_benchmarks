@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2018-07-30 Mon 23:51 -->
+<!-- 2018-07-31 Tue 18:05 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Weather Research and Forecast (WRF) Scaling, Performance Assessment and Optimization</title>
@@ -264,15 +264,15 @@ This is still very much a work in progress!
 
 <p>
 This repo contains the benchmark cases and scripts used for assessing the
-scaling performance of WRF on NCAR&rsquo;s Cheyenne Supercomputer.
+scaling performance of WRF on NCAR's Cheyenne Supercomputer.
 </p>
 
 <p>
 <a href="results.html">The results of this study can be found here.</a>
 </p>
 
-<div id="outline-container-org8b64a53" class="outline-2">
-<h2 id="git_directories"><a id="org8b64a53"></a>git directories</h2>
+<div id="outline-container-org4a0d197" class="outline-2">
+<h2 id="git_directories"><a id="org4a0d197"></a>git directories</h2>
 <div class="outline-text-2" id="text-git_directories">
 <ul class="org-ul">
 <li><code>cases/</code> contains the namelists for WPS and WRF for the various benchmark
@@ -292,8 +292,8 @@ and associated analysis and plotting code used to generate the results.</li>
 </div>
 </div>
 
-<div id="outline-container-orgcc50afe" class="outline-2">
-<h2 id="how_to_run_example"><a id="orgcc50afe"></a>Example of how to run the <code>new_conus12km</code> benchmark case</h2>
+<div id="outline-container-org99fe5cc" class="outline-2">
+<h2 id="how_to_run_example"><a id="org99fe5cc"></a>Example of how to run the <code>new_conus12km</code> benchmark case</h2>
 <div class="outline-text-2" id="text-how_to_run_example">
 <p>
 As always, change the example paths to your directory structure. All the scripts
@@ -305,13 +305,14 @@ paths. All the job submission scripts in <code>WRFs</code> and <code>WPSs</code>
 <p>
 The following will give you a table with timing results using the
 <code>new_conus12km</code> benchmark with WRFV4.0 compiled with intel18.0.1 and mpt2.18
-scaled across 1, 2, 4, 8 nodes on cheyenne. (cheyenne&rsquo;s 36 cores/node is the
+scaled across 1, 2, 4, 8 nodes on cheyenne. (cheyenne's 36 cores/node is the
 default in <code>wrf_run_pbs_jobs</code>)
 </p>
 
 <div class="org-src-container">
 <pre class="src src-sh"><span class="org-builtin">export</span> <span class="org-variable-name">JASPERLIB</span>=/glade/u/home/wrfhelp/UNGRIB_LIBRARIES/lib
 <span class="org-builtin">export</span> <span class="org-variable-name">JASPERINC</span>=/glade/u/home/wrfhelp/UNGRIB_LIBRARIES/include
+<span class="org-builtin">alias</span> <span class="org-variable-name">qsub</span>=<span class="org-string">'/opt/pbs/bin/qsub -A MY_ACCOUNT_CODE -m abe -M my_email_address'</span>
 
 git clone https://github.com/akirakyle/WRF_benchmarks.git
 
@@ -323,7 +324,7 @@ qstat <span class="org-comment-delimiter"># </span><span class="org-comment">wai
 qstat <span class="org-comment-delimiter"># </span><span class="org-comment">wait for job to finish...</span>
 ./WRF_benchmarks/wrf_run_pbs_jobs -c ~/WRF_benchmarks/cases/new_conus12km <span class="org-sh-escaped-newline">\</span>
                                   -w ~/work/WRFs/WRFV4.0-intel18.0.1-mpt2.18 <span class="org-sh-escaped-newline">\</span>
-                                  -n <span class="org-highlight-numbers-number">1</span> <span class="org-highlight-numbers-number">2</span> <span class="org-highlight-numbers-number">4</span> <span class="org-highlight-numbers-number">8</span> -r ./run <span class="org-sh-escaped-newline">\</span>
+                                  -n 1 2 4 8 -r ./run <span class="org-sh-escaped-newline">\</span>
                                   -p <span class="org-string">'-A MY_ACCOUNT_CODE -m abe -M my_email_address'</span>
 qstat <span class="org-comment-delimiter"># </span><span class="org-comment">wait for jobs to finish...</span>
 <span class="org-builtin">cd</span> run
@@ -358,12 +359,12 @@ org mode text.
 </div>
 </div>
 
-<div id="outline-container-org6ec702c" class="outline-2">
-<h2 id="benchmark_data"><a id="org6ec702c"></a>Data Sources for the various benchmark cases</h2>
+<div id="outline-container-org6c02413" class="outline-2">
+<h2 id="benchmark_data"><a id="org6c02413"></a>Data Sources for the various benchmark cases</h2>
 <div class="outline-text-2" id="text-benchmark_data">
 </div>
-<div id="outline-container-org6247a20" class="outline-3">
-<h3 id="katrina"><a id="org6247a20"></a><code>katrina</code> (1km, 3km, 30km)</h3>
+<div id="outline-container-orgb9a3d0f" class="outline-3">
+<h3 id="katrina"><a id="orgb9a3d0f"></a><code>katrina</code> (1km, 3km, 30km)</h3>
 <div class="outline-text-3" id="text-katrina">
 <p>
 Data for running the Hurricane Katrina cases can be downloaded from the WRF
@@ -388,8 +389,8 @@ these cases
 </div>
 </div>
 
-<div id="outline-container-org0566da0" class="outline-3">
-<h3 id="conus"><a id="org0566da0"></a><code>conus12km</code> and <code>conus2.5km</code></h3>
+<div id="outline-container-orgc7dd6ae" class="outline-3">
+<h3 id="conus"><a id="orgc7dd6ae"></a><code>conus12km</code> and <code>conus2.5km</code></h3>
 <div class="outline-text-3" id="text-conus">
 <p>
 The <code>wrfbdy_d01</code> and <code>wrfrst_d01</code> files for the official CONUS benchmarks at
@@ -399,8 +400,8 @@ The <code>wrfbdy_d01</code> and <code>wrfrst_d01</code> files for the official C
 </div>
 </div>
 
-<div id="outline-container-org340d294" class="outline-3">
-<h3 id="maria_and_new_conus"><a id="org340d294"></a><code>maria1km</code>, <code>maria3km</code>, and <code>new_conus12km</code> and <code>new_conus2.5km</code></h3>
+<div id="outline-container-org04c9688" class="outline-3">
+<h3 id="maria_and_new_conus"><a id="org04c9688"></a><code>maria1km</code>, <code>maria3km</code>, and <code>new_conus12km</code> and <code>new_conus2.5km</code></h3>
 <div class="outline-text-3" id="text-maria_and_new_conus">
 <p>
 The data for these Hurricane Maria cases and CONUS cases comes from the NCEP GFS
@@ -420,7 +421,7 @@ these cases
 <div id="postamble" class="status">
 <p class="author">Author: Akira Kyle</p>
 <p class="email">Email: <a href="mailto:akyle@cmu.edu">akyle@cmu.edu</a></p>
-<p class="date">Created: 2018-07-30 Mon 23:51</p>
+<p class="date">Created: 2018-07-31 Tue 18:05</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

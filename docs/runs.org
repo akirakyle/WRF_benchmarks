@@ -334,15 +334,28 @@
 | MV2_CPU_BINDING_POLICY=hybrid MV2_HYBRID_BINDING_POLICY=bunch MV2_USE_THREAD_WARNING=0 MV2_USE_MCAST=1 MV2_ENABLE_SHARP=1 |
 
 #+name: pending
-| Case          | WRF     | Compiler | MPI        | T     | N | W | P | M | O | Q | M | Env |
-|---------------+---------+----------+------------+-------+---+---+---+---+---+---+---+-----|
-| new_conus12km | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 | 8 |   |   |   |   |   |   |   0 |
+| Case          | WRF     | Compiler | MPI        | T     |  N |        W | P | M | O | Q       | M | Env |
+|---------------+---------+----------+------------+-------+----+----------+---+---+---+---------+---+-----|
+| new_conus12km | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 |  8 |          |   |   |   |         |   |   0 |
+| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 |  2 | 04:00:00 |   |   |   | economy |   |   0 |
+| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 |  4 | 04:00:00 |   |   |   | economy |   |   0 |
+| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 |  8 | 04:00:00 |   |   |   | economy |   |   0 |
+| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 | 16 | 04:00:00 |   |   |   | economy |   |   0 |
+| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 | 32 | 04:00:00 |   |   |   | economy |   |   0 |
+| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 | 64 | 04:00:00 |   |   |   | economy |   |   0 |
+| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E1_T1 |  2 | 04:00:00 |   |   |   | economy |   |   1 |
+| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E1_T1 |  4 | 04:00:00 |   |   |   | economy |   |   1 |
+| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E1_T1 |  8 | 04:00:00 |   |   |   | economy |   |   1 |
+| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E1_T1 | 16 | 04:00:00 |   |   |   | economy |   |   1 |
+| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E1_T1 | 32 | 04:00:00 |   |   |   | economy |   |   1 |
+| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E1_T1 | 64 | 04:00:00 |   |   |   | economy |   |   1 |
 
 #+name: run
-| Case     | WRF     | Compiler | MPI        | T  |  N |        W | P | M | O | Q | M | Env |
-|----------+---------+----------+------------+----+----+----------+---+---+---+---+---+-----|
+| Case          | WRF     | Compiler    | MPI        | T     | N | W | P | M | O | Q | M | Env |
+|---------------+---------+-------------+------------+-------+---+---+---+---+---+---+---+-----|
+| new_conus12km | WRFV4.0 | intel18.0.1 | mvapich2.3 | E0_T1 | 8 |   |   |   |   |   |   |   0 |
 
-#+header: :var ENV_VARS=env_vars RUN=run[2]
+#+header: :var ENV_VARS=env_vars RUN=run[7]
 #+begin_src bash :dir /ssh:cheyenne:~/ :results raw drawer
 #set -x
 CASE=${RUN[0]}
@@ -367,11 +380,11 @@ WRF_DIR=~/work/WRFs/$WRF-$COMPILER-$MPI
 
 WRF_PATH=$(readlink -f $WRF_DIR)
 if [ -z $WRF_PATH ] || [ ! -d $WRF_PATH ]; then
-    echo "Invalid WRF_PATH: $WRF_DIR"; exit 1
+    echo "Invalid WRF_PATH: $WRF_DIR"; exit
 fi
 CASE_PATH=$(readlink -f $CASE_DIR)
 if [ -z $CASE_PATH ] || [ ! -d $WRF_PATH ]; then
-    echo "Invalid CASE_PATH: $CASE_PATH"; exit 1
+    echo "Invalid CASE_PATH: $CASE_PATH"; exit
 fi
 
 if [ -z $TRIAL ]; then TRIAL=T1; fi
@@ -413,16 +426,16 @@ qsub $PBS_SCRIPT
 #+RESULTS:
 :RESULTS:
 #!/bin/bash
-#PBS -N new_conus12km-WRFV4.0-gnu8.1.0-mvapich2.3-ENV1-N008
-#PBS -l walltime=00:30:00
-#PBS -q regular
+#PBS -N maria3km-WRFV4.0-gnu8.1.0-mvapich2.3-E1_T1-N064
+#PBS -l walltime=04:00:00
+#PBS -q economy
 #PBS -j oe
-#PBS -l select=8:ncpus=36:mpiprocs=36
+#PBS -l select=64:ncpus=36:mpiprocs=36
 
 export TMPDIR=/glade/scratch/akirak/temp
 mkdir -p /glade/scratch/akirak
 
-export MV2_CPU_BINDING_POLICY=hybrid MV2_HYBRID_BINDING_POLICY=bunch MV2_USE_THREAD_WARNING=0
-./mpirun_wrf 288
-1362248.chadmin1
+export MV2_CPU_BINDING_POLICY=hybrid MV2_HYBRID_BINDING_POLICY=bunch MV2_USE_THREAD_WARNING=0 MV2_USE_MCAST=1 MV2_ENABLE_SHARP=1
+./mpirun_wrf 2304
+1371572.chadmin1
 :END:

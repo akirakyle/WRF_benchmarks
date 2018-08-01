@@ -1,26 +1,12 @@
 # -*- org-html-htmlize-output-type: css; -*-
-#+title: Weather Research and Forecast (WRF) Scaling, Performance Assessment and Optimization
-# #+subtitle: Comparison of Compilers and MPI Libraries on Cheyenne \vspace{-.2cm}
+#+title: Weather Research and Forecast (WRF) Scaling and Performance Assessment
 #+subtitle: NCAR SIParCS Program
-#+date: August 3, 2018
 #+author: Akira Kyle
 #+email: akyle@cmu.edu
 #+property: header-args :results raw drawer :exports results :eval never-export
-# #+options: H:2 toc:t num:t author:nil
 #+options: toc:t num:nil email:t author:t date:nil
 #+setupfile: theme-readtheorg-local.setup
 # #+html_head: <style type="text/css">body{ max-width:50em; margin-left:auto; margin-right:auto; }</style>
-#+latex_header: \author[Kyle]{\vspace{-.4cm} Akira Kyle\inst{1}, Davide Del Vento \inst{2}, Brian Vanderwende \inst{2}, Negin Sobhani \inst{2}, Dixit Patel \inst{3}}
-# #+latex_header: \institute[shortinst]{\inst{1} Carnegie Mellon University \and \inst{2} National Center for Atmospheric Research \and \inst{3} University of Colorado Boulder}
-#+latex_header: \titlegraphic{\begin{picture}(0,0) \put(315,-150){\makebox(0,0)[rt]{\includegraphics[width=0.25\linewidth]{Updated-SIParCS-logo.png} \includegraphics[width=0.25\linewidth]{NSF_4-Color_vector_Logo.pdf}}} \end{picture}}
-#+latex_header: \institute[NCAR]{\inst{1} \includegraphics[width=0.4\linewidth]{CMU_Logo_Horiz_Red.pdf} \vspace{-.1cm} \and \inst{2} \includegraphics[width=0.34\linewidth]{ncar-logo2.pdf} \vspace{-.2cm} \and \inst{3} \includegraphics[width=0.46\linewidth]{boulder-one-line.png}}
-#+latex_header: \graphicspath{{./figs/}{./imgs/}{./obipy-resources/}}
-#+latex_class: beamer
-#+beamer_theme: metropolis
-# #+startup: beamer
-# #+beamer_theme: Pittsburgh
-# \usecolortheme[snowy]{owl}
-# #+beamer_color_theme: owl
 
 #+begin_warning
 This is still very much a work in progress!
@@ -70,16 +56,12 @@ scale their runs to larger core counts.
    :CUSTOM_ID: wrf_flowchart
    :END:
 #+ATTR_LATEX: :width 0.9\linewidth
-[[./figs/WRF_flow_chart-ARW_v4.png]]
+[[./imgs/WRF_flow_chart-ARW_v4.png]]
 
 ** Cheyenne
    :PROPERTIES:
    :CUSTOM_ID: cheyenne_specs
    :END:
-
-#+begin_note
-[[https://www2.cisl.ucar.edu/resources/computational-systems/cheyenne][More Details on the Cheyenne supercomputer can be found here]]
-#+end_note
 
 - 4,032 computation nodes
  	- Dual-socket nodes, 18 cores per socket
@@ -94,6 +76,10 @@ scale their runs to larger core counts.
   - Partial 9D Enhanced Hypercube single-plane interconnect topology
   - Bandwidth: 25 GBps bidirectional per link
   - Latency: MPI ping-pong < 1 µs; hardware link 130 ns
+
+#+begin_note
+[[https://www2.cisl.ucar.edu/resources/computational-systems/cheyenne][More Details on the Cheyenne supercomputer can be found here]]
+#+end_note
 
 * Intro
   :PROPERTIES:
@@ -296,9 +282,12 @@ import matplotlib.pyplot as plt
 #+end_src
 
 #+begin_src ipython :session
-def plot_scaling(cases, labels, title, shifts=None, legend_outside=True, fmts=None):
+def plot_scaling(cases, labels, title, shifts=None, legend_outside=True,
+                 line=None, fmts=None):
     if not shifts: shifts = [1] * len(cases)
     if not fmts: fmts = ['o--'] * len(cases)
+    plt.figure(figsize=(3.5,3.5))
+    if line: plt.loglog([150,3500000],[25,0.002], 'b-')#, linewidth=2.0)
     for case,label,shift,fmt in zip(cases,labels,shifts,fmts):
         gridpoints = e_we[case[0]] * e_sn[case[0]]
         secs = []; cpus = []
@@ -309,15 +298,17 @@ def plot_scaling(cases, labels, title, shifts=None, legend_outside=True, fmts=No
         secs = np.array(secs); cpus = np.array(cpus)
         p = secs.argsort()
         plt.loglog(gridpoints/(cpus[p]*shift), 1/secs[p], fmt, label=label[0])
-    plt.xlabel("Total grid points / core")
-    plt.ylabel("Time steps / s")
+    plt.xlabel("Total grid points / core", fontweight='bold')
+    plt.ylabel("Time steps / s", fontweight='bold')
     if legend_outside: plt.legend(loc='upper center', bbox_to_anchor=(1.6, 1.0), ncol=1)
-    else: plt.legend(loc='best')
+    else: plt.legend(loc='best', prop={'size': 8})
     #plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=2)
     plt.title(title)
-    plt.axis('scaled')
+    # plt.axis('scaled')
     plt.grid(False)
+#+end_src
 
+#+begin_src ipython :session
 def plot_bar(cases, nodes, labels, title):
     secs = []
     for case in cases:
@@ -336,6 +327,7 @@ def plot_bar(cases, nodes, labels, title):
     ax.set_yticklabels(labels)
     ax.invert_yaxis()
     ax.set_xlabel('Time steps/s')
+    plt.legend(loc='best', prop={'size': 8})
     ax.set_title(title)
 #+end_src
 
@@ -650,18 +642,21 @@ plot_scaling(cases, labels, title)
 maria_case = ['maria1km', 'WRFV4.0', 'intel18.0.1', 'mpt2.18',  'T1' ]
 runs = getFromDict(data, maria_case)
 cpus = np.array([d[7]*d[8] for _,d in runs.items()])
+p = cpus.argsort()
+ticks = np.arange(len(cpus))
 comp = np.array([d[1] for _,d in runs.items()])/60.0
 init = np.array([d[3] for _,d in runs.items()])/60.0
 write = np.array([d[5] for _,d in runs.items()])/60.0
 tot = comp+init+write
 gridpoints = e_we[case[0]] * e_sn[case[0]]
 plt.figure(figsize=(4,4))
-plt.plot(cpus, tot, 'bo', label='Total')
-plt.plot(cpus, init, 'rs', label='Initialization')
-plt.plot(cpus, comp, 'gv', label='Computing')
-plt.plot(cpus, write, 'b+', label='Writing output')
-plt.xlabel("Cores")
-plt.ylabel("Wall-clock time (minutes)")
+plt.plot(ticks, tot[p], 'bo', label='Total')
+plt.plot(ticks, init[p], 'rs', label='Initialization')
+plt.plot(ticks, comp[p], 'gv', label='Computing')
+plt.plot(ticks, write[p], 'b+', label='Writing output')
+plt.xticks(ticks, cpus[p], rotation='vertical')
+plt.xlabel("Cores", fontweight='bold')
+plt.ylabel("Wall-clock time (minutes)", fontweight='bold')
 plt.legend(loc='best')
 # plt.title("Run time results")
 # plt.axis('equal')
@@ -671,7 +666,7 @@ plt.grid(False)
 
 #+RESULTS:
 :RESULTS:
-# Out[9]:
+# Out[175]:
 [[file:./figs/maria1km_runtime.svg]]
 :END:
 
@@ -699,13 +694,14 @@ plt.grid(False)
 #+header: :var cases=cases-cases labels=cases-labels
 #+header: :var title=""
 #+begin_src ipython :session :ipyfile ./figs/cases.svg
-plot_scaling(cases, labels, title, legend_outside=False)
+plot_scaling(cases, labels, title, line=True,
+             legend_outside=False, fmts=['bo', 'gx', 'r+', 'y^'])
 #+end_src
 
 #+attr_latex: :width 1.0\linewidth
 #+RESULTS:
 :RESULTS:
-# Out[6]:
+# Out[177]:
 [[file:./figs/cases.svg]]
 :END:
 
@@ -918,6 +914,7 @@ plot_bar(cases, 4, labels, title)
 | intel18.0.1_opt66 - mpt2.18   |
 | intel18.0.1  - openmpi3.1.0   |
 | intel18.0.1  - impi2018.1.163 |
+
 
 ** Compilers
    :PROPERTIES:
@@ -1141,38 +1138,60 @@ plot_scaling(cases, labels, title, legend_outside=False)
    :END:
 
 #+begin_note
-mvapich2.3E0 corresponds to setting the environment variables:
+mvapich2.3 BIND corresponds to setting the environment variables:
 ~MV2_CPU_BINDING_POLICY=hybrid MV2_HYBRID_BINDING_POLICY=bunch~
 
-mvapich2.3E1 corresponds to setting the environment variables:
+mvapich2.3 HW corresponds to setting the environment variables:
 ~MV2_CPU_BINDING_POLICY=hybrid MV2_HYBRID_BINDING_POLICY=bunch MV2_USE_MCAST=1 MV2_ENABLE_SHARP=1~
 #+end_note
 
-#+begin_src ipython :session :ipyfile ./figs/mvapich-io-new_conus12km.svg
-case, wrf, comp = 'new_conus12km', 'WRFV4.0', 'gnu8.1.0'
-for mpi,trial,l in [('mvapich2.2', 'T1', 'b'), ('mpt2.18', 'T1', 'r'), 
-                    ('mvapich2.3', 'E0_T1', 'g'), ('mvapich2.3', 'E1_T1', 'y')]:
-    run = getFromDict(data, [case, wrf, comp, mpi , trial])
-    plt.plot([d[7]*d[8] for _,d in run.items()], [d[4] for _,d in run.items()],
-             l+'+--', label='init '+mpi+''+trial[:-3])
-    plt.plot([d[7]*d[8] for _,d in run.items()], [d[6] for _,d in run.items()],
-             l+'o--', label='write '+mpi+''+trial[:-3])
+#+begin_src ipython :session
+def plot_mvapich(case):
+    wrf, comp = 'WRFV4.0', 'gnu8.1.0'
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(7,3.5))
+    fig.tight_layout()
+    for mpi,trial,l,f in [('mpt2.18', 'T1', '','o'), ('mvapich2.2', 'T1', '', 'x'),
+                        ('mvapich2.3', 'E0_T1', ' BIND', '+'), ('mvapich2.3', 'E1_T1', ' HW', '.')]:
+        run = getFromDict(data, [case, wrf, comp, mpi , trial])
+        ax1.plot([d[7]*d[8] for _,d in run.items()], [d[4] for _,d in run.items()],
+                f+'--', label=mpi+l)
+        ax2.plot([d[7]*d[8] for _,d in run.items()], [d[6] for _,d in run.items()],
+                f+'--', label=mpi+l)
 
-plt.xlabel("Cores")
-plt.ylabel("Time")
-#plt.legend(loc='best')
-plt.legend(loc='upper center', bbox_to_anchor=(1.22, 1.0), ncol=1)
-plt.title("Scaling I/O for new_conus12km")
-plt.grid(False)
+    ax1.set_xlabel("Cores", fontweight='bold')
+    ax1.set_ylabel("Init Time (minutes)", fontweight='bold')
+    ax2.set_xlabel("Cores", fontweight='bold')
+    ax2.set_ylabel("Write Time (minutes)", fontweight='bold', labelpad=0)
+    #plt.legend(loc='upper center', bbox_to_anchor=(1.38, 1.0), ncol=1)
+    plt.legend(loc='upper center', bbox_to_anchor=(-0.15, -0.2), ncol=4)
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-# Out[44]:
+# Out[272]:
+:END:
+
+#+begin_src ipython :session :ipyfile ./figs/mvapich-io-new_conus12km.svg
+plot_mvapich('new_conus12km')
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[273]:
 [[file:./figs/mvapich-io-new_conus12km.svg]]
 :END:
 
-#+begin_src ipython :session :ipyfile ./figs/mvapich-io-new_conus2.5km.svg
+#+begin_src ipython :session :ipyfile ./figs/mvapich-io-maria3km.svg
+plot_mvapich('maria3km')
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[276]:
+[[file:./figs/mvapich-io-maria3km.svg]]
+:END:
+
+#+begin_src ipython :session :ipyfile ./figs/mvapich-io-new_conus2-5km.svg
 case, wrf, comp, trial = 'new_conus2.5km', 'WRFV4.0', 'gnu8.1.0', 'T1'
 for mpi,l in [('mvapich2.2', 'b'), ('mpt2.18', 'r')]:
     run = getFromDict(data, [case, wrf, comp, mpi , trial])
@@ -1190,30 +1209,8 @@ plt.grid(False)
 
 #+RESULTS:
 :RESULTS:
-# Out[17]:
-[[file:./figs/mvapich-io-new_conus2.5km.svg]]
-:END:
-
-#+begin_src ipython :session :ipyfile ./figs/mvapich-io-maria3km.svg
-case, wrf, comp, trial = 'maria3km', 'WRFV4.0', 'gnu8.1.0', 'T1'
-for mpi,l in [('mvapich2.2', 'b'), ('mpt2.18', 'r')]:
-    run = getFromDict(data, [case, wrf, comp, mpi , trial])
-    plt.plot([d[7]*d[8] for _,d in run.items()], [d[4] for _,d in run.items()],
-             l+'+--', label='init '+mpi)
-    plt.plot([d[7]*d[8] for _,d in run.items()], [d[6] for _,d in run.items()],
-             l+'o--', label='write '+mpi)
-
-plt.xlabel("Cores")
-plt.ylabel("Time")
-plt.legend(loc='best')
-plt.title("Scaling of I/O for maria3km")
-plt.grid(False)
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-# Out[18]:
-[[file:./figs/mvapich-io-maria3km.svg]]
+# Out[91]:
+[[file:./figs/mvapich-io-new_conus2-5km.svg]]
 :END:
 
 ** figs :noexport:
@@ -1221,10 +1218,10 @@ plt.grid(False)
 #+name: new_conus12km-cases-gnu-mpi
 | case          | WRF version | compiler    | mpi            | trial |
 |---------------+-------------+-------------+----------------+-------|
-| new_conus12km | WRFV4.0     | gnu6.3.0    | mpich3.2       | T1    |
 | new_conus12km | WRFV4.0     | gnu8.1.0    | mpt2.18        | T1    |
-| new_conus12km | WRFV4.0     | gnu8.1.0    | mvapich2.2     | T1    |
 | new_conus12km | WRFV4.0     | gnu8.1.0    | openmpi3.1.0   | T1    |
+| new_conus12km | WRFV4.0     | gnu8.1.0    | mvapich2.2     | T1    |
+| new_conus12km | WRFV4.0     | gnu6.3.0    | mpich3.2       | T1    |
 
 #+name: new_conus12km-cases-intel-mpi
 | case          | WRF version | compiler    | mpi            | trial |
@@ -1236,10 +1233,10 @@ plt.grid(False)
 #+name: new_conus12km-labels-gnu-mpi
 | label   |
 |---------|
-| MPICH   |
 | MPT     |
-| MVAPICH |
 | OpenMPI |
+| MVAPICH |
+| MPICH   |
 
 #+name: new_conus12km-labels-intel-mpi
 | label     |
@@ -1248,7 +1245,7 @@ plt.grid(False)
 | OpenMPI   |
 | Intel MPI |
 
-#+name: new_conus12km-cases-compiler-fig
+#+name: new_conus12km-cases-compiler-gnu-fig
 | case          | WRF version | compiler              | mpi        | trial |
 |---------------+-------------+-----------------------+------------+-------|
 | new_conus12km | WRFV4.0     | gnu8.1.0              | mpt2.18    | T1    |
@@ -1258,58 +1255,98 @@ plt.grid(False)
 | new_conus12km | WRFV4.0     | gnu8.1.0_O3_native    | mpt2.18    | T1    |
 | new_conus12km | WRFV4.0     | gnu8.1.0_Ofast        | mpt2.18    | T1    |
 | new_conus12km | WRFV4.0     | gnu8.1.0_Ofast_native | mpt2.18    | T1    |
-| new_conus12km | WRFV4.0     | intel18.0.1           | mpt2.18    | T1    |
-| new_conus12km | WRFV4.0     | intel18.0.1_host      | mpt2.18    | T1    |
-| new_conus12km | WRFV4.0     | intel18.0.1_opt66     | mpt2.18    | T1    |
+
+#+name: new_conus12km-cases-compiler-intel-fig
+| case          | WRF version | compiler          | mpi     | trial |
+|---------------+-------------+-------------------+---------+-------|
+| new_conus12km | WRFV4.0     | intel18.0.1       | mpt2.18 | T1    |
+| new_conus12km | WRFV4.0     | intel18.0.1_host  | mpt2.18 | T1    |
+| new_conus12km | WRFV4.0     | intel18.0.1_opt66 | mpt2.18 | T1    |
 
 #+name: new_conus12km-labels-compiler-fig
-| label                                |
-|--------------------------------------|
-| gnu -O2                              |
-| gnu -O3                              |
-| gnu -mfma                            |
-| gnu -O3 -mfma                        |
-| gnu -O3 -march=native                |
-| gnu -Ofast                           |
-| gnu -Ofast -march=native             |
-| intel18.0.1 -O3                      |
-| intel18.0.1 -Xhost                   |
-| intel18.0.1  -xHost -fp-model fast=2 |
+| label                         |
+|-------------------------------|
+| gnu -O2                       |
+| gnu -O3                       |
+| gnu -mfma                     |
+| gnu -O3 -mfma                 |
+| gnu -O3 -march=native         |
+| gnu -Ofast                    |
+| gnu -Ofast -march=native      |
+| intel -O3                     |
+| intel -Xhost                  |
+| intel -xHost -fp-model fast=2 |
 
 ** figs
 #+header: :var cases=new_conus12km-cases-gnu-mpi labels=new_conus12km-labels-gnu-mpi
 #+header: :var title=""
 #+begin_src ipython :session :ipyfile ./figs/new_conus12km_gnu_mpi.svg
-plot_scaling(cases, labels, title, legend_outside=False, fmts=['.--', 'o--', 'x--', '+--'])
+plot_scaling(cases, labels, title, legend_outside=False, fmts=['C0o--', 'C1x--', 'C2+--', 'C3.--'])
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-# Out[4]:
+# Out[217]:
 [[file:./figs/new_conus12km_gnu_mpi.svg]]
 :END:
 
 #+header: :var cases=new_conus12km-cases-intel-mpi labels=new_conus12km-labels-intel-mpi
 #+header: :var title=""
 #+begin_src ipython :session :ipyfile ./figs/new_conus12km_intel_mpi.svg
-plot_scaling(cases, labels, title, legend_outside=False, fmts=['o--', 'x--', '.--'])
+plot_scaling(cases, labels, title, legend_outside=False, fmts=['C0o--', 'C1x--', 'C4^--'])
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-# Out[5]:
+# Out[219]:
 [[file:./figs/new_conus12km_intel_mpi.svg]]
 :END:
 
-#+header: :var cases=new_conus12km-cases-compiler-fig labels=new_conus12km-labels-compiler-fig
-#+header: :var title=""
+#+header: :var cases_gnu=new_conus12km-cases-compiler-gnu-fig
+#+header: :var cases_intel=new_conus12km-cases-compiler-intel-fig
+#+header: :var labels=new_conus12km-labels-compiler-fig
 #+begin_src ipython :session :ipyfile ./figs/new_conus12km_bar_compiler_fig.svg
-plot_bar(cases, 'N016.rsl', labels, title)
+nodes='N002.rsl'
+secs_gnu = []
+for case in cases_gnu:
+    sec = getFromDict(data, case+[nodes])[2]
+    secs_gnu.append(sec if isinstance(sec, float) else 0.0)
+secs_intel = []
+for case in cases_intel:
+    sec = getFromDict(data, case+[nodes])[2]
+    secs_intel.append(sec if isinstance(sec, float) else 0.0)
+
+secs_gnu = np.array(secs_gnu)
+secs_intel = np.array(secs_intel)
+
+y_pos_gnu = np.arange(len(cases_gnu))
+y_pos_intel = np.arange(len(cases_intel)) + y_pos_gnu[-1] + 1
+
+fig, ax = plt.subplots(figsize=(5,3.5))
+
+ax.barh(y_pos_gnu, secs_intel[0]/secs_gnu, color='C0')
+ax.barh(y_pos_intel, secs_intel[0]/secs_intel, color='C1')
+
+ax.set_yticks([]) #y_pos)
+ax.set_xticks(np.linspace(0,1.2,num=13))
+# ax.set_yticklabels(labels_gnu+labels_intel)
+for i, label in enumerate([l[0] for l in labels]):
+    ax.text(0.05, i + .20, label, color='white', fontweight='bold')
+ax.invert_yaxis()
+#ax.set_xlabel('Time steps/s', fontweight='bold')
+ax.set_xlabel('Normalized Performance', fontweight='bold')
+
+# ax.annotate('', xy=(0.72, 0.07),  xycoords='figure fraction',
+#             xytext=(0.28, 0.07), textcoords='figure fraction',
+#             arrowprops=dict(facecolor='black', width=2))
+# plt.figtext(0.1, -0.05, 'worse\nperformance', fontweight='bold')
+# plt.figtext(0.75, -0.05, 'better\nperformance', fontweight='bold')
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-# Out[65]:
+# Out[199]:
+: Text(0.5,0,'Normalized Performance')
 [[file:./figs/new_conus12km_bar_compiler_fig.svg]]
 :END:
 
@@ -1447,7 +1484,7 @@ Finally it's worth noting that the vertical axis between Figures
 the difference in clock speeds between the processors used in Yellowstone versus
 those used in Cheyenne.
 
-* TODO WRF scaling and timing on Cheyenne
+* WRF scaling and timing on Cheyenne
   :PROPERTIES:
   :CUSTOM_ID: wrf_scaling_and_timing_on_cheyenne
   :END:
@@ -1458,6 +1495,8 @@ those used in Cheyenne.
 To see how WRFs performance differs on Cheyenne compared to yellowstone, see the
 discussion [[#run_time_scaling_comparison][here]]
 #+end_note
+
+The results on Cheyenne below may be helpful in answering such questions as:
 
 - "Is it possible to solve a problem with such-and-such resolution in a timely
   manner?"
@@ -1470,6 +1509,17 @@ Numbers from the figures below can help you develop some back-of-the-envelope
 estimates of what will happen if you increase or decrease the core counts of
 your runs, so that you can find one that is optimal for you both in terms of
 time-to-solution and in terms of your allocation.
+
+If you're preparing an allocation request, while these plots provide some
+guidance, you do need to run some tests on Cheyenne or a comparable system to
+support the validity of your core-hour estimate for your own physics
+parameterization, and to make sure you account for the overhead from
+initialization and I/O. (Different I/O settings and frequency will affect your
+runs differently.)
+
+Also see [[#optimizing_wrf_performance][Optimizing WRF performance]] for related documentation and [[https://www2.cisl.ucar.edu/user-support/determining-computational-resource-needs][Determining
+computational resource needs]] for additional information on preparing allocation
+requests.
 
 --------------------------------------------------------------------------------
 
@@ -1488,26 +1538,50 @@ corresponds to a large difference in values.
 #+caption: WRF scaling
 [[file:./figs/cases.svg]]
 
+On Cheyenne, we see that WRF does not significantly depart from this linear
+strong scaling at any amount of gridpoints per core.
 
-Beginning in WRFV4.0, the minimum patch size is 10 grid cells in either
-direction. This limits you to using at least 100 gridpoints/core. Thus WRF will
-prevent you from running on very large relative core counts where
-initialization, I/O, and communication dominate.
+*** TODO Running WRF with a small number of gridpoints per core
 
-** TODO Run time results
+WRFV4.0 will refuse to run if there is a minimum patch size of less than 10 grid
+points in either direction. This limits users from running with fewer than 100
+gridpoints per core, which would likely be a very MPI communication bound region
+where WRF would depart from its linear strong scaling. Thus WRF will prevent you
+from running on very large relative core counts where initialization, I/O, and
+communication dominate.
+
+*** TODO Running WRF with a large number of gridpoints per core
+
+The interesting feature in Figure [[wrf_scaling]] in the high gridpoints per core
+region where the time steps per second seem to jump slightly is an artifact of
+the memory constraints on Cheyenne. The normal nodes on Cheyenne have only 64 GB
+of memory. WRF runs with too many gridpoints per node will run out of memory and
+be killed. The maximum number of gridpoints per node that will fit into the 64
+GB of memory of that node depends on the physics parameterizations, however, we
+observed that typically the maximum is between 10^5 and 10^6 total gridpoints.
+Thus to obtain the results in the very large gridpoints per core region, we
+utilized Cheyenne's 128 GB memory nodes for an additional point or two, then we
+undersubscribed the cores on each node. This undersubscription of cores is
+likely responsible for the small bump in speed observed. However we do not
+recommend that users undersubscribe cores as core-hours are charged for all
+cores on the node so undersubscription of cores will be an inefficient use of a
+user's core-hour allocation.
+
+
+** Run time results
    :PROPERTIES:
    :CUSTOM_ID: run_time_results
    :END:
 
-Figure [[wrf_runtime]] below shows the total run time for WRF jobs using increasing
-numbers of cores. Initialization time, computation time, and writing time also
-are shown for runs using up to 9,216 cores.
+Figure [[wrf_runtime]] below shows the /total/ run time for WRF jobs using
+increasing numbers of cores with the total run time broken down into the
+initialization time, computation time, and writing time.
 
 These results are based on simulations of Hurricane Maria (2017) at 1km
 resolution.
 
 As illustrated, initialization and writing output times remain relatively fixed,
-but increasing slightly as you move to larger core counts. Times shown are for a
+only increasing slightly as you move to larger core counts. Times shown are for a
 and single output file of the Maria 1km case, which used a domain of about 372
 million grid points. If you have more restarts and output files, your numbers
 will be different but the trend will be similar.
@@ -1515,6 +1589,13 @@ will be different but the trend will be similar.
 #+name: wrf_runtime
 #+caption: WRF Run Timing
 [[file:./figs/maria1km_runtime.svg]]
+
+*** TODO Running WRF on a large number of nodes
+Users wishing to run WRF with more than 10,000 MPI tasks, which on Cheyenne
+corresponds to using 277 nodes with 36 MPI tasks per node need to patch WRF to
+use more digits in the ~rsl.out.XXXX~ and ~rsl.error.XXXX~ files otherwise WRF
+will not run. A patch for WRFV4.0 can be [[https://github.com/akirakyle/WRF_benchmarks/blob/master/WRFs/WRFV4.0-rsl-8digit.patch][found here]].
+
 
 * TODO Optimizing WRF performance
   :PROPERTIES:

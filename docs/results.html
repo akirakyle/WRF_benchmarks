@@ -3,10 +3,10 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2018-07-31 Tue 08:43 -->
+<!-- 2018-08-01 Wed 01:53 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Weather Research and Forecast (WRF) Scaling, Performance Assessment and Optimization</title>
+<title>Weather Research and Forecast (WRF) Scaling and Performance Assessment</title>
 <meta name="generator" content="Org mode" />
 <meta name="author" content="Akira Kyle" />
 <style type="text/css">
@@ -235,7 +235,7 @@ for the JavaScript code in this tag.
 </head>
 <body>
 <div id="content">
-<h1 class="title">Weather Research and Forecast (WRF) Scaling, Performance Assessment and Optimization
+<h1 class="title">Weather Research and Forecast (WRF) Scaling and Performance Assessment
 <br />
 <span class="subtitle">NCAR SIParCS Program</span>
 </h1>
@@ -284,7 +284,7 @@ for the JavaScript code in this tag.
 <li><a href="#katrina">Katrina</a></li>
 <li><a href="#cases_plus">Cases plus</a></li>
 <li><a href="#mvapich_io">mvapich i/o</a></li>
-<li><a href="#orga0ea6c8">figs</a></li>
+<li><a href="#org42bc07b">figs</a></li>
 </ul>
 </li>
 <li><a href="#analysis">Analysis</a>
@@ -295,10 +295,19 @@ for the JavaScript code in this tag.
 <li><a href="#comp_time_scaling_comparison">Computation Time Scaling Results</a></li>
 </ul>
 </li>
-<li><a href="#wrf_scaling_and_timing_on_cheyenne"><span class="todo TODO">TODO</span> WRF scaling and timing on Cheyenne</a>
+<li><a href="#wrf_scaling_and_timing_on_cheyenne">WRF scaling and timing on Cheyenne</a>
 <ul>
-<li><a href="#scaling_results"><span class="todo TODO">TODO</span> Scaling Results</a></li>
-<li><a href="#run_time_results"><span class="todo TODO">TODO</span> Run time results</a></li>
+<li><a href="#scaling_results"><span class="todo TODO">TODO</span> Scaling Results</a>
+<ul>
+<li><a href="#orgc6210fd"><span class="todo TODO">TODO</span> Running WRF with a small number of gridpoints per core</a></li>
+<li><a href="#orgf241bfe"><span class="todo TODO">TODO</span> Running WRF with a large number of gridpoints per core</a></li>
+</ul>
+</li>
+<li><a href="#run_time_results">Run time results</a>
+<ul>
+<li><a href="#org3ac2d18"><span class="todo TODO">TODO</span> Running WRF on a large number of nodes</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#optimizing_wrf_performance"><span class="todo TODO">TODO</span> Optimizing WRF performance</a>
@@ -319,8 +328,8 @@ This is still very much a work in progress!
 
 </div>
 
-<div id="outline-container-orge45c4e5" class="outline-2">
-<h2 id="abstract"><a id="orge45c4e5"></a>Abstract</h2>
+<div id="outline-container-org54d17c1" class="outline-2">
+<h2 id="abstract"><a id="org54d17c1"></a>Abstract</h2>
 <div class="outline-text-2" id="text-abstract">
 <p>
 The Weather Research and Forecast (WRF) model is a parallel mesoscale numerical
@@ -344,12 +353,12 @@ previous supercomputer, Yellowstone.
 </div>
 </div>
 
-<div id="outline-container-org2f0d721" class="outline-2">
-<h2 id="background"><a id="org2f0d721"></a>Background</h2>
+<div id="outline-container-orgf36b536" class="outline-2">
+<h2 id="background"><a id="orgf36b536"></a>Background</h2>
 <div class="outline-text-2" id="text-background">
 </div>
-<div id="outline-container-org81b1f31" class="outline-3">
-<h3 id="weather_research_forcast_model"><a id="org81b1f31"></a>The Weather Research and Forecast Model</h3>
+<div id="outline-container-org4e5bc13" class="outline-3">
+<h3 id="weather_research_forcast_model"><a id="org4e5bc13"></a>The Weather Research and Forecast Model</h3>
 <div class="outline-text-3" id="text-weather_research_forcast_model">
 <p>
 The Weather Research and Forecast (WRF) model is a parallel mesoscale numerical
@@ -362,27 +371,20 @@ scale their runs to larger core counts.
 </div>
 </div>
 
-<div id="outline-container-orgc6cfedc" class="outline-3">
-<h3 id="wrf_flowchart"><a id="orgc6cfedc"></a>WRF System Flowchart</h3>
+<div id="outline-container-org9f424b5" class="outline-3">
+<h3 id="wrf_flowchart"><a id="org9f424b5"></a>WRF System Flowchart</h3>
 <div class="outline-text-3" id="text-wrf_flowchart">
 
 <div class="figure">
-<p><img src="./figs/WRF_flow_chart-ARW_v4.png" alt="WRF_flow_chart-ARW_v4.png" />
+<p><img src="./imgs/WRF_flow_chart-ARW_v4.png" alt="WRF_flow_chart-ARW_v4.png" />
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org862e827" class="outline-3">
-<h3 id="cheyenne_specs"><a id="org862e827"></a>Cheyenne</h3>
+<div id="outline-container-orgd6f06aa" class="outline-3">
+<h3 id="cheyenne_specs"><a id="orgd6f06aa"></a>Cheyenne</h3>
 <div class="outline-text-3" id="text-cheyenne_specs">
-<div class="note">
-<p>
-<a href="https://www2.cisl.ucar.edu/resources/computational-systems/cheyenne">More Details on the Cheyenne supercomputer can be found here</a>
-</p>
-
-</div>
-
 <ul class="org-ul">
 <li>4,032 computation nodes
 <ul class="org-ul">
@@ -408,16 +410,23 @@ scale their runs to larger core counts.
 <li>Latency: MPI ping-pong &lt; 1 µs; hardware link 130 ns</li>
 </ul></li>
 </ul>
+
+<div class="note">
+<p>
+<a href="https://www2.cisl.ucar.edu/resources/computational-systems/cheyenne">More Details on the Cheyenne supercomputer can be found here</a>
+</p>
+
+</div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org715e07f" class="outline-2">
-<h2 id="intro"><a id="org715e07f"></a>Intro</h2>
+<div id="outline-container-orgcb311a7" class="outline-2">
+<h2 id="intro"><a id="orgcb311a7"></a>Intro</h2>
 <div class="outline-text-2" id="text-intro">
 </div>
-<div id="outline-container-org6805902" class="outline-3">
-<h3 id="test_cases"><a id="org6805902"></a>Test cases</h3>
+<div id="outline-container-orgb3e3226" class="outline-3">
+<h3 id="test_cases"><a id="orgb3e3226"></a>Test cases</h3>
 <div class="outline-text-3" id="text-test_cases">
 <ul class="org-ul">
 <li><code>conus12km</code> and <code>conus2.5km</code>
@@ -540,8 +549,8 @@ above official CONUS benchmarks</li>
 </div>
 </div>
 
-<div id="outline-container-org4ba033d" class="outline-3">
-<h3 id="compilers"><a id="org4ba033d"></a>Compilers</h3>
+<div id="outline-container-orgd193bb5" class="outline-3">
+<h3 id="compilers"><a id="orgd193bb5"></a>Compilers</h3>
 <div class="outline-text-3" id="text-compilers">
 <ul class="org-ul">
 <li>GNU Compiler Collection (GCC) versions 6.3.0, 8.1.0
@@ -565,8 +574,8 @@ supported by the compiling machine</li>
 </div>
 </div>
 
-<div id="outline-container-org4715428" class="outline-3">
-<h3 id="mpi_libraries"><a id="org4715428"></a>Message Passing Interface Libraries</h3>
+<div id="outline-container-orgff7dc33" class="outline-3">
+<h3 id="mpi_libraries"><a id="orgff7dc33"></a>Message Passing Interface Libraries</h3>
 <div class="outline-text-3" id="text-mpi_libraries">
 <ul class="org-ul">
 <li>SGI&rsquo;s MPT version 2.18 (Default MPI for Cheyenne)</li>
@@ -579,12 +588,12 @@ supported by the compiling machine</li>
 </div>
 </div>
 
-<div id="outline-container-orge820ee9" class="outline-2">
-<h2 id="observations"><a id="orge820ee9"></a>Observations</h2>
+<div id="outline-container-org9f27cb1" class="outline-2">
+<h2 id="observations"><a id="org9f27cb1"></a>Observations</h2>
 <div class="outline-text-2" id="text-observations">
 </div>
-<div id="outline-container-org361755d" class="outline-3">
-<h3 id="gnu_compilation_issue"><a id="org361755d"></a>Compilation issue with gnu &gt; 6.3.0 and WRF &lt; V4.0</h3>
+<div id="outline-container-orgf9d6f7c" class="outline-3">
+<h3 id="gnu_compilation_issue"><a id="orgf9d6f7c"></a>Compilation issue with gnu &gt; 6.3.0 and WRF &lt; V4.0</h3>
 <div class="outline-text-3" id="text-gnu_compilation_issue">
 <p>
 This likely require a source patch to fix, not an environment or compiler issue
@@ -599,8 +608,8 @@ Error: Size of ‘put’ argument of ‘random_seed’ intrinsic at (1) too smal
 </div>
 </div>
 
-<div id="outline-container-org13ffda8" class="outline-3">
-<h3 id="exceeding_min_patch_size"><a id="org13ffda8"></a><code>new_conus12km</code> on WRFV4.0 exceeds minimum patch size on &gt;= 32 nodes (36 cpus per node)</h3>
+<div id="outline-container-org54e5eae" class="outline-3">
+<h3 id="exceeding_min_patch_size"><a id="org54e5eae"></a><code>new_conus12km</code> on WRFV4.0 exceeds minimum patch size on &gt;= 32 nodes (36 cpus per node)</h3>
 <div class="outline-text-3" id="text-exceeding_min_patch_size">
 <pre class="example">
 taskid: 0 hostname: r14i1n17
@@ -644,8 +653,8 @@ the patch size &lt; 10 grid cells in either direction, the model will stop.&rdqu
 </div>
 </div>
 
-<div id="outline-container-org2185943" class="outline-3">
-<h3 id="out_of_mem"><a id="org2185943"></a>Not enough memory for small node count on large cases</h3>
+<div id="outline-container-orgec33912" class="outline-3">
+<h3 id="out_of_mem"><a id="orgec33912"></a>Not enough memory for small node count on large cases</h3>
 <div class="outline-text-3" id="text-out_of_mem">
 <p>
 When run on cheyenne&rsquo;s 64 GB memory nodes
@@ -660,13 +669,13 @@ usually see jobs SIGKILLed at various points during startup for
 </div>
 </div>
 
-<div id="outline-container-org140bfdd" class="outline-3">
-<h3 id="intel_compilation_time"><a id="org140bfdd"></a>Intel takes ~2x as long to compile wrf then gnu</h3>
+<div id="outline-container-orgb3724ca" class="outline-3">
+<h3 id="intel_compilation_time"><a id="orgb3724ca"></a>Intel takes ~2x as long to compile wrf then gnu</h3>
 <div class="outline-text-3" id="text-intel_compilation_time">
 </div>
 </div>
-<div id="outline-container-orgcff6944" class="outline-3">
-<h3 id="wrf_compilation_opt_66_67"><a id="orgcff6944"></a>WRF compilation option 66/67</h3>
+<div id="outline-container-org3f6bff4" class="outline-3">
+<h3 id="wrf_compilation_opt_66_67"><a id="org3f6bff4"></a>WRF compilation option 66/67</h3>
 <div class="outline-text-3" id="text-wrf_compilation_opt_66_67">
 <p>
 Relevant diff of <code>configure.wrf</code>:
@@ -692,8 +701,8 @@ Relevant diff of <code>configure.wrf</code>:
 </div>
 </div>
 
-<div id="outline-container-org889f1da" class="outline-3">
-<h3 id="over_10000_mpi_tasks"><a id="org889f1da"></a>Jobs with over 10000 mpi tasks</h3>
+<div id="outline-container-org06d8204" class="outline-3">
+<h3 id="over_10000_mpi_tasks"><a id="org06d8204"></a>Jobs with over 10000 mpi tasks</h3>
 <div class="outline-text-3" id="text-over_10000_mpi_tasks">
 <p>
 WRF produces <code>rsl.out.XXXX</code> and <code>rsl.error.XXXX</code> files for every mpi task, so to
@@ -711,8 +720,8 @@ A patch for WRFV4.0 can be found at <code>WRFs/WRFV4.0-rsl-8digit.patch</code>
 </div>
 </div>
 
-<div id="outline-container-orgb87f1b7" class="outline-2">
-<h2 id="results"><a id="orgb87f1b7"></a>Results</h2>
+<div id="outline-container-orga46269a" class="outline-2">
+<h2 id="results"><a id="orga46269a"></a>Results</h2>
 <div class="outline-text-2" id="text-results">
 <div class="note">
 <p>
@@ -722,8 +731,8 @@ All the raw data used to generate the plots seen here can be <a href="https://gi
 </div>
 </div>
 
-<div id="outline-container-org8dfeaea" class="outline-3">
-<h3 id="conus12km"><a id="org8dfeaea"></a>CONUS 12km</h3>
+<div id="outline-container-org2d2d00c" class="outline-3">
+<h3 id="conus12km"><a id="org2d2d00c"></a>CONUS 12km</h3>
 <div class="outline-text-3" id="text-conus12km">
 
 <div class="figure">
@@ -734,8 +743,8 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-org47d9b4b" class="outline-3">
-<h3 id="new_conus12km_wrfv3_8_1"><a id="org47d9b4b"></a>NEW CONUS 12km WRFV3.8.1</h3>
+<div id="outline-container-orgf804859" class="outline-3">
+<h3 id="new_conus12km_wrfv3_8_1"><a id="orgf804859"></a>NEW CONUS 12km WRFV3.8.1</h3>
 <div class="outline-text-3" id="text-new_conus12km_wrfv3_8_1">
 
 <div class="figure">
@@ -746,8 +755,8 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-orgf97d81c" class="outline-3">
-<h3 id="conus12km_vs_new_conus12km"><a id="orgf97d81c"></a>OLD CONUS 12km vs NEW CONUS 12km WRFV3.8.1</h3>
+<div id="outline-container-org84e8985" class="outline-3">
+<h3 id="conus12km_vs_new_conus12km"><a id="org84e8985"></a>OLD CONUS 12km vs NEW CONUS 12km WRFV3.8.1</h3>
 <div class="outline-text-3" id="text-conus12km_vs_new_conus12km">
 
 <div class="figure">
@@ -758,8 +767,8 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-orga28b756" class="outline-3">
-<h3 id="new_conus12km"><a id="orga28b756"></a>NEW CONUS 12km</h3>
+<div id="outline-container-org2ebc844" class="outline-3">
+<h3 id="new_conus12km"><a id="org2ebc844"></a>NEW CONUS 12km</h3>
 <div class="outline-text-3" id="text-new_conus12km">
 
 <div class="figure">
@@ -770,8 +779,8 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-org1f8cfe1" class="outline-3">
-<h3 id="new_conus2.5km"><a id="org1f8cfe1"></a>NEW CONUS 2.5km</h3>
+<div id="outline-container-org7083ba2" class="outline-3">
+<h3 id="new_conus2.5km"><a id="org7083ba2"></a>NEW CONUS 2.5km</h3>
 <div class="outline-text-3" id="text-new_conus2.5km">
 
 <div class="figure">
@@ -782,8 +791,8 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-orgc595510" class="outline-3">
-<h3 id="maria3km"><a id="orgc595510"></a>Maria 3km</h3>
+<div id="outline-container-org8d9c7fa" class="outline-3">
+<h3 id="maria3km"><a id="org8d9c7fa"></a>Maria 3km</h3>
 <div class="outline-text-3" id="text-maria3km">
 
 <div class="figure">
@@ -794,8 +803,8 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-orgb8f1b98" class="outline-3">
-<h3 id="maria1km"><a id="orgb8f1b98"></a>Maria 1km</h3>
+<div id="outline-container-orgf53f2f1" class="outline-3">
+<h3 id="maria1km"><a id="orgf53f2f1"></a>Maria 1km</h3>
 <div class="outline-text-3" id="text-maria1km">
 
 <div class="figure">
@@ -806,8 +815,8 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-orged9992a" class="outline-3">
-<h3 id="cases"><a id="orged9992a"></a>Cases</h3>
+<div id="outline-container-org72a3cc0" class="outline-3">
+<h3 id="cases"><a id="org72a3cc0"></a>Cases</h3>
 <div class="outline-text-3" id="text-cases">
 
 <div class="figure">
@@ -818,8 +827,8 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-orgae5c708" class="outline-3">
-<h3 id="mpis"><a id="orgae5c708"></a>MPIs</h3>
+<div id="outline-container-org24593d0" class="outline-3">
+<h3 id="mpis"><a id="org24593d0"></a>MPIs</h3>
 <div class="outline-text-3" id="text-mpis">
 
 <div class="figure">
@@ -851,8 +860,8 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-org15a4a25" class="outline-3">
-<h3 id="compilers"><a id="org15a4a25"></a>Compilers</h3>
+<div id="outline-container-org766190d" class="outline-3">
+<h3 id="compilers"><a id="org766190d"></a>Compilers</h3>
 <div class="outline-text-3" id="text-compilers">
 
 <div class="figure">
@@ -884,8 +893,8 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-org74b3f1e" class="outline-3">
-<h3 id="hybrid"><a id="org74b3f1e"></a>Hybrid</h3>
+<div id="outline-container-org4645259" class="outline-3">
+<h3 id="hybrid"><a id="org4645259"></a>Hybrid</h3>
 <div class="outline-text-3" id="text-hybrid">
 
 <div class="figure">
@@ -910,8 +919,8 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-org218a783" class="outline-3">
-<h3 id="katrina"><a id="org218a783"></a>Katrina</h3>
+<div id="outline-container-org5549562" class="outline-3">
+<h3 id="katrina"><a id="org5549562"></a>Katrina</h3>
 <div class="outline-text-3" id="text-katrina">
 
 <div class="figure">
@@ -922,8 +931,8 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-org66aa683" class="outline-3">
-<h3 id="cases_plus"><a id="org66aa683"></a>Cases plus</h3>
+<div id="outline-container-orgc6c5d4b" class="outline-3">
+<h3 id="cases_plus"><a id="orgc6c5d4b"></a>Cases plus</h3>
 <div class="outline-text-3" id="text-cases_plus">
 
 <div class="figure">
@@ -934,17 +943,17 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-orgaf8b0fa" class="outline-3">
-<h3 id="mvapich_io"><a id="orgaf8b0fa"></a>mvapich i/o</h3>
+<div id="outline-container-org4c8b9cd" class="outline-3">
+<h3 id="mvapich_io"><a id="org4c8b9cd"></a>mvapich i/o</h3>
 <div class="outline-text-3" id="text-mvapich_io">
 <div class="note">
 <p>
-mvapich2.3E0 corresponds to setting the environment variables:
+mvapich2.3 BIND corresponds to setting the environment variables:
 <code>MV2_CPU_BINDING_POLICY=hybrid MV2_HYBRID_BINDING_POLICY=bunch</code>
 </p>
 
 <p>
-mvapich2.3E1 corresponds to setting the environment variables:
+mvapich2.3 HW corresponds to setting the environment variables:
 <code>MV2_CPU_BINDING_POLICY=hybrid MV2_HYBRID_BINDING_POLICY=bunch MV2_USE_MCAST=1 MV2_ENABLE_SHARP=1</code>
 </p>
 
@@ -959,23 +968,24 @@ Sorry, your browser does not support SVG.</object>
 
 
 <div class="figure">
-<p><object type="image/svg+xml" data="./figs/mvapich-io-new_conus2.5km.svg" class="org-svg">
+<p><object type="image/svg+xml" data="./figs/mvapich-io-maria3km.svg" class="org-svg">
 Sorry, your browser does not support SVG.</object>
 </p>
 </div>
 
 
 <div class="figure">
-<p><object type="image/svg+xml" data="./figs/mvapich-io-maria3km.svg" class="org-svg">
+<p><object type="image/svg+xml" data="./figs/mvapich-io-new_conus2-5km.svg" class="org-svg">
 Sorry, your browser does not support SVG.</object>
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orga0ea6c8" class="outline-3">
-<h3 id="orga0ea6c8">figs</h3>
-<div class="outline-text-3" id="text-orga0ea6c8">
+
+<div id="outline-container-org42bc07b" class="outline-3">
+<h3 id="org42bc07b">figs</h3>
+<div class="outline-text-3" id="text-org42bc07b">
 
 <div class="figure">
 <p><object type="image/svg+xml" data="./figs/new_conus12km_gnu_mpi.svg" class="org-svg">
@@ -990,6 +1000,10 @@ Sorry, your browser does not support SVG.</object>
 </p>
 </div>
 
+<pre class="example">
+Text(0.5,0,'Normalized Performance')
+
+</pre>
 
 <div class="figure">
 <p><object type="image/svg+xml" data="./figs/new_conus12km_bar_compiler_fig.svg" class="org-svg">
@@ -1000,15 +1014,15 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-org908c44d" class="outline-2">
-<h2 id="analysis"><a id="org908c44d"></a>Analysis</h2>
+<div id="outline-container-org6396e2e" class="outline-2">
+<h2 id="analysis"><a id="org6396e2e"></a>Analysis</h2>
 <div class="outline-text-2" id="text-analysis">
 </div>
-<div id="outline-container-org82fa2b9" class="outline-3">
-<h3 id="analysis-compilers"><a id="org82fa2b9"></a>Compilers</h3>
+<div id="outline-container-org1edf2e6" class="outline-3">
+<h3 id="analysis-compilers"><a id="org1edf2e6"></a>Compilers</h3>
 <div class="outline-text-3" id="text-analysis-compilers">
 <p>
-We see from Figure <a href="#org94f33fd">29</a> that the Intel compiler is consistently faster
+We see from Figure <a href="#org74ccfcf">29</a> that the Intel compiler is consistently faster
 than the Gnu compiler across all flags tried. We also see that for both Intel
 and Gnu, the <code>-Ofast</code> (for Gnu) or <code>-fp-model fast=2</code> (for Intel) are the only
 flags that make a significant difference in speed. Other flags tried such as
@@ -1016,7 +1030,7 @@ flags that make a significant difference in speed. Other flags tried such as
 </p>
 
 
-<div id="org94f33fd" class="figure">
+<div id="org74ccfcf" class="figure">
 <p><object type="image/svg+xml" data="./figs/new_conus12km_bar_compiler_fig.svg" class="org-svg">
 Sorry, your browser does not support SVG.</object>
 </p>
@@ -1025,8 +1039,8 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-org0daeb4f" class="outline-3">
-<h3 id="analysis-mpi"><a id="org0daeb4f"></a>MPI Libraries</h3>
+<div id="outline-container-orgea7da4c" class="outline-3">
+<h3 id="analysis-mpi"><a id="orgea7da4c"></a>MPI Libraries</h3>
 <div class="outline-text-3" id="text-analysis-mpi">
 <p>
 We also tested the scaling performance of several MPI implementations. Note that
@@ -1035,13 +1049,13 @@ Cheyenne uses a Mellanox EDR InfiniBand high-speed interconnect with a Partial
 </p>
 
 <p>
-We see from Figures <a href="#orgf9b1fc9">30</a> and <a href="#org2f515cb">31</a> that MPT, MVAPICH and OpenMPI all have
+We see from Figures <a href="#orgd58be6f">30</a> and <a href="#org05e8031">31</a> that MPT, MVAPICH and OpenMPI all have
 similar performance, while MPICH has overall poor performance and the
 performance Intel MPI does not scale well to large node counts.
 </p>
 
 
-<div id="orgf9b1fc9" class="figure">
+<div id="orgd58be6f" class="figure">
 <p><object type="image/svg+xml" data="./figs/new_conus12km_gnu_mpi.svg" class="org-svg">
 Sorry, your browser does not support SVG.</object>
 </p>
@@ -1049,7 +1063,7 @@ Sorry, your browser does not support SVG.</object>
 </div>
 
 
-<div id="org2f515cb" class="figure">
+<div id="org05e8031" class="figure">
 <p><object type="image/svg+xml" data="./figs/new_conus12km_intel_mpi.svg" class="org-svg">
 Sorry, your browser does not support SVG.</object>
 </p>
@@ -1058,11 +1072,11 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-org5a5630c" class="outline-3">
-<h3 id="run_time_scaling_comparison"><a id="org5a5630c"></a>Run Time Scaling Comparison</h3>
+<div id="outline-container-orgbc33836" class="outline-3">
+<h3 id="run_time_scaling_comparison"><a id="orgbc33836"></a>Run Time Scaling Comparison</h3>
 <div class="outline-text-3" id="text-run_time_scaling_comparison">
 <p>
-Figures <a href="#org5e94296">32</a> and <a href="#org22bee83">33</a> show the
+Figures <a href="#org19edc73">32</a> and <a href="#orgf213a61">33</a> show the
 total run time for WRF using increasing numbers of cores with the total run time
 broken down into the initialization time, computation time, and writing time.
 These results use the 1 km Hurricane Maria Benchmark case. We see that on
@@ -1076,14 +1090,14 @@ in the MPI used in Cheyenne versus Yellowstone.
 </p>
 
 
-<div id="org5e94296" class="figure">
+<div id="org19edc73" class="figure">
 <p><img src="./imgs/timingdav.png" alt="timingdav.png" />
 </p>
 <p><span class="figure-number">Figure 32: </span>Run Time Scaling on <b>Yellowstone</b></p>
 </div>
 
 
-<div id="org22bee83" class="figure">
+<div id="orgf213a61" class="figure">
 <p><object type="image/svg+xml" data="./figs/maria1km_runtime.svg" class="org-svg">
 Sorry, your browser does not support SVG.</object>
 </p>
@@ -1092,13 +1106,13 @@ Sorry, your browser does not support SVG.</object>
 </div>
 </div>
 
-<div id="outline-container-org35af21b" class="outline-3">
-<h3 id="comp_time_scaling_comparison"><a id="org35af21b"></a>Computation Time Scaling Results</h3>
+<div id="outline-container-orgaa71d80" class="outline-3">
+<h3 id="comp_time_scaling_comparison"><a id="orgaa71d80"></a>Computation Time Scaling Results</h3>
 <div class="outline-text-3" id="text-comp_time_scaling_comparison">
 <p>
 When expressing the scaling as a function of WRF gridpoints per core, we see
-that all the cases scale similarly in both Figure <a href="#orgadfcf06">35</a> on
-Cheyenne and Figure <a href="#orgc2927c4">34</a> on Yellowstone. Note that both
+that all the cases scale similarly in both Figure <a href="#orgb9dcafd">35</a> on
+Cheyenne and Figure <a href="#org831b25a">34</a> on Yellowstone. Note that both
 axes are logarithmic, so a small distance between points corresponds to a large
 difference in values. On both Cheyenne and Yellowstone, in the high relative
 gridpoints per core region, we see that WRF has linear <b>strong scaling</b>. This
@@ -1110,14 +1124,14 @@ computation.
 </p>
 
 
-<div id="orgc2927c4" class="figure">
+<div id="org831b25a" class="figure">
 <p><img src="./imgs/scalingideppresdav.png" alt="scalingideppresdav.png" />
 </p>
 <p><span class="figure-number">Figure 34: </span>Computation Scaling on <b>Yellowstone</b></p>
 </div>
 
 
-<div id="orgadfcf06" class="figure">
+<div id="orgb9dcafd" class="figure">
 <p><object type="image/svg+xml" data="./figs/cases.svg" class="org-svg">
 Sorry, your browser does not support SVG.</object>
 </p>
@@ -1143,7 +1157,7 @@ where WRF would depart from its linear strong scaling.
 </p>
 
 <p>
-The interesting feature in Figure <a href="#orgadfcf06">35</a> in the high
+The interesting feature in Figure <a href="#orgb9dcafd">35</a> in the high
 gridpoints per core region where the time steps per second seem to jump slightly
 is an artifact of the memory constraints on Cheyenne. The normal nodes on
 Cheyenne have only 64 GB of memory, which is less than on Yellowstone. WRF runs
@@ -1162,7 +1176,7 @@ allocation.
 
 <p>
 Finally it&rsquo;s worth noting that the vertical axis between Figures
-<a href="#orgc2927c4">34</a> and <a href="#orgadfcf06">35</a> is shifted due to
+<a href="#org831b25a">34</a> and <a href="#orgb9dcafd">35</a> is shifted due to
 the difference in clock speeds between the processors used in Yellowstone versus
 those used in Cheyenne.
 </p>
@@ -1170,8 +1184,8 @@ those used in Cheyenne.
 </div>
 </div>
 
-<div id="outline-container-org3a9891d" class="outline-2">
-<h2 id="wrf_scaling_and_timing_on_cheyenne"><a id="org3a9891d"></a><span class="todo TODO">TODO</span> WRF scaling and timing on Cheyenne</h2>
+<div id="outline-container-orge13d291" class="outline-2">
+<h2 id="wrf_scaling_and_timing_on_cheyenne"><a id="orge13d291"></a>WRF scaling and timing on Cheyenne</h2>
 <div class="outline-text-2" id="text-wrf_scaling_and_timing_on_cheyenne">
 <div class="note">
 <p>
@@ -1184,6 +1198,10 @@ discussion <a href="#run_time_scaling_comparison">here</a>
 </p>
 
 </div>
+
+<p>
+The results on Cheyenne below may be helpful in answering such questions as:
+</p>
 
 <ul class="org-ul">
 <li>&ldquo;Is it possible to solve a problem with such-and-such resolution in a timely
@@ -1201,14 +1219,29 @@ your runs, so that you can find one that is optimal for you both in terms of
 time-to-solution and in terms of your allocation.
 </p>
 
+<p>
+If you&rsquo;re preparing an allocation request, while these plots provide some
+guidance, you do need to run some tests on Cheyenne or a comparable system to
+support the validity of your core-hour estimate for your own physics
+parameterization, and to make sure you account for the overhead from
+initialization and I/O. (Different I/O settings and frequency will affect your
+runs differently.)
+</p>
+
+<p>
+Also see <a href="#optimizing_wrf_performance">Optimizing WRF performance</a> for related documentation and <a href="https://www2.cisl.ucar.edu/user-support/determining-computational-resource-needs">Determining
+computational resource needs</a> for additional information on preparing allocation
+requests.
+</p>
+
 <hr />
 </div>
 
-<div id="outline-container-org45ae5cd" class="outline-3">
-<h3 id="scaling_results"><a id="org45ae5cd"></a><span class="todo TODO">TODO</span> Scaling Results</h3>
+<div id="outline-container-org553d32c" class="outline-3">
+<h3 id="scaling_results"><a id="org553d32c"></a><span class="todo TODO">TODO</span> Scaling Results</h3>
 <div class="outline-text-3" id="text-scaling_results">
 <p>
-Figure <a href="#org94f33fd">29</a> shows scaling results from Hurricane Maria simulations at 3km
+Figure <a href="#org74ccfcf">29</a> shows scaling results from Hurricane Maria simulations at 3km
 and 1km resolutions along with CONUS simulations at 12km and 2.5km resolutions
 all run using WRFV4.0. When expressed this way, all the cases scale similarly.
 Note that both axes are logarithmic, so a small distance between points
@@ -1216,30 +1249,64 @@ corresponds to a large difference in values.
 </p>
 
 
-<div id="org7f5ec54" class="figure">
+<div id="orgbb44acd" class="figure">
 <p><object type="image/svg+xml" data="./figs/cases.svg" class="org-svg">
 Sorry, your browser does not support SVG.</object>
 </p>
 <p><span class="figure-number">Figure 36: </span>WRF scaling</p>
 </div>
 
-
 <p>
-Beginning in WRFV4.0, the minimum patch size is 10 grid cells in either
-direction. This limits you to using at least 100 gridpoints/core. Thus WRF will
-prevent you from running on very large relative core counts where
-initialization, I/O, and communication dominate.
+On Cheyenne, we see that WRF does not significantly depart from this linear
+strong scaling at any amount of gridpoints per core.
+</p>
+</div>
+
+<div id="outline-container-orgc6210fd" class="outline-4">
+<h4 id="orgc6210fd"><span class="todo TODO">TODO</span> Running WRF with a small number of gridpoints per core</h4>
+<div class="outline-text-4" id="text-orgc6210fd">
+<p>
+WRFV4.0 will refuse to run if there is a minimum patch size of less than 10 grid
+points in either direction. This limits users from running with fewer than 100
+gridpoints per core, which would likely be a very MPI communication bound region
+where WRF would depart from its linear strong scaling. Thus WRF will prevent you
+from running on very large relative core counts where initialization, I/O, and
+communication dominate.
 </p>
 </div>
 </div>
 
-<div id="outline-container-org7bf58cb" class="outline-3">
-<h3 id="run_time_results"><a id="org7bf58cb"></a><span class="todo TODO">TODO</span> Run time results</h3>
+<div id="outline-container-orgf241bfe" class="outline-4">
+<h4 id="orgf241bfe"><span class="todo TODO">TODO</span> Running WRF with a large number of gridpoints per core</h4>
+<div class="outline-text-4" id="text-orgf241bfe">
+<p>
+The interesting feature in Figure <a href="#org74ccfcf">29</a> in the high gridpoints per core
+region where the time steps per second seem to jump slightly is an artifact of
+the memory constraints on Cheyenne. The normal nodes on Cheyenne have only 64 GB
+of memory. WRF runs with too many gridpoints per node will run out of memory and
+be killed. The maximum number of gridpoints per node that will fit into the 64
+GB of memory of that node depends on the physics parameterizations, however, we
+observed that typically the maximum is between 10<sup>5</sup> and 10<sup>6</sup> total gridpoints.
+Thus to obtain the results in the very large gridpoints per core region, we
+utilized Cheyenne&rsquo;s 128 GB memory nodes for an additional point or two, then we
+undersubscribed the cores on each node. This undersubscription of cores is
+likely responsible for the small bump in speed observed. However we do not
+recommend that users undersubscribe cores as core-hours are charged for all
+cores on the node so undersubscription of cores will be an inefficient use of a
+user&rsquo;s core-hour allocation.
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgbcca48d" class="outline-3">
+<h3 id="run_time_results"><a id="orgbcca48d"></a>Run time results</h3>
 <div class="outline-text-3" id="text-run_time_results">
 <p>
-Figure <a href="#org931e7aa">37</a> below shows the total run time for WRF jobs using increasing
-numbers of cores. Initialization time, computation time, and writing time also
-are shown for runs using up to 9,216 cores.
+Figure <a href="#org8a44356">37</a> below shows the <i>total</i> run time for WRF jobs using
+increasing numbers of cores with the total run time broken down into the
+initialization time, computation time, and writing time.
 </p>
 
 <p>
@@ -1249,25 +1316,38 @@ resolution.
 
 <p>
 As illustrated, initialization and writing output times remain relatively fixed,
-but increasing slightly as you move to larger core counts. Times shown are for a
+only increasing slightly as you move to larger core counts. Times shown are for a
 and single output file of the Maria 1km case, which used a domain of about 372
 million grid points. If you have more restarts and output files, your numbers
 will be different but the trend will be similar.
 </p>
 
 
-<div id="org931e7aa" class="figure">
+<div id="org8a44356" class="figure">
 <p><object type="image/svg+xml" data="./figs/maria1km_runtime.svg" class="org-svg">
 Sorry, your browser does not support SVG.</object>
 </p>
 <p><span class="figure-number">Figure 37: </span>WRF Run Timing</p>
 </div>
 </div>
+
+<div id="outline-container-org3ac2d18" class="outline-4">
+<h4 id="org3ac2d18"><span class="todo TODO">TODO</span> Running WRF on a large number of nodes</h4>
+<div class="outline-text-4" id="text-org3ac2d18">
+<p>
+Users wishing to run WRF with more than 10,000 MPI tasks, which on Cheyenne
+corresponds to using 277 nodes with 36 MPI tasks per node need to patch WRF to
+use more digits in the <code>rsl.out.XXXX</code> and <code>rsl.error.XXXX</code> files otherwise WRF
+will not run. A patch for WRFV4.0 can be <a href="https://github.com/akirakyle/WRF_benchmarks/blob/master/WRFs/WRFV4.0-rsl-8digit.patch">found here</a>.
+</p>
+</div>
+</div>
 </div>
 </div>
 
-<div id="outline-container-org6be3c31" class="outline-2">
-<h2 id="optimizing_wrf_performance"><a id="org6be3c31"></a><span class="todo TODO">TODO</span> Optimizing WRF performance</h2>
+
+<div id="outline-container-orgde313ef" class="outline-2">
+<h2 id="optimizing_wrf_performance"><a id="orgde313ef"></a><span class="todo TODO">TODO</span> Optimizing WRF performance</h2>
 <div class="outline-text-2" id="text-optimizing_wrf_performance">
 <div class="note">
 <p>
@@ -1286,8 +1366,8 @@ included small runs and others, with different domain sizes and time steps.
 <hr />
 </div>
 
-<div id="outline-container-org9d915c7" class="outline-3">
-<h3 id="compiling_and_linking"><a id="org9d915c7"></a><span class="todo TODO">TODO</span> Compiling and linking</h3>
+<div id="outline-container-org5c91d5a" class="outline-3">
+<h3 id="compiling_and_linking"><a id="org5c91d5a"></a><span class="todo TODO">TODO</span> Compiling and linking</h3>
 <div class="outline-text-3" id="text-compiling_and_linking">
 <p>
 We recommend using the default <b>Intel compiler</b>. In our runs, the Intel compiler
@@ -1314,8 +1394,8 @@ We do not recommend SMPar alone or serial WRF builds.
 </div>
 </div>
 
-<div id="outline-container-orgf916109" class="outline-3">
-<h3 id="runtime_options"><a id="orgf916109"></a><span class="todo TODO">TODO</span> Runtime options</h3>
+<div id="outline-container-org9a686dc" class="outline-3">
+<h3 id="runtime_options"><a id="org9a686dc"></a><span class="todo TODO">TODO</span> Runtime options</h3>
 <div class="outline-text-3" id="text-runtime_options">
 <p>
 We recommend using the following when running WRF jobs:
@@ -1346,8 +1426,8 @@ We used the default binding settings in test runs.
 </div>
 </div>
 
-<div id="outline-container-org89b3b27" class="outline-3">
-<h3 id="scaling_and_core_count"><a id="org89b3b27"></a><span class="todo TODO">TODO</span> Scaling and core count</h3>
+<div id="outline-container-org88b578c" class="outline-3">
+<h3 id="scaling_and_core_count"><a id="org88b578c"></a><span class="todo TODO">TODO</span> Scaling and core count</h3>
 <div class="outline-text-3" id="text-scaling_and_core_count">
 <p>
 WRF is a highly scalable model, demonstrating both weak and strong scaling,
@@ -1381,8 +1461,8 @@ optimal core count for your problem size.
 </div>
 </div>
 
-<div id="outline-container-orgb5a3e17" class="outline-2">
-<h2 id="summary"><a id="orgb5a3e17"></a>Summary</h2>
+<div id="outline-container-org495c8a7" class="outline-2">
+<h2 id="summary"><a id="org495c8a7"></a>Summary</h2>
 <div class="outline-text-2" id="text-summary">
 <ul class="org-ul">
 <li>openMPI, MPT, and MVAPICH show similar runtime performance.</li>
@@ -1394,7 +1474,7 @@ optimal core count for your problem size.
 <div id="postamble" class="status">
 <p class="author">Author: Akira Kyle</p>
 <p class="email">Email: <a href="mailto:akyle@cmu.edu">akyle@cmu.edu</a></p>
-<p class="date">Created: 2018-07-31 Tue 08:43</p>
+<p class="date">Created: 2018-08-01 Wed 01:53</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

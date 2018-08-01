@@ -51,6 +51,7 @@ default in ~wrf_run_pbs_jobs~)
 #+begin_src sh
 export JASPERLIB=/glade/u/home/wrfhelp/UNGRIB_LIBRARIES/lib
 export JASPERINC=/glade/u/home/wrfhelp/UNGRIB_LIBRARIES/include
+alias qsub='/opt/pbs/bin/qsub -A MY_ACCOUNT_CODE -m abe -M my_email_address'
 
 git clone https://github.com/akirakyle/WRF_benchmarks.git
 
