@@ -282,12 +282,10 @@ import matplotlib.pyplot as plt
 #+end_src
 
 #+begin_src ipython :session
-def plot_scaling(cases, labels, title, shifts=None, legend_outside=True,
-                 line=None, fmts=None):
+def plot_scaling(cases, labels, title, shifts=None, legend_outside=True, fmts=None):
     if not shifts: shifts = [1] * len(cases)
     if not fmts: fmts = ['o--'] * len(cases)
     plt.figure(figsize=(3.5,3.5))
-    if line: plt.loglog([150,3500000],[25,0.002], 'b-')#, linewidth=2.0)
     for case,label,shift,fmt in zip(cases,labels,shifts,fmts):
         gridpoints = e_we[case[0]] * e_sn[case[0]]
         secs = []; cpus = []
@@ -657,7 +655,9 @@ plt.plot(ticks, write[p], 'b+', label='Writing output')
 plt.xticks(ticks, cpus[p], rotation='vertical')
 plt.xlabel("Cores", fontweight='bold')
 plt.ylabel("Wall-clock time (minutes)", fontweight='bold')
-plt.legend(loc='best')
+leg = plt.legend(loc='best')
+leg.get_frame().set_edgecolor('k')
+plt.gca().tick_params(direction='in',top=True,right=True)
 # plt.title("Run time results")
 # plt.axis('equal')
 # plt.axes().set_aspect('equal', 'datalim')
@@ -666,7 +666,7 @@ plt.grid(False)
 
 #+RESULTS:
 :RESULTS:
-# Out[175]:
+# Out[313]:
 [[file:./figs/maria1km_runtime.svg]]
 :END:
 
@@ -674,18 +674,18 @@ plt.grid(False)
 #+name: cases-cases
 | case           | WRF version | compiler    | mpi     | trial                                                      |
 |----------------+-------------+-------------+---------+------------------------------------------------------------|
+| maria1km       | WRFV4.0     | intel18.0.1 | mpt2.18 | T1,T1_hm                                                   |
+| maria3km       | WRFV4.0     | intel18.0.1 | mpt2.18 | T1,T1_hm,T1_hm_p18,T1_hm_p09,T1_hm_p04,T1_hm_p02,T1_hm_p01 |
 | new_conus12km  | WRFV4.0     | intel18.0.1 | mpt2.18 | T1,T1_p18,T1_p09,T1_p04,T1_p02,T1_p01                      |
 | new_conus2.5km | WRFV4.0     | intel18.0.1 | mpt2.18 | T1,T1_hm,T1_hm_p18,T1_hm_p09,T1_hm_p04,T1_hm_p02,T1_hm_p01 |
-| maria3km       | WRFV4.0     | intel18.0.1 | mpt2.18 | T1,T1_hm,T1_hm_p18,T1_hm_p09,T1_hm_p04,T1_hm_p02,T1_hm_p01 |
-| maria1km       | WRFV4.0     | intel18.0.1 | mpt2.18 | T1,T1_hm                                                   |
 
 #+name: cases-labels
 | label       |
 |-------------|
+| Maria 1km   |
+| Maria 3km   |
 | CONUS 12km  |
 | CONUS 2.5km |
-| Maria 3km   |
-| Maria 1km   |
 
 ** Cases
    :PROPERTIES:
@@ -694,14 +694,17 @@ plt.grid(False)
 #+header: :var cases=cases-cases labels=cases-labels
 #+header: :var title=""
 #+begin_src ipython :session :ipyfile ./figs/cases.svg
-plot_scaling(cases, labels, title, line=True,
-             legend_outside=False, fmts=['bo', 'gx', 'r+', 'y^'])
+plot_scaling(cases, labels, title, legend_outside=False, fmts=['bo', 'gx', 'r+', 'y2'])
+plt.legend(frameon=False)
+plt.loglog([150,3500000],[25,0.002], 'C7-', zorder=0)#, linewidth=2.0)
+plt.loglog([8000,700000],[20,0.3], 'b-', zorder=0)#, linewidth=2.0)
+plt.text(7500, 22, 'Yellowstone Scaling Trend', rotation=-44)
+plt.gca().tick_params(direction='in',top=True,right=True,which='both')
 #+end_src
 
-#+attr_latex: :width 1.0\linewidth
 #+RESULTS:
 :RESULTS:
-# Out[177]:
+# Out[319]:
 [[file:./figs/cases.svg]]
 :END:
 
@@ -819,6 +822,7 @@ plot_bar(cases, 4, labels, title)
 | new_conus12km | WRFV4.0     | gnu8.1.0_Ofast        | mpt2.18    | T1    |
 | new_conus12km | WRFV4.0     | gnu8.1.0_Ofast_native | mpt2.18    | T1    |
 | new_conus12km | WRFV4.0     | intel18.0.1           | mpt2.18    | T1    |
+| new_conus12km | WRFV4.0     | intel18.0.1_O2        | mpt2.18    | T1    |
 | new_conus12km | WRFV4.0     | intel18.0.1_host      | mpt2.18    | T1    |
 | new_conus12km | WRFV4.0     | intel18.0.1_opt66     | mpt2.18    | T1    |
 
@@ -834,6 +838,7 @@ plot_bar(cases, 4, labels, title)
 | gnu8.1.0_Ofast - mpt2.18        |
 | gnu8.1.0_Ofast_native - mpt2.18 |
 | intel18.0.1 - mpt2.18           |
+| intel18.0.1_O2 - mpt2.18        |
 | intel18.0.1_host - mpt2.18      |
 | intel18.0.1_opt66 - mpt2.18     |
 
@@ -915,7 +920,6 @@ plot_bar(cases, 4, labels, title)
 | intel18.0.1  - openmpi3.1.0   |
 | intel18.0.1  - impi2018.1.163 |
 
-
 ** Compilers
    :PROPERTIES:
    :CUSTOM_ID: compilers
@@ -928,7 +932,7 @@ plot_scaling(cases, labels, title)
 
 #+RESULTS:
 :RESULTS:
-# Out[90]:
+# Out[324]:
 [[file:./figs/new_conus12km_compiler.svg]]
 :END:
 
@@ -1259,6 +1263,7 @@ plt.grid(False)
 #+name: new_conus12km-cases-compiler-intel-fig
 | case          | WRF version | compiler          | mpi     | trial |
 |---------------+-------------+-------------------+---------+-------|
+| new_conus12km | WRFV4.0     | intel18.0.1_O2    | mpt2.18 | T1    |
 | new_conus12km | WRFV4.0     | intel18.0.1       | mpt2.18 | T1    |
 | new_conus12km | WRFV4.0     | intel18.0.1_host  | mpt2.18 | T1    |
 | new_conus12km | WRFV4.0     | intel18.0.1_opt66 | mpt2.18 | T1    |
@@ -1273,6 +1278,7 @@ plt.grid(False)
 | gnu -O3 -march=native         |
 | gnu -Ofast                    |
 | gnu -Ofast -march=native      |
+| intel -O2                     |
 | intel -O3                     |
 | intel -Xhost                  |
 | intel -xHost -fp-model fast=2 |
@@ -1282,11 +1288,13 @@ plt.grid(False)
 #+header: :var title=""
 #+begin_src ipython :session :ipyfile ./figs/new_conus12km_gnu_mpi.svg
 plot_scaling(cases, labels, title, legend_outside=False, fmts=['C0o--', 'C1x--', 'C2+--', 'C3.--'])
+plt.ylim((0.5527280832636986, 19.066819718699122))
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-# Out[217]:
+# Out[285]:
+: (0.5527280832636986, 19.066819718699122)
 [[file:./figs/new_conus12km_gnu_mpi.svg]]
 :END:
 
@@ -1294,11 +1302,13 @@ plot_scaling(cases, labels, title, legend_outside=False, fmts=['C0o--', 'C1x--',
 #+header: :var title=""
 #+begin_src ipython :session :ipyfile ./figs/new_conus12km_intel_mpi.svg
 plot_scaling(cases, labels, title, legend_outside=False, fmts=['C0o--', 'C1x--', 'C4^--'])
+plt.ylim((0.5527280832636986, 19.066819718699122))
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-# Out[219]:
+# Out[286]:
+: (0.5527280832636986, 19.066819718699122)
 [[file:./figs/new_conus12km_intel_mpi.svg]]
 :END:
 
@@ -1334,7 +1344,7 @@ for i, label in enumerate([l[0] for l in labels]):
     ax.text(0.05, i + .20, label, color='white', fontweight='bold')
 ax.invert_yaxis()
 #ax.set_xlabel('Time steps/s', fontweight='bold')
-ax.set_xlabel('Normalized Performance', fontweight='bold')
+ax.set_xlabel('Normalized Computational Speed', fontweight='bold')
 
 # ax.annotate('', xy=(0.72, 0.07),  xycoords='figure fraction',
 #             xytext=(0.28, 0.07), textcoords='figure fraction',
@@ -1345,9 +1355,57 @@ ax.set_xlabel('Normalized Performance', fontweight='bold')
 
 #+RESULTS:
 :RESULTS:
-# Out[199]:
-: Text(0.5,0,'Normalized Performance')
+# Out[326]:
+: Text(0.5,0,'Normalized Computational Speed')
 [[file:./figs/new_conus12km_bar_compiler_fig.svg]]
+:END:
+
+#+header: :var cases_gnu=new_conus12km-cases-compiler-gnu-fig
+#+header: :var cases_intel=new_conus12km-cases-compiler-intel-fig
+#+header: :var labels=new_conus12km-labels-compiler-fig
+#+begin_src ipython :session :ipyfile ./figs/new_conus12km_bar_compiler_fig_stretch.svg
+nodes='N002.rsl'
+secs_gnu = []
+for case in cases_gnu:
+    sec = getFromDict(data, case+[nodes])[2]
+    secs_gnu.append(sec if isinstance(sec, float) else 0.0)
+secs_intel = []
+for case in cases_intel:
+    sec = getFromDict(data, case+[nodes])[2]
+    secs_intel.append(sec if isinstance(sec, float) else 0.0)
+
+secs_gnu = np.array(secs_gnu)
+secs_intel = np.array(secs_intel)
+
+y_pos_gnu = np.arange(len(cases_gnu))
+y_pos_intel = np.arange(len(cases_intel)) + y_pos_gnu[-1] + 1
+
+fig, ax = plt.subplots(figsize=(7,3.5))
+
+ax.barh(y_pos_gnu, secs_intel[0]/secs_gnu, color='C0')
+ax.barh(y_pos_intel, secs_intel[0]/secs_intel, color='C1')
+
+ax.set_yticks([]) #y_pos)
+ax.set_xticks(np.linspace(0,1.2,num=13))
+# ax.set_yticklabels(labels_gnu+labels_intel)
+for i, label in enumerate([l[0] for l in labels]):
+    ax.text(0.05, i + .20, label, color='white', fontweight='bold')
+ax.invert_yaxis()
+#ax.set_xlabel('Time steps/s', fontweight='bold')
+ax.set_xlabel('Normalized Computational Performance', fontweight='bold')
+
+# ax.annotate('', xy=(0.72, 0.07),  xycoords='figure fraction',
+#             xytext=(0.28, 0.07), textcoords='figure fraction',
+#             arrowprops=dict(facecolor='black', width=2))
+# plt.figtext(0.1, -0.05, 'worse\nperformance', fontweight='bold')
+# plt.figtext(0.75, -0.05, 'better\nperformance', fontweight='bold')
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# Out[321]:
+: Text(0.5,0,'Normalized Computational Performance')
+[[file:./figs/new_conus12km_bar_compiler_fig_stretch.svg]]
 :END:
 
 * Analysis

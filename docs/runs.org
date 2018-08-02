@@ -328,34 +328,47 @@
 | new_conus12km   | WRFV4.0   | gnu8.1.0              | mvapich2.3     | E1_T1     |    4 |          |    |    |    |         |       |   1 |
 | new_conus12km   | WRFV4.0   | gnu8.1.0              | mvapich2.3     | E1_T1     |    8 |          |    |    |    |         |       |   1 |
 | new_conus12km   | WRFV4.0   | gnu8.1.0              | mvapich2.3     | E1_T1     |   16 |          |    |    |    |         |       |   1 |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.3     | E0_T1     |    2 | 04:00:00 |    |    |    | economy |       |   0 |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.3     | E0_T1     |    4 | 04:00:00 |    |    |    | economy |       |   0 |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.3     | E0_T1     |   16 | 04:00:00 |    |    |    | economy |       |   0 |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.3     | E0_T1     |   32 | 04:00:00 |    |    |    | economy |       |   0 |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.3     | E1_T1     |    2 | 04:00:00 |    |    |    | economy |       |   1 |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.3     | E1_T1     |    4 | 04:00:00 |    |    |    | economy |       |   1 |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.3     | E1_T1     |    8 | 04:00:00 |    |    |    | economy |       |   1 |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.3     | E1_T1     |   16 | 04:00:00 |    |    |    | economy |       |   1 |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.3     | E1_T1     |   32 | 04:00:00 |    |    |    | economy |       |   1 |
+| maria3km        | WRFV4.0   | gnu8.1.0              | mvapich2.3     | E1_T1     |   64 | 04:00:00 |    |    |    | economy |       |   1 |
 
 #+name: env_vars
 | MV2_CPU_BINDING_POLICY=hybrid MV2_HYBRID_BINDING_POLICY=bunch MV2_USE_THREAD_WARNING=0                                    |
 | MV2_CPU_BINDING_POLICY=hybrid MV2_HYBRID_BINDING_POLICY=bunch MV2_USE_THREAD_WARNING=0 MV2_USE_MCAST=1 MV2_ENABLE_SHARP=1 |
 
+#+name: failed
+| Case          | WRF     | Compiler    | MPI        | T     |   N |        W | P | M | O | Q       | M | Env |
+|---------------+---------+-------------+------------+-------+-----+----------+---+---+---+---------+---+-----|
+| new_conus12km | WRFV4.0 | gnu8.1.0    | mvapich2.3 | E0_T1 |   8 |          |   |   |   |         |   |   0 |
+| maria3km      | WRFV4.0 | gnu8.1.0    | mvapich2.3 | E0_T1 |   8 | 04:00:00 |   |   |   | economy |   |   0 |
+| maria3km      | WRFV4.0 | gnu8.1.0    | mvapich2.3 | E0_T1 |  64 | 04:00:00 |   |   |   | economy |   |   0 |
+| new_conus12km | WRFV4.0 | intel18.0.1 | mvapich2.3 | E0_T1 |   2 |          |   |   |   |         |   |   0 |
+| new_conus12km | WRFV4.0 | intel18.0.1 | mvapich2.3 | E1_T1 |   2 |          |   |   |   |         |   |   1 |
+| maria3km      | WRFV4.0 | gnu8.1.0    | mvapich2.3 | E0_T1 | 128 | 04:00:00 |   |   |   | economy |   |   0 |
+| maria3km      | WRFV4.0 | gnu8.1.0    | mvapich2.3 | E1_T1 | 128 | 04:00:00 |   |   |   | economy |   |   1 |
+
 #+name: pending
-| Case          | WRF     | Compiler | MPI        | T     |  N |        W | P | M | O | Q       | M | Env |
-|---------------+---------+----------+------------+-------+----+----------+---+---+---+---------+---+-----|
-| new_conus12km | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 |  8 |          |   |   |   |         |   |   0 |
-| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 |  2 | 04:00:00 |   |   |   | economy |   |   0 |
-| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 |  4 | 04:00:00 |   |   |   | economy |   |   0 |
-| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 |  8 | 04:00:00 |   |   |   | economy |   |   0 |
-| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 | 16 | 04:00:00 |   |   |   | economy |   |   0 |
-| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 | 32 | 04:00:00 |   |   |   | economy |   |   0 |
-| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E0_T1 | 64 | 04:00:00 |   |   |   | economy |   |   0 |
-| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E1_T1 |  2 | 04:00:00 |   |   |   | economy |   |   1 |
-| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E1_T1 |  4 | 04:00:00 |   |   |   | economy |   |   1 |
-| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E1_T1 |  8 | 04:00:00 |   |   |   | economy |   |   1 |
-| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E1_T1 | 16 | 04:00:00 |   |   |   | economy |   |   1 |
-| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E1_T1 | 32 | 04:00:00 |   |   |   | economy |   |   1 |
-| maria3km      | WRFV4.0 | gnu8.1.0 | mvapich2.3 | E1_T1 | 64 | 04:00:00 |   |   |   | economy |   |   1 |
+| Case          | WRF     | Compiler       | MPI     | T  |  N | W | P | M | O | Q | M | Env |
+|---------------+---------+----------------+---------+----+----+---+---+---+---+---+---+-----|
+| new_conus12km | WRFV4.0 | intel18.0.1_O2 | mpt2.18 | T1 |  1 |   |   |   |   |   |   |     |
+| new_conus12km | WRFV4.0 | intel18.0.1_O2 | mpt2.18 | T1 |  2 |   |   |   |   |   |   |     |
+| new_conus12km | WRFV4.0 | intel18.0.1_O2 | mpt2.18 | T1 |  4 |   |   |   |   |   |   |     |
+| new_conus12km | WRFV4.0 | intel18.0.1_O2 | mpt2.18 | T1 |  8 |   |   |   |   |   |   |     |
+| new_conus12km | WRFV4.0 | intel18.0.1_O2 | mpt2.18 | T1 | 16 |   |   |   |   |   |   |     |
+| new_conus12km | WRFV4.0 | intel18.0.1_O2 | mpt2.18 | T1 | 32 |   |   |   |   |   |   |     |
 
 #+name: run
-| Case          | WRF     | Compiler    | MPI        | T     | N | W | P | M | O | Q | M | Env |
-|---------------+---------+-------------+------------+-------+---+---+---+---+---+---+---+-----|
-| new_conus12km | WRFV4.0 | intel18.0.1 | mvapich2.3 | E0_T1 | 8 |   |   |   |   |   |   |   0 |
+| Case          | WRF     | Compiler       | MPI     | T  |  N | W | P | M | O | Q | M | Env |
+|---------------+---------+----------------+---------+----+----+---+---+---+---+---+---+-----|
 
-#+header: :var ENV_VARS=env_vars RUN=run[7]
+#+header: :var ENV_VARS=env_vars RUN=run[2]
 #+begin_src bash :dir /ssh:cheyenne:~/ :results raw drawer
 #set -x
 CASE=${RUN[0]}
@@ -426,16 +439,15 @@ qsub $PBS_SCRIPT
 #+RESULTS:
 :RESULTS:
 #!/bin/bash
-#PBS -N maria3km-WRFV4.0-gnu8.1.0-mvapich2.3-E1_T1-N064
-#PBS -l walltime=04:00:00
-#PBS -q economy
+#PBS -N new_conus12km-WRFV4.0-intel18.0.1_O2-mpt2.18-T1-N032
+#PBS -l walltime=00:30:00
+#PBS -q regular
 #PBS -j oe
-#PBS -l select=64:ncpus=36:mpiprocs=36
+#PBS -l select=32:ncpus=36:mpiprocs=36
 
 export TMPDIR=/glade/scratch/akirak/temp
 mkdir -p /glade/scratch/akirak
 
-export MV2_CPU_BINDING_POLICY=hybrid MV2_HYBRID_BINDING_POLICY=bunch MV2_USE_THREAD_WARNING=0 MV2_USE_MCAST=1 MV2_ENABLE_SHARP=1
-./mpirun_wrf 2304
-1371572.chadmin1
+./mpirun_wrf 1152
+1385666.chadmin1
 :END:

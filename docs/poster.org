@@ -1,4 +1,4 @@
-# -*- org-latex-packages-alist: (("" "lmodern" t) ("" "exscale" t) ("" "minted" t) ("" "svg" nil) ("" "geometry" nil) ("" "fancyhdr" nil)); -*-
+# -*- org-latex-packages-alist: (("" "lmodern" t) ("" "exscale" t) ("" "svg" nil)); -*-
 #+title: WRF Scaling and Performance Assessment
 #+date: August 3, 2018
 #+author: Akira Kyle
@@ -19,8 +19,8 @@
 
 #+latex: \addtobeamertemplate{headline}{}{
 #+latex: \begin{tikzpicture}[remember picture, overlay]
-#+latex: \node [shift={(9 cm,-5.2cm)}]  at (current page.north west){
-#+latex: \includegraphics[height=3.5cm]{ncar-logo.pdf}
+#+latex: \node [shift={(11 cm,-4.3cm)}]  at (current page.north west){
+#+latex: \includegraphics[height=4.8cm]{my-ncar-logo.pdf}
 #+latex: };
 #+latex: \node [shift={(-14 cm,-4.7cm)}]  at (current page.north east){
 #+latex: \includegraphics[height=5.5cm]{NSF_4-Color_vector_Logo.pdf}
@@ -76,18 +76,18 @@ physics suite, however the 2.5 km resolution case disables ~cu_physics~. The
 Hurricane Maria benchmarks use the TROPICAL physics suite but with ~cu_physics~
 disabled and ~sf_sfclay_physics = 1~ for both resolutions.
 
-| Region | Resoultion | Horizontal |   Vertical |      Total | Time |   Run |
-|        |            | Gridpoints | Gridpoints | Gridpoints | step | Hours |
-|--------+------------+------------+------------+------------+------+-------|
-|        |        <r> |            |            |        <r> |      |       |
-| CONUS  |      12 km |        425 |        300 |    127,500 |   72 |     6 |
-| CONUS  |     2.5 km |       1901 |       1301 |  2,473,201 |   15 |     6 |
-| Maria  |       3 km |       1396 |       1384 |  1,932,064 |    9 |     3 |
-| Maria  |       1 km |       3665 |       2894 | 10,606,510 |    3 |     1 |
+#+attr_latex: :align |l||r|r|r|r|r|r|
+| Region | Resoultion | Horizontal |   Vertical | Total      |       Time |   Run |
+|        |            | Gridpoints | Gridpoints | Gridpoints | Step (Sec) | Hours |
+|--------+------------+------------+------------+------------+------------+-------|
+| CONUS  | 12 km      |        425 |        300 | 127,500    |         72 |     6 |
+| CONUS  | 2.5 km     |       1901 |       1301 | 2,473,201  |         15 |     6 |
+| Maria  | 3 km       |       1396 |       1384 | 1,932,064  |          9 |     3 |
+| Maria  | 1 km       |       3665 |       2894 | 10,606,510 |          3 |     1 |
 
 
 \vspace{-.3cm}
-**** Compilers and Message Passing Interface Libraries
+**** Compilers
      :PROPERTIES:
      :BEAMER_env: block
      :END:
@@ -118,9 +118,9 @@ flags that make a significant difference in speed. Other flags tried such as
 
 \vspace{-1.2cm}
 #+name: wrf_scaling
-#+caption: \vspace{-5cm}Comparison of Intel 18.0.1 and Gnu 8.1.0 compilers and various compile flags
-#+attr_latex: :width 0.8\linewidth
-[[file:./figs/new_conus12km_bar_compiler_fig.svg]]
+#+caption: \vspace{-5cm}Comparison of Intel 18.0.1 and Gnu 8.1.0 compilers with various compilation flags
+#+attr_latex: :height 11cm
+[[file:./figs/new_conus12km_bar_compiler_fig_stretch.svg]]
 
 *** Center column
     :PROPERTIES:
@@ -136,15 +136,15 @@ We also tested the scaling performance of several MPI implementations. Note that
 Cheyenne uses a Mellanox EDR InfiniBand high-speed interconnect with a Partial
 9D Enhanced Hypercube single-plane interconnect topology.
 
-- MPT version 2.18 (Default MPI for Cheyenne)
+- MPT version 2.18 (v2.15 is default MPI on Cheyenne)
 - MVAPICH version 2.2
 - OpenMPI version 3.1.0
 - Intel MPI version 2018.1.163
 - MPICH version 3.2
 
-We see from Figures \ref{fig:gnu-mpi} and \ref{fig:intel-mpi} that MPT,
-MVAPICH and OpenMPI all have similar performance, while MPICH has overall poor
-performance and the performance Intel MPI does not scale well to large node
+We see from Figures \ref{fig:gnu-mpi} and \ref{fig:intel-mpi} that MPT, MVAPICH
+and OpenMPI all have similar performance, while MPICH has overall poor
+performance and the performance Intel MPI does not scale well to large core
 counts.
 
 \vspace{-.5cm}
@@ -176,10 +176,10 @@ These results use the 1 km Hurricane Maria Benchmark case. We see that on
 Cheyenne the initialization and writing output times remain relatively fixed,
 only increasing slightly as you move to larger core counts. However on
 Yellowstone, the initialization time scaled much poorer at large node counts,
-eventually leading to unfeasible long jobs. This improvement in the scaling of
-the initialization time is likely due to the improvements made to WRF's
-initialization code with how the MPI calls are performed along with improvements
-in the MPI used in Cheyenne versus Yellowstone.
+eventually leading to unfeasibly long jobs. This improvement in the scaling of
+the initialization time is likely due to improvements made in the MPI
+collectives in WRF's initialization and writing output code along with
+improvements to the MPI used on Cheyenne versus Yellowstone.
 
 \vspace{-.5cm}
 #+begin_figure
@@ -203,7 +203,7 @@ in the MPI used in Cheyenne versus Yellowstone.
     :BEAMER_col: 0.30
     :END:
 
-\vspace{-.8cm}
+\vspace{-1cm}
 **** Computation Time Scaling Results
      :PROPERTIES:
      :BEAMER_env: block
@@ -213,23 +213,25 @@ that all the cases scale similarly in both Figure \ref{fig:cheyenne-scaling} on
 Cheyenne and Figure \ref{fig:yellowstone-scaling} on Yellowstone. Note that both
 axes are logarithmic, so a small distance between points corresponds to a large
 difference in values. On both Cheyenne and Yellowstone, in the high relative
-gridpoints per core region, we see that WRF has linear *strong scaling*. This
-means that WRF is making effective use of the parallel computational resources
-available to it. So increasing the number of cores a run uses, will
+gridpoints per core region, we see that WRF experiences linear *strong scaling*.
+This means that WRF is making effective use of the parallel computational
+resources available to it. So increasing the number of cores a run uses, will
 proportionately decrease WRF's computation time (however initialization and I/O
 time may increase) while about same number of total core-hours will be used for
 computation.
 
-\vspace{-.5cm}
+\vspace{-1.4cm}
 #+begin_figure
 \begin{minipage}{.5\textwidth}
   \centering
+  \hspace{-1.8cm}
   \includegraphics[width=1\linewidth]{./imgs/scalingideppresdav}
   \captionof{figure}{Computation Scaling on \textbf{Yellowstone}}
   \label{fig:yellowstone-scaling}
 \end{minipage}%
-\begin{minipage}{.5\textwidth}
+\begin{minipage}{.55\textwidth}
   \centering
+  \hspace{-2.0cm}
   \includesvg[width=1\linewidth]{./figs/cases}
   \captionof{figure}{Computation Scaling on \textbf{Cheyenne}}
   \label{fig:cheyenne-scaling}
@@ -245,28 +247,27 @@ simulation than if they had run it on fewer cores. In this low gridpoints per
 core region, MPI communication starts to dominate the actual time spent in
 computation. However on Cheyenne, we see that WRF does not significantly depart
 from this linear strong scaling at any amount of gridpoints per core. Likely
-this is due to improvements in the WRF's MPI code along with a better network
-interconnect on Cheyenne than Yellowstone along with a MPI library. Furthermore
-WRFV4.0 will refuse to run if there is a minimum patch size of less than 10 grid
-points in either direction. This limits users from running with fewer than 100
-gridpoints per core, which would likely be a very MPI communication bound region
-where WRF would depart from its linear strong scaling.
+this is due to improvements in WRF's MPI code along with a better network
+interconnect and MPI on Cheyenne than Yellowstone. Also WRFV4.0 refuses to run
+if there is a minimum patch size of less than 10 grid points in either
+direction. This limits users from running with fewer than 100 gridpoints per
+core, which would likely be a very MPI communication bound region where WRF
+would depart from its linear strong scaling.
 
 The interesting feature in Figure \ref{fig:cheyenne-scaling} in the high
 gridpoints per core region where the time steps per second seem to jump slightly
-is an artifact of the memory constraints on Cheyenne. The normal nodes on
-Cheyenne have only 64 GB of memory, which is less than on Yellowstone. WRF runs
-with too many gridpoints per node will run out of memory and be killed. The
-maximum number of gridpoints per node that will fit into the 64 GB of memory of
-that node depends on the physics parameterizations, however, we observed that
-typically the maximum is between 10^5 and 10^6 total gridpoints. Thus to obtain
-the results in the very large gridpoints per core region, we utilized Cheyenne's
-128 GB memory nodes for an additional point or two, then we undersubscribed the
-cores on each node. This undersubscription of cores is likely responsible for
-the small bump in speed observed. However we do not recommend that users
-undersubscribe cores as core-hours are charged for all cores on the node so
-undersubscription of cores will be an inefficient use of a user's core-hour
-allocation.
+is an artifact of the memory constraints on Cheyenne. There is less memory per
+core on Cheyenne than Yellowstone. WRF runs with too many gridpoints per node
+will run out of memory and be killed. The maximum number of gridpoints per node
+that will fit into the 64 GB of memory of a node on Cheyenne depends on the
+physics parameterizations, however, we observed that typically the maximum is
+between 10^5 and 10^6 total gridpoints. Thus to obtain the results in the very
+large gridpoints per core region, we utilized Cheyenne's 128 GB memory nodes for
+an additional point or two, then we undersubscribed the cores on each node. This
+undersubscription of cores is likely responsible for the small bump in speed
+observed. However we do not recommend that users undersubscribe cores as
+core-hours are charged for all cores on the node so undersubscription of cores
+will be an inefficient use of a user's core-hour allocation.
 
 Finally it's worth noting that the vertical axis between Figures
 \ref{fig:yellowstone-scaling} and \ref{fig:cheyenne-scaling} is shifted due to

@@ -46,14 +46,10 @@
 
 * Background
 ** The Weather Research and Forecast Model
-:PROPERTIES:
-:BEAMER_act: [<+->]
-:END:
-
+#+ATTR_BEAMER: :overlay <+->
 - The Weather Research and Forecast (WRF) model is a parallel mesoscale
   numerical weather forecasting application used in both operational and
   research environments.
-
 - WRF is among the more commonly run codes by atmospheric scientists on NCAR's
   Cheyenne supercomputer.
   - Thus it is very important for WRF's users to know how to obtain the best
@@ -65,10 +61,7 @@
 [[./imgs/WRF_flow_chart-ARW_v4.png]]
 
 ** Cheyenne
-:PROPERTIES:
-:BEAMER_act: [<+->]
-:END:
-
+#+ATTR_BEAMER: :overlay <+->
 - 4,032 computation nodes
  	- Dual-socket nodes, 18 cores per socket
     - 145,152 total processor cores
@@ -84,10 +77,7 @@
   - Latency: MPI ping-pong < 1 µs; hardware link 130 ns
 
 ** Benchmark cases
-:PROPERTIES:
-:BEAMER_act: [<+->]
-:END:
-
+#+ATTR_BEAMER: :overlay <+->
 - Official CONUS (Contiguous United States) benchmarks for WRF
   only ran on WRF versions 3.8.1 or prior.
 - Wanted to benchmark most recent version of WRF (4.0), so we had to update the
@@ -101,28 +91,27 @@
       resolutions.
 
 ** Summary of Benchmark Cases
-
+*** col
+  :PROPERTIES:
+  :BEAMER_col: 1.1
+  :END:
 \footnotesize
 #+attr_latex: :align |l||r|r|r|r|r|r|
-| Region | Resoultion | Horizontal |   Vertical |      Total | Time |   Run |
-|        |            | Gridpoints | Gridpoints | Gridpoints | step | Hours |
-|--------+------------+------------+------------+------------+------+-------|
-| CONUS  |      12 km |        425 |        300 |    127,500 |   72 |     6 |
-| CONUS  |     2.5 km |       1901 |       1301 |  2,473,201 |   15 |     6 |
-| Maria  |       3 km |       1396 |       1384 |  1,932,064 |    9 |     3 |
-| Maria  |       1 km |       3665 |       2894 | 10,606,510 |    3 |     1 |
-
+| Region | Resoultion | Horizontal |   Vertical | Total      | Time    | Run   |
+|        |            | Gridpoints | Gridpoints | Gridpoints | Step    | Time  |
+|--------+------------+------------+------------+------------+---------+-------|
+| CONUS  | 12 km      |        425 |        300 | 127,500    | 72 secs | 6 hrs |
+| CONUS  | 2.5 km     |       1901 |       1301 | 2,473,201  | 15 secs | 6 hrs |
+| Maria  | 3 km       |       1396 |       1384 | 1,932,064  | 9 secs  | 3 hrs |
+| Maria  | 1 km       |       3665 |       2894 | 10,606,510 | 3 secs  | 1 hrs |
 
 * Compilers
 ** Compiler Options
-:PROPERTIES:
-:BEAMER_act: [<+->]
-:END:
-
+#+ATTR_BEAMER: :overlay <+->
 - GNU Compiler Collection (GCC) versions 6.3.0, 8.1.0
   - WRF compiles with ~-O2~ by default
   - ~-O3~ : enables all ~-O2~ optimization along with optimizations such as
-    function inlining and loop vectorization
+    function inlining and loop vectorization and more aggressive loop unrolling
   - ~-Ofast~ : enables all ~-O3~ optimizations along with disregarding strict
     standards compliance (such is for floating point operations)
   - ~-mfma~ : enables Fused Multiply-Add instruction set
@@ -134,35 +123,47 @@
   - ~-fp-model fast=2~ : similar to GNU's ~-Ofast~ optimization
 
 ** Compiler Performance Results
-
 \setlength{\abovecaptionskip}{-0.1cm}
 \vspace{-0.6cm}
 #+caption: Comparison of Intel 18.0.1 and Gnu 8.1.0 compilers with various compilation flags normalized to default Intel WRF compilation
-#+attr_latex: :width 0.85\linewidth
+#+attr_latex: :width 0.80\linewidth
 [[file:./figs/new_conus12km_bar_compiler_fig.svg]]
 
 \footnotesize
-\vspace{-0.8cm}
+\vspace{-0.6cm}
 #+begin_center
 Runs made using CONUS 12 km Benchmark Case on 2 Nodes
 #+end_center
 
-** Compiler Performance Summary
-- Intel compiler is consistently 25-30% faster than the Gnu compiler across all
-  flags tried.
-- We also see that for both Intel and Gnu, the ~-Ofast~ (for Gnu) or ~-fp-model
-  fast=2~ (for Intel) are the only flags that make a significant difference in
-  speed.
-- Other flags tried such as ~-mfma~ or ~-march=native~ ~-Xhost~ made little to
-  no difference in WRF's speed.
+** Compiler Performance Results
+\vspace{-0.6cm}
+#+attr_latex: :width 0.80\linewidth
+[[file:./figs/new_conus12km_bar_compiler_fig.svg]]
+
+\vspace{-0.4cm}
+#+begin_overprint
+#+BEAMER: \onslide<+>
+Intel compiler is consistently 25-30% faster than the Gnu compiler across all
+flags tried.
+
+#+BEAMER: \onslide<+>
+We also see that for both Intel and Gnu, the ~-Ofast~ (for Gnu) or ~-fp-model
+fast=2~ (for Intel) are the only flags that make a significant difference in
+speed.
+
+#+BEAMER: \onslide<+>
+Other flags tried such as ~-mfma~ or ~-march=native~ ~-Xhost~ made little to no
+difference in WRF's speed.
+
+#+BEAMER: \onslide<+>
+WRF has compilation option (66) which enables ~-fp-model fast=2~ and ~-Xhost~
+and a few other flags.
+#+end_overprint
 
 * Message Passing Interface Libraries
 ** MPIs Tested on Cheyenne
-:PROPERTIES:
-:BEAMER_act: [<+->]
-:END:
-
-- SGI's MPT version 2.18 (Default MPI for Cheyenne)
+#+ATTR_BEAMER: :overlay <+->
+- SGI's MPT version 2.18 (v2.15 is default MPI on Cheyenne)
 - Ohio State University's MVAPICH version 2.2
 - OpenMPI version 3.1.0
 - Intel MPI version 2018.1.163
@@ -173,7 +174,7 @@ Runs made using CONUS 12 km Benchmark Case on 2 Nodes
   :PROPERTIES:
   :BEAMER_col: 0.56
   :END:
-
+\vspace{-0.2cm}
 #+caption: MPI comparison using \hspace{1cm} *Gnu 8.1.0*
 #+attr_latex: :width 1.0\linewidth
 [[file:./figs/new_conus12km_gnu_mpi.svg]]
@@ -182,7 +183,7 @@ Runs made using CONUS 12 km Benchmark Case on 2 Nodes
   :PROPERTIES:
   :BEAMER_col: 0.56
   :END:
-
+\vspace{-0.2cm}
 #+caption: MPI comparison using \hspace{1cm} *Intel 18.0.1*
 #+attr_latex: :width 1.0\linewidth
 [[file:./figs/new_conus12km_intel_mpi.svg]]
@@ -192,12 +193,35 @@ Runs made using CONUS 12 km Benchmark Case on 2 Nodes
   :ignoreheading:
   :END:
 \footnotesize
-\vspace{-1.1cm}
+\vspace{-0.9cm}
 #+begin_center
 Runs made using CONUS 12 km Benchmark Case
 #+end_center
 
-** MPI Comparison Summary
+** MPI Comparison Results
+*** Left col
+  :PROPERTIES:
+  :BEAMER_col: 0.56
+  :END:
+\vspace{-0.095cm}
+#+attr_latex: :width 1.0\linewidth
+[[file:./figs/new_conus12km_gnu_mpi.svg]]
+
+*** Right col
+  :PROPERTIES:
+  :BEAMER_col: 0.56
+  :END:
+\vspace{-0.095cm}
+#+attr_latex: :width 1.0\linewidth
+[[file:./figs/new_conus12km_intel_mpi.svg]]
+
+*** 
+  :PROPERTIES:
+  :ignoreheading:
+  :END:
+
+\vspace{-0.6cm}
+#+ATTR_BEAMER: :overlay <+->
 - MPT, MVAPICH and OpenMPI all have similar performance.
 - MPICH has overall poor performance and the performance.
 - Intel MPI does not scale well to large node counts.
@@ -208,9 +232,8 @@ Runs made using CONUS 12 km Benchmark Case
   :PROPERTIES:
   :BEAMER_col: 0.53
   :END:
-
 \vspace{-.5cm}
-#+caption: Run Time Scaling on *Yellowstone*
+#+caption: WRF V3.3 Run Time Scaling on *Yellowstone*
 #+name: yellowstone-run-time
 #+attr_latex: :width 1.0\linewidth
 [[file:./imgs/timingdav.png]]
@@ -219,9 +242,9 @@ Runs made using CONUS 12 km Benchmark Case
   :PROPERTIES:
   :BEAMER_col: 0.55
   :END:
-
+\setlength{\abovecaptionskip}{-0.15cm}
 \vspace{-.5cm}
-#+caption: Run Time Scaling on *Cheyenne*
+#+caption: WRF V4.0 Run Time Scaling on *Cheyenne*
 #+name: cheyenne-run-time
 #+attr_latex: :width 1.0\linewidth
 [[file:./figs/maria1km_runtime.svg]]
@@ -231,34 +254,60 @@ Runs made using CONUS 12 km Benchmark Case
   :ignoreheading:
   :END:
 \footnotesize
-\vspace{-1.3cm}
+\vspace{-1.0cm}
 #+begin_center
 Runs made using Hurricane Maria 1 km Benchmark case.
 #+end_center
-** Run Time Discussion
-:PROPERTIES:
-:BEAMER_act: [<+->]
-:END:
 
-- In Fig [[cheyenne-run-time]] for Cheyenne the initialization and writing output
-  times remain relatively fixed, only increasing slightly as you move to larger
-  core counts.
-- In Fig [[yellowstone-run-time]] for Yellowstone, the initialization time scaled
-  much poorer at large node counts, eventually leading to unfeasible long jobs.
-  - This improvement in the scaling of the initialization time is likely due to
-    the improvements made to WRF's initialization code with how the MPI calls
-    are performed along with improvements in the MPI used in Cheyenne versus
-    Yellowstone.
-
-* Computation Time Scaling
-** Computation Time Scaling Results
-
+** Run Time Scaling Comparison
 *** Left col
   :PROPERTIES:
   :BEAMER_col: 0.53
   :END:
+\vspace{-.785cm}
+#+attr_latex: :width 1.0\linewidth
+[[file:./imgs/timingdav.png]]
 
-#+caption: Computation Scaling on *Yellowstone*
+*** Right col
+  :PROPERTIES:
+  :BEAMER_col: 0.55
+  :END:
+\vspace{-.395cm}
+#+attr_latex: :width 1.0\linewidth
+[[file:./figs/maria1km_runtime.svg]]
+
+*** 
+  :PROPERTIES:
+  :ignoreheading:
+  :END:
+
+\vspace{-0.8cm}
+#+begin_overprint
+#+BEAMER: \onslide<+>
+On Yellowstone (Fig [[yellowstone-run-time]]), the initialization time scaled much
+poorer at large node counts, eventually leading to unfeasibly long jobs.
+
+#+BEAMER: \onslide<+>
+On Cheyenne (Fig [[cheyenne-run-time]]), the initialization and writing output times
+remain relatively fixed, only increasing slightly as you move to larger core
+counts.
+
+#+BEAMER: \onslide<+>
+\small
+This improvement in the scaling of the initialization time is likely due to
+improvements made in the MPI collectives in WRF's initialization and writing
+output code along with improvements to the MPI used on Cheyenne versus
+Yellowstone.
+#+end_overprint
+
+* Computation Time Scaling
+** Computation Time Scaling Results
+*** Left col
+  :PROPERTIES:
+  :BEAMER_col: 0.53
+  :END:
+\vspace{-0.9cm}
+#+caption: WRF V3.3 Computation Scaling on *Yellowstone*
 #+name: yellowstone-scaling
 #+attr_latex: :width 1.0\linewidth
 [[file:./imgs/scalingideppresdav.png]]
@@ -267,67 +316,100 @@ Runs made using Hurricane Maria 1 km Benchmark case.
   :PROPERTIES:
   :BEAMER_col: 0.58
   :END:
-
-#+caption: Computation Scaling on *Cheyenne*
+\vspace{-0.9cm}
+#+caption: WRF V4.0 Computation \hspace{.5cm} Scaling on *Cheyenne*
 #+name: cheyenne-scaling
 #+attr_latex: :width 1.0\linewidth
 [[file:./figs/cases.svg]]
 
+** Computation Time Scaling Results
+*** Left col
+  :PROPERTIES:
+  :BEAMER_col: 0.53
+  :END:
+\vspace{-0.47cm}
+#+attr_latex: :width 1.0\linewidth
+[[file:./imgs/scalingideppresdav.png]]
 
-** Computation Time Scaling Discussion
-:PROPERTIES:
-:BEAMER_act: [<+->]
-:END:
+*** Right col
+  :PROPERTIES:
+  :BEAMER_col: 0.58
+  :END:
+\vspace{-0.47cm}
+#+attr_latex: :width 1.0\linewidth
+[[file:./figs/cases.svg]]
 
-- Large number of gridpoints per core region:
-  - In both Fig [[yellowstone-scaling]] on Yellowstone and Fig [[cheyenne-scaling]] on
-    Cheyenne, WRF experiences linear *strong scaling*
-    - Increasing number of cores will proportionately decrease computation time
-      while the same number of total core-hours will be used for computation
-- Small number of gridpoints per core region:
-  - In Fig [[yellowstone-scaling]] on Yellowstone, WRF departs from the linear
-    strong scaling relationship.
-    - Runs in this region would use more core-hours to run the same simulation
-      than if they had been run on fewer cores
-    - MPI communication dominates the actual time spent in computation
-  - In Fig [[cheyenne-scaling]] on Cheyenne, WRF does not significantly depart from
-    linear strong scaling
-    - Likely due to improvements in WRF's MPI code along and a better network
-      interconnect on Cheyenne than Yellowstone
+*** 
+  :PROPERTIES:
+  :ignoreheading:
+  :END:
 
-** Additional Considerations
-:PROPERTIES:
-:BEAMER_act: [<+->]
-:END:
+*** 
+  :PROPERTIES:
+  :BEAMER_col: 1.1
+  :END:
 
-\vspace{-0.3cm}
-- Starting with V4.0, WRF refuses to run with a minimum patch size of less than
-  10 grid points in either direction
-  - Prevents users from running with fewer than 100 gridpoints per core where
-    WRF computation would be very MPI bound
-- Normal nodes on Cheyenne have only 64 GB of memory, less than on Yellowstone
-  - WRF runs with too many gridpoints per node will run out of memory and be
-    killed
-    - Typically the max gridpoints per node that will fit into memory the is
-      between 10^5 and 10^6 total gridpoints but it depends on the physics
-      parameterizations
-  - The points in very large gridpoints per core region in Fig [[cheyenne-scaling]]
-    for Cheyenne, used the 128 GB memory nodes and undersubscribed the cores on
-    each node.
-    - Undersubscription of cores is likely responsible for the small bump in
-      speed observed
-    - Undersubscription of cores is an inefficient use of a user's core-hour
-      allocation and users should in general not do this
+\vspace{-0.65cm}
+#+begin_overprint
+\small
+\linespread{1.0}
+\setlength{\itemsep}{0cm}
+\setlength{\parskip}{0cm}
+
+#+BEAMER: \onslide<+>
+Large number of gridpoints per core region:\vspace{-.2cm}
+- On both Yellowstone (Fig [[yellowstone-scaling]]) and Cheyenne
+  (Fig [[cheyenne-scaling]]) WRF experiences linear *strong scaling*\vspace{-.2cm}
+- Increasing number of cores will proportionately decrease
+  computation time while the same number of total core-hours will be used for
+  computation
+
+#+BEAMER: \onslide<+>
+Small number of gridpoints per core region:\vspace{-.2cm}
+- On Yellowstone (Fig [[yellowstone-scaling]]), WRF departs from linear strong
+  scaling\vspace{-.2cm}
+  - Runs in this region would use more core-hours to run the
+    same simulation than if they had been run on fewer cores
+  - MPI communication dominates the actual time spent in
+    computation
+
+#+BEAMER: \onslide<+>
+Small number of gridpoints per core region:\vspace{-.2cm}
+- On Cheyenne (Fig [[cheyenne-scaling]]), WRF doesn't significantly depart from
+  linear strong scaling
+  - Likely due to improvements in WRF's MPI code along and a better network
+    interconnect on Cheyenne than Yellowstone
+
+#+BEAMER: \onslide<+>
+Starting with V4.0, WRF refuses to run with a minimum patch size of less than 10
+grid points in either direction
+- Prevents users from running with fewer than 100 gridpoints per core where WRF
+  computation would be very MPI bound
+
+#+BEAMER: \onslide<+>
+Cheyenne has ~1.78 GB of memory/core which is ~12% less than
+Yellowstone\vspace{-.2cm}
+- Runs with too many gridpoints/node will run out of memory and be
+  killed\vspace{-.2cm}
+- Typically the max gridpoints/node that will fit into memory the is between
+  10^5 and 10^6 total gridpoints but it depends on the physics parameterizations
+
+#+BEAMER: \onslide<+>
+Runs in the very large gridpoints per core region on Cheyenne (Fig
+[[cheyenne-scaling]]) used the 128 GB memory nodes and/or undersubscribed the cores
+on each node\vspace{-.2cm}
+- This causes the small bump in speed observed starting around 10^5
+  gridpoints/core\vspace{-.2cm}
+- Undersubscribing cores is an inefficient use of a user's core-hour allocation
+#+end_overprint
+
 
 * MVAPICH Scaling
 ** MVAPICH Runtime Options
-:PROPERTIES:
-:BEAMER_act: [<+->]
-:END:
-
-- Interested in MVAPICH as a potential future default MPI
+#+ATTR_BEAMER: :overlay <+->
+- Interested in MVAPICH as a potential default MPI for the next NCAR
+  supercomputing system
 - MVAPICH developed for InfiniBand networks
-
 - Tried setting some runtime environment variables:
   - BIND
     - ~MV2_CPU_BINDING_POLICY=hybrid~
@@ -350,32 +432,45 @@ Runs made using Hurricane Maria 1 km Benchmark case.
   :PROPERTIES:
   :BEAMER_col: 1.1
   :END:
-#+caption: MVAPICH Maria 1km Init and Write Scaling
+#+caption: MVAPICH Maria 3km Init and Write Scaling
 #+attr_latex: :width 1.0\linewidth
 [[file:./figs/mvapich-io-maria3km.svg]]
 
 * Conclusion
 ** Summary
+
+#+ATTR_BEAMER: :overlay <+->
 - Intel compiler consistently faster than Gnu compiler
   - Users should use ~-fp-model fast=2~ or ~-Ofast~ for a modest performance
     increase
 - MPT, OpenMPI, and MVAPICH show similar performance while Intel MPI and MPICH
   have poorer performance
 - WRF's initialization and writing time show improvements compared to previous
-  results on Yellowstone with a previous WRF version
+  results on Yellowstone with a previous WRF version due to better MPI
+  collectives.
 - WRF V4.0 scales well across entire run-able region
   - Will run out of memory on runs with too many of gridpoints per core
   - WRF will prevent runs with too few of gridpoints per core
 
 ** Acknowledgments
-- Davide Del Vento
-- Brian Vanderwende
-- Alessandro Fanfarillo
-- Negin Sobhani
-
-- The SIParCS Program
+- Mentors
+  - Davide Del Vento
+  - Brian Vanderwende
+  - Alessandro Fanfarillo
+  - Negin Sobhani
+- Project Partner
+  - Dixit Patel
+- The SIParCS Program and Admins
+  - Rich Loft
   - AJ Lauer
   - Jenna Preston
   - Eliott Foust
-  - Rich Loft
+  - Valerie Sloan
   - Shilo Hall
+** Project Git Repository
+All the results presented here along with the benchmarking scripts, WRF
+namelists, analysis code, and more can be found in the git repository for this
+project:
+
+[[https://github.com/akirakyle/WRF_benchmarks]]
+
